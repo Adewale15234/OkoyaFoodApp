@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<a href="{{ url_for('dashboard') }}" class="back-link">← Back to Dashboard</a>
+
+<h1>Attendance History</h1>
+
+<table>
+    <tr>
+        <th>Worker Name</th>
+        <th>Date</th>
+        <th>Attendance Status</th>
+    </tr>
+    {% for record in attendance_records %}
+    <tr>
+        <td>{{ record.worker.name }}</td>
+        <td>{{ record.date }}</td>
+        <td>{{ record.status }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

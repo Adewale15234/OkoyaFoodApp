@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="dashboard-container">
+    <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="dashboard-logo">
+
+    <h2 class="greeting">👋 Hello, Admin! Welcome back.</h2>
+    <p class="today-date">📅 Today: <span id="todayDate"></span></p>
+
+<!-- Theme Switchers -->
+<div class="theme-controls">
+    <button onclick="setTheme('light')">☀️ Light</button>
+    <button onclick="setTheme('dark')">🌙 Dark</button>
+    <button onclick="setTheme('blue')">🔵 Blue</button>
+    <button onclick="setTheme('red')">🔴 Red</button>
+</div>
+    <h1>Welcome to Okoya Food Staff Manager</h1>
+
+    <nav class="dashboard-nav">
+        <a href="{{ url_for('register_worker') }}">📋 Register Worker</a>
+        <a href="{{ url_for('attendance') }}">🕒 Mark Attendance</a>
+        <a href="{{ url_for('salary') }}">💰 Record Salary</a>
+        <a href="{{ url_for('attendance_history') }}">📅 Attendance History</a>
+        <a href="{{ url_for('salary_history') }}">🧾 Salary History</a>
+        <a href="{{ url_for('workers_name') }}">👥 View Registered Workers</a>
+        <a href="{{ url_for('logout') }}" class="logout-btn">🚪 Logout</a>
+    </nav>
+</div>
+
+<script>
+    // Format and display today's date
+    document.addEventListener('DOMContentLoaded', function () {
+        const today = new Date();
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById('todayDate').textContent = today.toLocaleDateString('en-US', options);
+
+        // Apply saved theme if available
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+            document.body.className = 'theme-' + savedTheme;
+        }
+    });
+
+    // Theme switcher function
+    function setTheme(theme) {
+        document.body.className = 'theme-' + theme;
+        localStorage.setItem('theme', theme);
+    }
+</script>
+{% endblock %}

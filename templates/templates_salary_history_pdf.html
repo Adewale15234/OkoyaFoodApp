@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Salary History PDF</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            border: 1px solid #555;
+            padding: 6px;
+            text-align: left;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Salary History</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Staff ID</th>
+                <th>Name</th>
+                <th>Total Days</th>
+                <th>Daily Rate (₦)</th>
+                <th>Amount (₦)</th>
+                <th>Payment Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for record in salary_records %}
+            <tr>
+                <td>{{ record.worker.staff_id }}</td>
+                <td>{{ record.worker.name }}</td>
+                <td>{{ record.total_days_present }}</td>
+                <td>{{ "{:.2f}".format(record.daily_rate) }}</td>
+                <td>{{ "{:.2f}".format(record.amount) }}</td>
+                <td>{{ record.payment_date.strftime('%Y-%m-%d') }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

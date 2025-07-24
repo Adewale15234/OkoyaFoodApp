@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Salary</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Salary</h1>
+    <a href="{{ url_for('dashboard') }}" class="back-link">← Back to Dashboard</a>
+
+    <table border="1" cellpadding="8" cellspacing="0">
+        <tr>
+            <th>Worker Name</th>
+            <th>Total Days Present</th>
+            <th>Daily Rate (₦)</th>
+            <th>Total Salary (₦)</th>
+            <th>Action</th>
+        </tr>
+        {% for worker in salary_data %}
+        <tr>
+            <form method="post">
+                <td>{{ worker.name }}</td>
+                <td>{{ worker.total_days_present }}</td>
+                <td>
+                    <input type="number" name="daily_rate" step="0.01" required>
+                    <input type="hidden" name="worker_id" value="{{ worker.id }}">
+                </td>
+                <td>--</td>
+                <td>
+                    <input type="submit" value="Save Salary">
+                </td>
+            </form>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

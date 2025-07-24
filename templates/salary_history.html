@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Salary History</title>
+</head>
+<body>
+    <h2>Salary History</h2>
+
+    <nav>
+        <a href="{{ url_for('dashboard') }}">Dashboard</a> |
+        <a href="{{ url_for('logout') }}">Logout</a> |
+        <a href="{{ url_for('print_salary_history_pdf') }}">🖨️ Print as PDF</a>
+    </nav>
+
+    {% if salary_records %}
+        <table border="1" cellpadding="8" cellspacing="0">
+            <thead>
+                <tr>
+                    <th>Staff ID</th>
+                    <th>Name</th>
+                    <th>Amount Paid (₦)</th>
+                    <th>Payment Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in salary_records %}
+                    <tr>
+                        <td>{{ record.worker.id }}</td>
+                        <td>{{ record.worker.name }}</td>
+                        <td>₦{{ record.amount }}</td>
+                        <td>{{ record.payment_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No salary records available.</p>
+    {% endif %}
+</body>
+</html>
