@@ -1,3 +1,4 @@
+from flask_migrate import Migrate
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
@@ -10,29 +11,45 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 
-class Worker(db.Model):
+# Do NOT include: from app import db
+
+class Worker(db.Model): 
+    __tablename__ = 'workers'
+
     id = db.Column(db.Integer, primary_key=True)
+    worker_code = db.Column(db.String(10), unique=True, nullable=True)  # NEW FIELD
     name = db.Column(db.String(100), nullable=False)
     phone_number = db.Column(db.String(20), nullable=False)
-    date_of_birth = db.Column(db.DateTime, nullable=False)
+    date_of_birth = db.Column(db.Date, nullable=False)
     gender = db.Column(db.String(10), nullable=False)
     qualifications = db.Column(db.String(100), nullable=False)
     position = db.Column(db.String(100), nullable=False)
-    date_of_employment = db.Column(db.DateTime, nullable=False)
+    national_id = db.Column(db.String(50), nullable=False)
+    nationality = db.Column(db.String(50), nullable=False)
+    home_address = db.Column(db.String(200), nullable=False)
+    ethnic_group = db.Column(db.String(50), nullable=False)
+    place_of_residence = db.Column(db.String(100), nullable=False)
+    disability = db.Column(db.String(100))  # Optional
+    email = db.Column(db.String(100), nullable=False)
+    date_of_employment = db.Column(db.Date, nullable=False)
 
     attendance_records = db.relationship('Attendance', backref='worker', lazy=True, cascade="all, delete")
     salary_records = db.relationship('Salary', backref='worker', lazy=True, cascade="all, delete")
 
+    def __repr__(self):
+        return f"<Worker {self.name}>"
+
 class Attendance(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    worker_id = db.Column(db.Integer, db.ForeignKey('worker.id'), nullable=False)
+    worker_id = db.Column(db.Integer, db.ForeignKey('workers.id'), nullable=False)
     date = db.Column(db.DateTime, nullable=False, default=db.func.current_timestamp())
     status = db.Column(db.String(10), nullable=False)
 
 class Salary(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    worker_id = db.Column(db.Integer, db.ForeignKey('worker.id'), nullable=False)
+    worker_id = db.Column(db.Integer, db.ForeignKey('workers.id'), nullable=False)
     total_days_present = db.Column(db.Integer, nullable=False)
     daily_rate = db.Column(db.Float, nullable=False)
     amount = db.Column(db.Float, nullable=False)
@@ -69,32 +86,45 @@ def dashboard():
     # your dashboard logic here
     return render_template('dashboard.html')
 
+from datetime import datetime
+from flask import Flask, render_template, request, redirect, url_for, flash
+from flask_sqlalchemy import SQLAlchemy
+
+
 @app.route('/register_worker', methods=['GET', 'POST'])
 def register_worker():
-    if not session.get('admin'):
-        return redirect(url_for('login'))
-
     if request.method == 'POST':
         try:
-            dob = datetime.strptime(request.form['date_of_birth'], '%Y-%m-%d')
-            doe = datetime.strptime(request.form['date_of_employment'], '%Y-%m-%d')
-        except ValueError:
-            flash('Enter valid dates for DOB and employment.')
-            return render_template('register_worker.html')
+            new_worker = Worker(
+                name=request.form['name'],
+                phone_number=request.form['phone_number'],
+                date_of_birth=datetime.strptime(request.form['date_of_birth'], "%Y-%m-%d"),
+                gender=request.form['gender'],
+                qualifications=request.form['qualifications'],
+                position=request.form['position'],
+                national_id=request.form['national_id'],
+                nationality=request.form['nationality'],
+                home_address=request.form['home_address'],
+                ethnic_group=request.form['ethnic_group'],
+                place_of_residence=request.form['place_of_residence'],
+                disability=request.form.get('disability', ''),  # Optional
+                email=request.form['email'],
+                date_of_employment=datetime.strptime(request.form['date_of_employment'], "%Y-%m-%d")
+            )
 
-        w = Worker(
-            name=request.form['name'],
-            phone_number=request.form['phone_number'],
-            date_of_birth=dob,
-            gender=request.form['gender'],
-            qualifications=request.form['qualifications'],
-            position=request.form['position'],
-            date_of_employment=doe
-        )
-        db.session.add(w)
-        db.session.commit()
-        flash('Worker registered successfully.')
-        return redirect(url_for('dashboard'))
+            db.session.add(new_worker)
+            db.session.commit()
+
+            # Generate and assign worker_code after we have an ID
+            new_worker.worker_code = f"WK{new_worker.id:03d}"
+            db.session.commit()
+
+            flash('Worker registered successfully!')
+            return redirect(url_for('dashboard'))
+
+        except Exception as e:
+            db.session.rollback()
+            return f"Error registering worker: {e}", 500
 
     return render_template('register_worker.html')
 
@@ -202,4 +232,5 @@ if __name__ == '__main__':
     os.makedirs('database', exist_ok=True)
     with app.app_context():
         db.create_all()
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
+
