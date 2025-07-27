@@ -233,16 +233,20 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database/site.db'
+
+# ✅ Use a clear absolute path for SQLite DB
+db_path = os.path.join(os.getcwd(), 'database', 'site.db')
+app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
 db = SQLAlchemy(app)
 
-# ✅ Always create the folder
-os.makedirs('database', exist_ok=True)
+# ✅ Make sure the directory exists BEFORE db.create_all()
+os.makedirs(os.path.dirname(db_path), exist_ok=True)
 
-# ✅ Always create all tables (even on Render)
 with app.app_context():
     db.create_all()
 
-# 🟢 Only run this locally
+# 🟢 Run only locally
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
