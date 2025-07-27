@@ -20,7 +20,7 @@
         <tr>
             <form method="post">
                 <td>{{ worker.name }}</td>
-                <td>{{ worker.total_days_present }}</td>
+                <td>{{ worker.total_days_present or 0 }}</td>
                 <td>
                     <input type="number" name="daily_rate" step="0.01" required>
                     <input type="hidden" name="worker_id" value="{{ worker.id }}">

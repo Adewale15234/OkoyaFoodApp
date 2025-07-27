@@ -3,18 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <title>Salary History</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        nav {
+            margin-bottom: 15px;
+        }
+        .no-print {
+            margin-top: 15px;
+        }
+        @media print {
+            .no-print {
+                display: none;
+            }
+        }
+    </style>
 </head>
 <body>
     <h2>Salary History</h2>
 
-    <nav>
+    <nav class="no-print">
         <a href="{{ url_for('dashboard') }}">Dashboard</a> |
         <a href="{{ url_for('logout') }}">Logout</a> |
-        <a href="{{ url_for('print_salary_history_pdf') }}">🖨️ Print as PDF</a>
+        <a href="#" onclick="window.print()">🖨️ Print This Page</a>
     </nav>
 
     {% if salary_records %}
-        <table border="1" cellpadding="8" cellspacing="0">
+        <table>
             <thead>
                 <tr>
                     <th>Staff ID</th>
@@ -26,7 +49,7 @@
             <tbody>
                 {% for record in salary_records %}
                     <tr>
-                        <td>{{ record.worker.id }}</td>
+                        <td>{{ record.worker.worker_code }}</td>
                         <td>{{ record.worker.name }}</td>
                         <td>₦{{ record.amount }}</td>
                         <td>{{ record.payment_date.strftime('%Y-%m-%d %H:%M') }}</td>
