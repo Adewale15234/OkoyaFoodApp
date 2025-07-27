@@ -228,9 +228,21 @@ def delete_worker(worker_id):
     flash(f"Deleted {worker.name} successfully.")
     return redirect(url_for('workers_name'))
 
-if __name__ == '__main__':
-    os.makedirs('database', exist_ok=True)
-    with app.app_context():
-        db.create_all()
-    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
+import os
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
 
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database/site.db'
+db = SQLAlchemy(app)
+
+# ✅ Always create the folder
+os.makedirs('database', exist_ok=True)
+
+# ✅ Always create all tables (even on Render)
+with app.app_context():
+    db.create_all()
+
+# 🟢 Only run this locally
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
