@@ -60,11 +60,9 @@ class Salary(db.Model):
     daily_rate = db.Column(db.Float, nullable=False)
     amount = db.Column(db.Float, nullable=False)
     payment_date = db.Column(db.DateTime, nullable=False, default=db.func.current_timestamp())
+# You should set ADMIN_PASSWORD_HASH in Render environment variables!
+admin_password_hash = os.getenv('ADMIN_PASSWORD_HASH') or generate_password_hash('Alayinde001', method='pbkdf2:sha256')
 
-# ✅ Admin password hash (demo)
-admin_password_hash = generate_password_hash('Alayinde001', method='pbkdf2:sha256')
-
-# ✅ Routes
 @app.route('/')
 def home():
     return redirect(url_for('dashboard' if 'admin' in session else 'login'))
@@ -77,9 +75,10 @@ def login():
         password = request.form['password']
         if username == 'admin' and check_password_hash(admin_password_hash, password):
             session['admin'] = username
+            session.permanent = True
             return redirect(url_for('dashboard'))
         else:
-            error = 'Invalid username or password.'
+            error = 'Invalid credentials.'
     return render_template('login.html', error=error)
 
 @app.route('/logout')

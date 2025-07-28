@@ -1,12 +1,21 @@
-<form method="POST">
-    <label>Username:</label>
-    <input type="text" name="username" required><br>
-    
-    <label>Password:</label>
-    <input type="password" name="password" required><br>
-
-    <input type="submit" value="Login">
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+</head>
+<body>
+    <h2>Admin Login</h2>
     {% if error %}
         <p style="color: red;">{{ error }}</p>
     {% endif %}
-</form>
+    <form method="POST">
+        <label>Username:</label><br>
+        <input type="text" name="username" required><br><br>
+
+        <label>Password:</label><br>
+        <input type="password" name="password" required><br><br>
+
+        <button type="submit">Login</button>
+    </form>
+</body>
+</html>
