@@ -61,8 +61,9 @@ class Salary(db.Model):
     amount = db.Column(db.Float, nullable=False)
     payment_date = db.Column(db.DateTime, nullable=False, default=db.func.current_timestamp())
 
-# You should set ADMIN_PASSWORD_HASH in Render environment variables!
-admin_password_hash = os.getenv('ADMIN_PASSWORD_HASH') or generate_password_hash('Alayinde001', method='pbkdf2:sha256')
+Can# Remove hash and environment variable stuff
+USERNAME = 'admin'
+PASSWORD = 'Alayinde001'
 
 @app.route('/')
 def home():
@@ -74,7 +75,7 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        if username == 'admin' and check_password_hash(admin_password_hash, password):
+        if username == USERNAME and password == PASSWORD:
             session['admin'] = username
             session.permanent = True
             return redirect(url_for('dashboard'))
