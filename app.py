@@ -60,6 +60,7 @@ class Salary(db.Model):
     daily_rate = db.Column(db.Float, nullable=False)
     amount = db.Column(db.Float, nullable=False)
     payment_date = db.Column(db.DateTime, nullable=False, default=db.func.current_timestamp())
+
 # You should set ADMIN_PASSWORD_HASH in Render environment variables!
 admin_password_hash = os.getenv('ADMIN_PASSWORD_HASH') or generate_password_hash('Alayinde001', method='pbkdf2:sha256')
 
