@@ -226,6 +226,12 @@ def create_tables():
 # Call it globally (for Render)
 create_tables()
 
+# Route to serve favicon.ico from static folder
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(os.path.join(app.root_path, 'static'),
+                               'favicon.ico', mimetype='image/vnd.microsoft.icon')
+
 # Optional: Global error handler for debugging 500s on Render
 @app.errorhandler(Exception)
 def handle_exception(e):
