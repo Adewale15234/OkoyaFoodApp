@@ -1,35 +1,39 @@
 {% extends 'base.html' %}
 {% block content %}
-<h2>Salary History</h2>
+<h2 class="print-area">Salary History</h2>
+
 <nav class="no-print">
     <a href="{{ url_for('dashboard') }}">Dashboard</a> |
     <a href="{{ url_for('logout') }}">Logout</a> |
     <a href="#" onclick="window.print()">🖨️ Print This Page</a>
 </nav>
-{% if salary_records %}
-    <table>
-        <thead>
-            <tr>
-                <th>Worker ID</th>
-                <th>Name</th>
-                <th>Total Days Present</th>
-                <th>Amount Paid (₦)</th>
-                <th>Payment Date</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for record in salary_records %}
+
+<div class="print-area">
+    {% if salary_records %}
+        <table>
+            <thead>
                 <tr>
-                    <td>{{ "WKD%03d"|format(record.worker.id) }}</td>
-                    <td>{{ record.worker.name }}</td>
-                    <td>{{ record.total_days_present }}</td>
-                    <td>₦{{ "%.2f"|format(record.amount) }}</td>
-                    <td>{{ record.payment_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <th>Worker ID</th>
+                    <th>Name</th>
+                    <th>Total Days Present</th>
+                    <th>Amount Paid (₦)</th>
+                    <th>Payment Date</th>
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-{% else %}
-    <p>No salary records available.</p>
-{% endif %}
+            </thead>
+            <tbody>
+                {% for record in salary_records %}
+                    <tr>
+                        <td>{{ "WKD%03d"|format(record.worker.id) }}</td>
+                        <td>{{ record.worker.name }}</td>
+                        <td>{{ record.total_days_present }}</td>
+                        <td>₦{{ "%.2f"|format(record.amount) }}</td>
+                        <td>{{ record.payment_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No salary records available.</p>
+    {% endif %}
+</div>
 {% endblock %}
