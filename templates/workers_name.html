@@ -1,96 +1,51 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Registered Workers</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <style>
-        .delete-button {
-            background-color: #e74c3c;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-        .delete-button:hover {
-            background-color: #c0392b;
-        }
-        .back-link {
-            display: inline-block;
-            margin-bottom: 15px;
-            text-decoration: none;
-            background-color: #3498db;
-            color: white;
-            padding: 6px 12px;
-            border-radius: 5px;
-        }
-        .back-link:hover {
-            background-color: #2980b9;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 30px;
-        }
-        th, td {
-            padding: 8px;
-            border: 1px solid #ddd;
-            text-align: left;
-        }
-        th {
-            background-color: #f4f4f4;
-        }
-    </style>
-</head>
-<body>
-    <h1>Registered Workers</h1>
-    <a href="{{ url_for('dashboard') }}" class="back-link">← Back to Dashboard</a>
-    
-    <table>
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Phone</th>
-                <th>DOB</th>
-                <th>Gender</th>
-                <th>Qualifications</th>
-                <th>Position</th>
-                <th>Employment Date</th>
-                <th>National ID</th>
-                <th>Nationality</th>
-                <th>Home Address</th>
-                <th>Ethnic Group</th>
-                <th>Residence</th>
-                <th>Disability</th>
-                <th>Email</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for worker in workers %}
-            <tr>
-                <td>{{ worker.name }}</td>
-                <td>{{ worker.phone_number }}</td>
-                <td>{{ worker.date_of_birth.strftime('%Y-%m-%d') }}</td>
-                <td>{{ worker.gender }}</td>
-                <td>{{ worker.qualifications }}</td>
-                <td>{{ worker.position }}</td>
-                <td>{{ worker.date_of_employment.strftime('%Y-%m-%d') }}</td>
-                <td>{{ worker.national_id or '—' }}</td>
-                <td>{{ worker.nationality or '—' }}</td>
-                <td>{{ worker.home_address or '—' }}</td>
-                <td>{{ worker.ethnic_group or '—' }}</td>
-                <td>{{ worker.place_of_residence or '—' }}</td>
-                <td>{{ worker.disability or '—' }}</td>
-                <td>{{ worker.email or '—' }}</td>
-                <td>
-                    <form action="{{ url_for('delete_worker', worker_id=worker.id) }}" method="post" onsubmit="return confirm('Are you sure you want to delete this worker?');">
-                        <button type="submit" class="delete-button">Delete</button>
-                    </form>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</body>
-</html>
+{% extends 'base.html' %}
+{% block content %}
+<h1>Registered Workers</h1>
+<a href="{{ url_for('dashboard') }}" class="back-link">← Back to Dashboard</a>
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Phone</th>
+            <th>DOB</th>
+            <th>Gender</th>
+            <th>Qualifications</th>
+            <th>Position</th>
+            <th>Employment Date</th>
+            <th>National ID</th>
+            <th>Nationality</th>
+            <th>Home Address</th>
+            <th>Ethnic Group</th>
+            <th>Residence</th>
+            <th>Disability</th>
+            <th>Email</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for worker in workers %}
+        <tr>
+            <td>{{ worker.name }}</td>
+            <td>{{ worker.phone_number }}</td>
+            <td>{{ worker.date_of_birth.strftime('%Y-%m-%d') }}</td>
+            <td>{{ worker.gender }}</td>
+            <td>{{ worker.qualifications }}</td>
+            <td>{{ worker.position }}</td>
+            <td>{{ worker.date_of_employment.strftime('%Y-%m-%d') }}</td>
+            <td>{{ worker.national_id or '—' }}</td>
+            <td>{{ worker.nationality or '—' }}</td>
+            <td>{{ worker.home_address or '—' }}</td>
+            <td>{{ worker.ethnic_group or '—' }}</td>
+            <td>{{ worker.place_of_residence or '—' }}</td>
+            <td>{{ worker.disability or '—' }}</td>
+            <td>{{ worker.email or '—' }}</td>
+            <td>
+                <form action="{{ url_for('delete_worker', worker_id=worker.id) }}" method="post" onsubmit="return confirm('Are you sure you want to delete this worker?');">
+                    <button type="submit" class="delete-button">Delete</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

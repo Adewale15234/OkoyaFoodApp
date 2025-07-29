@@ -1,33 +1,10 @@
+/* Use your latest style.css as posted above, it's already clean and modernized! */
 body {
     font-family: Arial, sans-serif;
     margin: 0;
-    background-color: #e8f0fe; /* Clean blue background */
+    background-color: #e8f0fe;
     color: #333;
 }
-
-/* ====================
-   HEADER AND LOGO
-   ==================== */
-header {
-    background-color: #0f62fe;
-    padding: 25px 30px;
-    color: white;
-    text-align: center;
-    position: relative;
-}
-
-header img {
-    position: absolute;
-    top: 25px;
-    left: 35px;
-    height: 70px;
-    border-radius: 8px;
-    box-shadow: 0 0 5px #222;
-}
-
-/* ====================
-   DASHBOARD STYLING
-   ==================== */
 .dashboard-container {
     max-width: 600px;
     margin: 60px auto;
@@ -38,7 +15,6 @@ header img {
     box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
     position: relative;
 }
-
 .dashboard-logo {
     position: absolute;
     top: 70px;
@@ -48,14 +24,12 @@ header img {
     border-radius: 50%;
     box-shadow: 0 0 6px #aaa;
 }
-
 .dashboard-nav {
     display: flex;
     flex-direction: column;
     gap: 15px;
     margin-top: 30px;
 }
-
 .dashboard-nav a {
     display: block;
     background-color: #4CAF50;
@@ -66,26 +40,18 @@ header img {
     border-radius: 6px;
     transition: background-color 0.3s ease;
 }
-
 .dashboard-nav a:hover {
     background-color: #388e3c;
 }
-
 .logout-btn {
     background-color: #e53935 !important;
 }
-
 .logout-btn:hover {
     background-color: #c62828 !important;
 }
-
-/* ====================
-   FORMS & INPUT
-   ==================== */
 form {
     margin-bottom: 20px;
 }
-
 input[type="text"],
 input[type="number"],
 input[type="date"],
@@ -96,10 +62,6 @@ select {
     border: 1px solid #ccc;
     border-radius: 4px;
 }
-
-/* ====================
-   BUTTONS
-   ==================== */
 button,
 input[type="submit"] {
     background-color: #0f62fe;
@@ -109,15 +71,10 @@ input[type="submit"] {
     cursor: pointer;
     border-radius: 4px;
 }
-
 button:hover,
 input[type="submit"]:hover {
     background-color: #0043ce;
 }
-
-/* ====================
-   TABLES
-   ==================== */
 table {
     width: 100%;
     border-collapse: collapse;
@@ -125,17 +82,12 @@ table {
     margin-top: 10px;
     box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
 }
-
 th,
 td {
     padding: 10px;
     text-align: left;
     border-bottom: 1px solid #ddd;
 }
-
-/* ====================
-   FLASH MESSAGES
-   ==================== */
 .flash-messages {
     background-color: #e7f3fe;
     border-left: 4px solid #2196F3;
@@ -144,31 +96,21 @@ td {
     color: #333;
     list-style: none;
 }
-
-/* ====================
-   GREETING + DATE
-   ==================== */
 .greeting {
     font-size: 1.2em;
     color: #222;
     margin-bottom: 5px;
     font-style: italic;
 }
-
 .today-date {
     margin-top: -10px;
     color: #444;
     font-size: 0.95em;
 }
-
-/* ====================
-   THEME CONTROLS (Optional)
-   ==================== */
 .theme-controls {
     margin-top: 15px;
     margin-bottom: 25px;
 }
-
 .theme-controls button {
     margin-right: 8px;
     padding: 6px 12px;
@@ -177,14 +119,9 @@ td {
     cursor: pointer;
     font-weight: bold;
 }
-
 .theme-controls button:hover {
     opacity: 0.85;
 }
-
-/* ====================
-   PRINT SUPPORT
-   ==================== */
 @media print {
     body * {
         visibility: hidden;
@@ -202,26 +139,49 @@ td {
         display: none !important;
     }
 }
-
-/* ====================
-   THEMES
-   ==================== */
 .light-theme {
     background-color: #ffffff;
     color: #000000;
 }
-
 .dark-theme {
     background-color: #121212;
     color: #ffffff;
 }
-
 .blue-theme {
     background-color: #e3f2fd;
     color: #0d47a1;
 }
-
 .red-theme {
     background-color: #ffebee;
     color: #b71c1c;
+}
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #e6f0ff;
+    padding: 15px 20px;
+    border-bottom: 1px solid #ccc;
+}
+.top-bar strong {
+    font-size: 1.2rem;
+}
+.top-bar a {
+    text-decoration: none;
+    margin-left: 15px;
+    color: #0056b3;
+    font-weight: bold;
+    transition: color 0.3s;
+}
+.top-bar a:hover {
+    color: #004080;
+}
+.logo {
+    height: 80px;
+    margin-right: 30px;
+}
+@media print {
+  .no-print {
+    display: none !important;
+  }
 }

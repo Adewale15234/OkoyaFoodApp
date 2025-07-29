@@ -1,33 +1,27 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Attendance</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
-    <h1>Attendance</h1>
-    <a href="{{ url_for('dashboard') }}" class="back-link">← Back to Dashboard</a>
-    <table>
-        <tr>
-            <th>Worker Name</th>
-            <th>Attendance Status</th>
-        </tr>
-        {% for worker in workers %}
-        <tr>
-            <td>{{ worker.name }}</td>
-            <td>
-                <form method="post">
-                    <select name="attendance_status">
-                        <option value="Present">Present</option>
-                        <option value="Absent">Absent</option>
-                    </select>
-                    <input type="hidden" name="worker_name" value="{{ worker.name }}">
-                    <input type="hidden" name="worker_id" value="{{ worker.id }}">
-                    <input type="submit" value="Submit">
-                </form>
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
-</body>
-</html>
+{% extends 'base.html' %}
+{% block content %}
+<h1>Attendance</h1>
+<a href="{{ url_for('dashboard') }}" class="back-link">← Back to Dashboard</a>
+<table>
+    <tr>
+        <th>Worker Name</th>
+        <th>Attendance Status</th>
+    </tr>
+    {% for worker in workers %}
+    <tr>
+        <td>{{ worker.name }}</td>
+        <td>
+            <form method="post">
+                <select name="attendance_status">
+                    <option value="Present">Present</option>
+                    <option value="Absent">Absent</option>
+                </select>
+                <input type="hidden" name="worker_name" value="{{ worker.name }}">
+                <input type="hidden" name="worker_id" value="{{ worker.id }}">
+                <input type="submit" value="Submit">
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

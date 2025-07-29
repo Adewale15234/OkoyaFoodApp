@@ -1,10 +1,7 @@
 {% extends 'base.html' %}
-
 {% block content %}
 <a href="{{ url_for('dashboard') }}" class="back-link">← Back to Dashboard</a>
-
 <h1>Attendance History</h1>
-
 <table>
     <tr>
         <th>Worker Name</th>
@@ -14,7 +11,7 @@
     {% for record in attendance_records %}
     <tr>
         <td>{{ record.worker.name }}</td>
-        <td>{{ record.date }}</td>
+        <td>{{ record.date.strftime('%Y-%m-%d %H:%M') }}</td>
         <td>{{ record.status }}</td>
     </tr>
     {% endfor %}
