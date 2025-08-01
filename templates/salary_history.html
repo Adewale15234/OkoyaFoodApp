@@ -17,6 +17,8 @@
                     <th>Name</th>
                     <th>Total Days Present</th>
                     <th>Amount Paid (₦)</th>
+                    <th>Bank Name</th>
+                <th>Bank Account</th>
                     <th>Payment Date</th>
                 </tr>
             </thead>
@@ -27,6 +29,8 @@
                         <td>{{ record.worker.name }}</td>
                         <td>{{ record.total_days_present }}</td>
                         <td>₦{{ "%.2f"|format(record.amount) }}</td>
+                        <td>{{ record.bank_name }}</td>
+                        <td>{{ record.bank_account }}</td>
                         <td>{{ record.payment_date.strftime('%Y-%m-%d %H:%M') }}</td>
                     </tr>
                 {% endfor %}
