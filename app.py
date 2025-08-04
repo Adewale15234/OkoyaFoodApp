@@ -17,7 +17,7 @@ app.secret_key = os.environ.get('SECRET_KEY', 'your-secret-key')
 if os.environ.get("DATABASE_URL"):
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ["DATABASE_URL"].replace("postgres://", "postgresql://")
 else:
-    db_path = os.path.join(os.getcwd(), 'database', 'site.db')
+    db_path = os.path.join('/tmp', 'site.db')
     os.makedirs(os.path.dirname(db_path), exist_ok=True)
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
 
