@@ -45,7 +45,11 @@ class Worker(db.Model):
     disability = db.Column(db.String(100))
     email = db.Column(db.String(100), nullable=False)
     date_of_employment = db.Column(db.Date, nullable=False)
-    
+
+    # ✅ Add these two fields:
+    bank_name = db.Column(db.String(100), nullable=True)
+    bank_account = db.Column(db.String(50), nullable=True)
+
     attendance_records = db.relationship('Attendance', backref='worker', lazy=True, cascade="all, delete-orphan")
     salary_records = db.relationship('Salary', backref='worker', lazy=True, cascade="all, delete-orphan")
 
