@@ -175,7 +175,6 @@ def salary():
     if 'admin' not in session:
         return redirect(url_for('login'))
 
-    # 🔧 Build a list of workers with attendance counts
     workers = Worker.query.all()
     salary_data = []
     for worker in workers:
@@ -184,40 +183,44 @@ def salary():
             'id': worker.id,
             'name': worker.name,
             'total_days_present': total_days_present,
-            'bank_name': '',
-            'bank_account': ''
+            'bank_name': worker.bank_name or '',
+            'bank_account': worker.bank_account or ''
         })
 
     if request.method == 'POST':
-        worker_id = request.form.get('worker_id')
-        daily_rate = request.form.get('daily_rate')
-        bank_name = request.form.get('bank_name')
-        bank_account = request.form.get('bank_account')
+        try:
+            worker_id = int(request.form.get('worker_id'))
+            daily_rate_input = request.form.get('daily_rate', '').replace(',', '').strip()
+            daily_rate = float(daily_rate_input)
+            bank_name = request.form.get('bank_name')
+            bank_account = request.form.get('bank_account')
+            amount_input = request.form.get('amount')
 
-        if worker_id and daily_rate and bank_name and bank_account:
-            worker = Worker.query.get(int(worker_id))
-            total_days_present = Attendance.query.filter_by(worker_id=worker.id, status="Present").count()
-            amount = total_days_present * float(daily_rate)
+            total_days_present = Attendance.query.filter_by(worker_id=worker_id, status="Present").count()
+
+            if amount_input:
+                amount = float(amount_input)
+            else:
+                amount = round(total_days_present * daily_rate, 2)
+
             new_salary = Salary(
-                worker_id=worker.id,
+                worker_id=worker_id,
                 total_days_present=total_days_present,
-                daily_rate=float(daily_rate),
+                daily_rate=daily_rate,
                 amount=amount,
                 bank_name=bank_name,
                 bank_account=bank_account
             )
             db.session.add(new_salary)
             db.session.commit()
-            flash(f"Salary recorded for {worker.name}")
+            flash("Salary recorded successfully.")
             return redirect(url_for('salary_history'))
-        else:
-            flash("Missing salary or bank info.", "error")
+        except Exception as e:
+            db.session.rollback()
+            logging.error(f"Error recording salary: {e}")
+            flash("There was an error recording the salary. Please check the values.", "error")
 
-    # ✅ Pass salary_data to the template
     return render_template('salary.html', salary_data=salary_data)
-
-    # ✅ Always return the form on GET
-    return render_template('salary.html', salary_data=workers)
 
 @app.route('/attendance_history')
 def attendance_history():
