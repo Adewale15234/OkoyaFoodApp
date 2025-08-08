@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
+from flask_migrate import Migrate, upgrade  # ✅ 'upgrade' is now imported
 from datetime import datetime
 import os
 import logging
@@ -194,23 +194,18 @@ def salary():
     if request.method == 'POST':
         try:
             worker_id = int(request.form.get('worker_id'))
-            daily_rate_input = request.form.get('daily_rate', '').replace(',', '').strip()
-            daily_rate = float(daily_rate_input)
+            amount_input = request.form.get('amount')
+            amount = float(amount_input.strip())
+
             bank_name = request.form.get('bank_name')
             bank_account = request.form.get('bank_account')
-            amount_input = request.form.get('amount')
 
             total_days_present = Attendance.query.filter_by(worker_id=worker_id, status="Present").count()
-
-            if amount_input:
-                amount = float(amount_input)
-            else:
-                amount = round(total_days_present * daily_rate, 2)
 
             new_salary = Salary(
                 worker_id=worker_id,
                 total_days_present=total_days_present,
-                daily_rate=daily_rate,
+                daily_rate=0,  # Not used
                 amount=amount,
                 bank_name=bank_name,
                 bank_account=bank_account
@@ -219,6 +214,7 @@ def salary():
             db.session.commit()
             flash("Salary recorded successfully.")
             return redirect(url_for('salary_history'))
+
         except Exception as e:
             db.session.rollback()
             logging.error(f"Error recording salary: {e}")
@@ -241,13 +237,12 @@ def salary_history():
     salary_records = Salary.query.order_by(Salary.payment_date.desc()).all()
     return render_template('salary_history.html', salary_records=salary_records)
 
-# Function to ensure tables are created — works both locally and on Render
-def create_tables():
+# Run migrations using Flask-Migrate (instead of db.create_all)
+def run_migrations():
     with app.app_context():
-        db.create_all()
+        upgrade()
 
-# Call it globally (for Render)
-create_tables()
+run_migrations()
 
 # Route to serve favicon.ico from static folder
 @app.route('/favicon.ico')

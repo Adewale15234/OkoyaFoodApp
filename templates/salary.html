@@ -9,7 +9,6 @@
         <th>Amount (₦)</th>
         <th>Bank Name</th>
         <th>Bank Account</th>
-        <th>Total Salary (₦)</th>
         <th>Action</th>
     </tr>
     {% for worker in salary_data %}
@@ -18,7 +17,7 @@
         <td>{{ worker.name }}</td>
         <td>{{ worker.total_days_present or 0 }}</td>
         <td>
-            <input type="number" name="daily_rate" step="0.01" required>
+            <input type="number" name="amount" step="0.01" required>
             <input type="hidden" name="worker_id" value="{{ worker.id }}">
         </td>
         <td>
@@ -26,9 +25,6 @@
         </td>
         <td>
             <input type="text" name="bank_account" value="{{ worker.bank_account or '' }}" required>
-        </td>
-        <td>
-            <input type="number" name="amount" step="0.01" placeholder="Optional">
         </td>
         <td>
             <input type="submit" value="Save Salary">
