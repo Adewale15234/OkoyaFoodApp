@@ -233,8 +233,16 @@ def attendance_history():
 def salary_history():
     if 'admin' not in session:
         return redirect(url_for('login'))
-    
+
     salary_records = Salary.query.order_by(Salary.payment_date.desc()).all()
+
+    # Safely attach total_days_present for display only
+    for record in salary_records:
+        try:
+            record.total_days_present = Attendance.query.filter_by(worker_id=record.worker_id, status="Present").count()
+        except:
+            record.total_days_present = 0  # fallback in case of error
+
     return render_template('salary_history.html', salary_records=salary_records)
 
 # Run migrations using Flask-Migrate (instead of db.create_all)
