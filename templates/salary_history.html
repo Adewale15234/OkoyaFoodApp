@@ -25,7 +25,7 @@
             <tbody>
                 {% for record in salary_records %}
                     <tr>
-                        <td>{{ "WKD%03d"|format(record.worker.id) }}</td>
+                        <td>{{ record.worker.worker_code }}</td>
                         <td>{{ record.worker.name }}</td>
                         <td>{{ record.total_days_present }}</td>
                         <td>₦{{ "%.2f"|format(record.amount) }}</td>

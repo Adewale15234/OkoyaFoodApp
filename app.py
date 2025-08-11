@@ -111,7 +111,16 @@ def register_worker():
 
     if request.method == 'POST':
         try:
+            # Generate worker code
+            last_worker = Worker.query.order_by(Worker.id.desc()).first()
+            if last_worker and last_worker.worker_code and last_worker.worker_code.startswith("WKD"):
+                last_code = int(last_worker.worker_code[3:])
+                new_code = f"WKD{last_code + 1:03d}"
+            else:
+                new_code = "WKD001"
+
             new_worker = Worker(
+                worker_code=new_code,
                 name=request.form['name'],
                 phone_number=request.form['phone_number'],
                 date_of_birth=datetime.strptime(request.form['date_of_birth'], '%Y-%m-%d'),
@@ -127,9 +136,11 @@ def register_worker():
                 email=request.form['email'],
                 date_of_employment=datetime.strptime(request.form['date_of_employment'], '%Y-%m-%d'),
             )
+
             db.session.add(new_worker)
             db.session.commit()
-            flash("Worker registered successfully.")
+
+            flash(f"Worker {new_code} registered successfully.")
             return redirect(url_for('workers_name'))
         except Exception as e:
             db.session.rollback()
