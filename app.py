@@ -135,6 +135,10 @@ def register_worker():
                 disability=request.form.get('disability'),
                 email=request.form['email'],
                 date_of_employment=datetime.strptime(request.form['date_of_employment'], '%Y-%m-%d'),
+
+                # ✅ Save new fields
+                bank_name=request.form['bank_name'],
+                bank_account=request.form['bank_account'],
             )
 
             db.session.add(new_worker)
