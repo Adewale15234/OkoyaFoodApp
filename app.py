@@ -51,6 +51,10 @@ class Worker(db.Model):
     bank_name = db.Column(db.String(100), nullable=True)
     bank_account = db.Column(db.String(50), nullable=True)
 
+    # ✅ Add these
+    guarantor = db.Column(db.String(100), nullable=False)
+    bank_account_name = db.Column(db.String(100), nullable=False)
+
     attendance_records = db.relationship(
         'Attendance',
         backref='worker',
@@ -63,6 +67,7 @@ class Worker(db.Model):
         lazy=True,
         cascade="all, delete-orphan"
     )
+
 class Attendance(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     worker_id = db.Column(db.Integer, db.ForeignKey('workers.id'), nullable=False)
@@ -114,7 +119,7 @@ def dashboard():
         return redirect(url_for('login'))
     return render_template('dashboard.html')
 
-@app.route('/register', methods=['GET', 'POST'])
+@app.route('/register', methods=['GET', 'POST']) 
 def register_worker():
     if 'admin' not in session:
         return redirect(url_for('login'))
@@ -146,9 +151,12 @@ def register_worker():
                 email=request.form['email'],
                 date_of_employment=datetime.strptime(request.form['date_of_employment'], '%Y-%m-%d'),
 
-                # ✅ Save new fields
+                # ✅ Newly added fields
+                amount_of_salary=int(request.form['amount_of_salary']),
                 bank_name=request.form['bank_name'],
                 bank_account=request.form['bank_account'],
+                guarantor=request.form['guarantor'],
+                bank_account_name=request.form['bank_account_name']
             )
 
             db.session.add(new_worker)
