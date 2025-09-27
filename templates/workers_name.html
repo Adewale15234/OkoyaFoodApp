@@ -64,4 +64,12 @@
                         <strong>Bank Account Name:</strong> {{ worker.bank_account_name or '—' }}<br>
                         <strong>Bank Name:</strong> {{ worker.bank_name or '—' }}<br>
                         <strong>Bank Account:</strong> {{ worker.bank_account or '—' }}<br>
-                    </div
+                    </div>
+                </div>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+</div>
+{% endblock %}
