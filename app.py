@@ -46,12 +46,11 @@ class Worker(db.Model):
     email = db.Column(db.String(100), nullable=False)
     date_of_employment = db.Column(db.Date, nullable=False)
 
-    # ✅ Newly added fields
-    amount_of_salary = db.Column(db.Integer, nullable=False)
+    # amount_of_salary: Float to accept decimals
+    amount_of_salary = db.Column(db.Float, nullable=False)
     bank_name = db.Column(db.String(100), nullable=True)
     bank_account = db.Column(db.String(50), nullable=True)
 
-    # ✅ Add these
     guarantor = db.Column(db.String(100), nullable=False)
     bank_account_name = db.Column(db.String(100), nullable=False)
 
@@ -78,14 +77,17 @@ class Salary(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     worker_id = db.Column(db.Integer, db.ForeignKey('workers.id'), nullable=False)
     total_days_present = db.Column(db.Integer, nullable=False)
-    daily_rate = db.Column(db.Float, nullable=False)
+    daily_rate = db.Column(db.Float, nullable=False, default=0.0)
     amount = db.Column(db.Float, nullable=False)
-    bank_name = db.Column(db.String(100), nullable=True)          # Add this
-    bank_account = db.Column(db.String(50), nullable=True)        # Add this
+    bank_name = db.Column(db.String(100), nullable=True)
+    bank_account = db.Column(db.String(50), nullable=True)
+    # Add bank_account_name to snapshot who the payment was made to
+    bank_account_name = db.Column(db.String(100), nullable=True)
     payment_date = db.Column(db.DateTime, nullable=False, default=db.func.current_timestamp())
 
 # Hardcoded credentials (Not secure! Replace with real auth for production)
-USERNAME = os.environ.get('ADMIN_USERNAME', 'Admin')
+# default admin lowered to 'admin' to match common usage
+USERNAME = os.environ.get('ADMIN_USERNAME', 'admin')
 PASSWORD = os.environ.get('ADMIN_PASSWORD', 'Alayinde001')
 
 # Routes
@@ -134,6 +136,9 @@ def register_worker():
             else:
                 new_code = "WKD001"
 
+            # Safely parse numeric inputs
+            amount_of_salary = float(request.form.get('amount_of_salary', '0') or 0)
+
             new_worker = Worker(
                 worker_code=new_code,
                 name=request.form['name'],
@@ -151,12 +156,12 @@ def register_worker():
                 email=request.form['email'],
                 date_of_employment=datetime.strptime(request.form['date_of_employment'], '%Y-%m-%d'),
 
-                # ✅ Newly added fields
-                amount_of_salary=int(request.form['amount_of_salary']),
-                bank_name=request.form['bank_name'],
-                bank_account=request.form['bank_account'],
-                guarantor=request.form['guarantor'],
-                bank_account_name=request.form['bank_account_name']
+                # Newly added fields
+                amount_of_salary=amount_of_salary,
+                bank_name=request.form.get('bank_name'),
+                bank_account=request.form.get('bank_account'),
+                guarantor=request.form.get('guarantor'),
+                bank_account_name=request.form.get('bank_account_name')
             )
 
             db.session.add(new_worker)
@@ -221,7 +226,8 @@ def salary():
             'name': worker.name,
             'total_days_present': total_days_present,
             'bank_name': worker.bank_name or '',
-            'bank_account': worker.bank_account or ''
+            'bank_account': worker.bank_account or '',
+            'bank_account_name': worker.bank_account_name or ''
         })
 
     if request.method == 'POST':
@@ -232,16 +238,18 @@ def salary():
 
             bank_name = request.form.get('bank_name')
             bank_account = request.form.get('bank_account')
+            bank_account_name = request.form.get('bank_account_name')
 
             total_days_present = Attendance.query.filter_by(worker_id=worker_id, status="Present").count()
 
             new_salary = Salary(
                 worker_id=worker_id,
                 total_days_present=total_days_present,
-                daily_rate=0,  # Not used
+                daily_rate=0,  # Not used currently
                 amount=amount,
                 bank_name=bank_name,
-                bank_account=bank_account
+                bank_account=bank_account,
+                bank_account_name=bank_account_name
             )
             db.session.add(new_salary)
             db.session.commit()
