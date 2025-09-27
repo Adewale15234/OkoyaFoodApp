@@ -46,13 +46,23 @@ class Worker(db.Model):
     email = db.Column(db.String(100), nullable=False)
     date_of_employment = db.Column(db.Date, nullable=False)
 
-    # ✅ Add these two fields:
+    # ✅ Newly added fields
+    amount_of_salary = db.Column(db.Integer, nullable=False)
     bank_name = db.Column(db.String(100), nullable=True)
     bank_account = db.Column(db.String(50), nullable=True)
 
-    attendance_records = db.relationship('Attendance', backref='worker', lazy=True, cascade="all, delete-orphan")
-    salary_records = db.relationship('Salary', backref='worker', lazy=True, cascade="all, delete-orphan")
-
+    attendance_records = db.relationship(
+        'Attendance',
+        backref='worker',
+        lazy=True,
+        cascade="all, delete-orphan"
+    )
+    salary_records = db.relationship(
+        'Salary',
+        backref='worker',
+        lazy=True,
+        cascade="all, delete-orphan"
+    )
 class Attendance(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     worker_id = db.Column(db.Integer, db.ForeignKey('workers.id'), nullable=False)
