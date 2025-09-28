@@ -15,7 +15,12 @@ app.secret_key = os.environ.get('SECRET_KEY', 'your-secret-key')
 
 # Database setup for Render: use DATABASE_URL if provided, else fallback to local SQLite
 if os.environ.get("DATABASE_URL"):
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ["DATABASE_URL"].replace("postgres://", "postgresql://")
+    uri = os.environ["DATABASE_URL"].replace("postgres://", "postgresql://")
+    app.config['SQLALCHEMY_DATABASE_URI'] = uri
+    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+        "pool_pre_ping": True,   # ✅ checks connection before using it
+        "pool_recycle": 300,     # ✅ recycle connections every 5 mins
+    }
 else:
     db_path = os.path.join('/tmp', 'site.db')
     os.makedirs(os.path.dirname(db_path), exist_ok=True)
