@@ -1,9 +1,18 @@
 {% extends 'base.html' %}
 {% block content %}
 <h1>Attendance</h1>
-<a href="{{ url_for('dashboard') }}" class="back-link">← Back to Dashboard</a>
 
-<div class="attendance-table-container">
+{% if secretary %}
+    <!-- Secretary sees Logout button -->
+    <a href="{{ url_for('logout') }}" class="logout-button" style="display:inline-block; padding:10px 15px; background:#dc3545; color:white; text-decoration:none; border-radius:5px; margin-bottom:20px;">
+        Logout
+    </a>
+{% else %}
+    <!-- Admin sees back to dashboard -->
+    <a href="{{ url_for('dashboard') }}" class="back-link">← Back to Dashboard</a>
+{% endif %}
+
+<div class="attendance-table-container" style="margin-top:20px;">
     <table class="attendance-table">
         <thead>
             <tr>

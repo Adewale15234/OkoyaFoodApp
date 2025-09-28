@@ -1,37 +1,22 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="dashboard-container" style="max-width:400px; margin:auto; padding:20px; background:#fff; border-radius:10px; box-shadow:0 5px 15px rgba(0,0,0,0.2);">
-    <h2 style="text-align:center; margin-bottom:20px;">Admin Login</h2>
-
+<div class="dashboard-container" style="max-width:400px;">
+    <h2>Admin Login</h2>
     {% if error %}
-        <p style="color: red; text-align:center;">{{ error }}</p>
+        <p style="color: red;">{{ error }}</p>
     {% endif %}
-
-    <!-- Admin Login Form -->
-    <form method="POST" style="margin-bottom:20px;">
+    <form method="POST">
         <label>Username:</label><br>
-        <input type="text" name="username" required style="width:100%; padding:10px; margin-top:5px;"><br><br>
+        <input type="text" name="username" required><br><br>
         <label>Password:</label><br>
-        <input type="password" name="password" required style="width:100%; padding:10px; margin-top:5px;"><br><br>
-        <button type="submit" style="width:100%; padding:10px; background:#2575fc; color:white; border:none; border-radius:5px; cursor:pointer;">Login</button>
+        <input type="password" name="password" required><br><br>
+        <button type="submit">Login</button>
     </form>
-
-    <!-- Secretary Attendance Button -->
+    <hr>
     <form method="POST" action="{{ url_for('secretary_attendance') }}">
         <button type="submit" style="width:100%; padding:10px; background:#28a745; color:white; border:none; border-radius:5px; cursor:pointer;">
             Mark Attendance (Secretary)
         </button>
     </form>
-
-    <!-- Flash messages -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            <div style="margin-top:15px;">
-            {% for category, message in messages %}
-                <p style="color: {% if category=='error' %}red{% elif category=='success' %}green{% else %}blue{% endif %}; text-align:center;">{{ message }}</p>
-            {% endfor %}
-            </div>
-        {% endif %}
-    {% endwith %}
 </div>
 {% endblock %}
