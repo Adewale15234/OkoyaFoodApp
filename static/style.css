@@ -22,7 +22,10 @@
 }
 
 .company-logo img {
-    height: 120px;   /* same height as passport */
+    height: 120px;      /* same height as passport */
+    width: 120px;       /* make logo square for consistency */
+    object-fit: contain; /* ensure full logo fits without distortion */
+    border-radius: 10px; /* optional rounded corners for style */
 }
 
 .passport-preview img {
