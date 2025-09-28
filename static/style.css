@@ -348,3 +348,57 @@ tbody td {
         color: #004080;
     }
 }
+/* Month Header */
+.month-header {
+    background-color: #e8f5e9; /* light green */
+    color: #2e7d32; /* dark green */
+    padding: 10px 15px;
+    border-radius: 8px;
+    margin-top: 30px;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+/* Week Header */
+.week-header {
+    background-color: #f1f8e9; /* lighter green */
+    color: #33691e; /* darker green */
+    padding: 8px 12px;
+    border-radius: 6px;
+    margin-top: 15px;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+/* Attendance Table */
+.attendance-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    border: 2px solid #2e7d32;
+}
+
+.attendance-table th, .attendance-table td {
+    padding: 10px;
+    text-align: center;
+    border: 1px solid #2e7d32;
+}
+
+.attendance-table th {
+    background-color: #2e7d32;
+    color: #fff;
+}
+
+/* Alternating rows */
+.attendance-table tbody tr:nth-child(even) {
+    background-color: #e8f5e9;
+}
+
+.attendance-table tbody tr:nth-child(odd) {
+    background-color: #f1f8e9;
+}
+
+/* Hover effect */
+.attendance-table tbody tr:hover {
+    background-color: #c8e6c9;
+}
