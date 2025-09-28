@@ -1,11 +1,20 @@
 /* =========================
+   General Styles
+   ========================= */
+body {
+    font-family: 'Arial', sans-serif;
+    background: #f7f9fc;
+    margin: 0;
+    padding: 0;
+}
+
+/* =========================
    Dashboard & Header Styles
    ========================= */
 .dashboard-wrapper {
     max-width: 1200px;
     margin: 30px auto;
     padding: 20px;
-    font-family: 'Arial', sans-serif;
 }
 
 /* Header */
@@ -14,11 +23,30 @@
     align-items: center;
     gap: 20px;
     flex-wrap: wrap;
-    background: #f7f9fc;
     padding: 20px;
     border-radius: 15px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     margin-bottom: 30px;
+
+    /* Background Logo */
+    background-image: url('../static/logo.png'); /* path to your logo */
+    background-size: 100px 100px;
+    background-repeat: no-repeat;
+    background-position: right top;
+    background-color: #f7f9fc;
+    position: relative;
+}
+
+/* Overlay for readability */
+.dashboard-header::after {
+    content: "";
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 15px;
+    pointer-events: none;
+    z-index: 0;
 }
 
 .dashboard-logo {
@@ -29,13 +57,16 @@
     border: 1px solid #ccc;
     background: #fff;
     padding: 5px;
+    z-index: 1;
 }
 
 .header-text {
     flex: 1;
     text-align: left;
+    z-index: 1;
 }
 
+/* Text Styling */
 .company-name {
     color: green;
     font-weight: bold;
@@ -44,7 +75,7 @@
 }
 
 .company-motto {
-    color: #FFD700; /* Deep Yellow */
+    color: goldenrod;
     font-weight: bold;
     font-size: 1.2rem;
     margin: 5px 0;
@@ -141,8 +172,9 @@
 @media (max-width: 768px) {
     .dashboard-header {
         flex-direction: column;
-        align-items: flex-start;
+        align-items: center;
         text-align: center;
+        background-position: center top;
     }
     .header-text {
         text-align: center;
@@ -151,5 +183,153 @@
         width: 70px;
         height: 70px;
         margin-bottom: 10px;
+    }
+}
+
+/* =========================
+   Register Worker Page
+   ========================= */
+.register-container {
+    max-width: 900px;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #000;
+    background: #fff;
+    font-family: Arial, sans-serif;
+}
+
+/* Official Header Row (Logo + Text + Passport) */
+.official-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.company-logo img {
+    height: 120px;
+    width: 120px;
+    object-fit: contain;
+    border-radius: 10px;
+}
+
+.passport-preview img {
+    height: 120px;
+    width: 100px;
+    object-fit: cover;
+    border: 1px solid #000;
+}
+
+.official-header {
+    flex: 1;
+    padding: 0 20px;
+}
+
+/* Header Text Styling */
+.form-title,
+.company-motto {
+    color: goldenrod;
+    font-weight: bold;
+}
+
+.company-name {
+    color: green;
+}
+
+.company-address,
+.form-note {
+    color: black;
+    font-weight: bold;
+}
+
+/* Form Layout */
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px 40px;
+    margin-bottom: 20px;
+}
+
+.form-grid label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 3px;
+}
+
+.form-grid input {
+    border: none;
+    border-bottom: 1px solid #000;
+    width: 100%;
+    padding: 3px;
+    background: transparent;
+    outline: none;
+}
+
+/* Submit Button */
+.form-submit {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.form-submit input,
+.form-submit button {
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    background: #004080;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    margin: 5px;
+}
+
+.form-submit input:hover,
+.form-submit button:hover {
+    background: #0066cc;
+}
+
+/* Extra Controls (Back + Print) */
+.form-controls {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 0.95rem;
+}
+
+.form-controls a {
+    color: #0f62fe;
+    text-decoration: none;
+    font-weight: bold;
+    margin: 0 5px;
+}
+
+.form-controls a:hover {
+    text-decoration: underline;
+}
+
+/* Section Titles */
+.section-title {
+    grid-column: span 2;
+    margin: 15px 0 10px;
+    font-size: 1.1rem;
+    color: #444;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 5px;
+}
+
+/* =========================
+   Print Styles
+   ========================= */
+@media print {
+    body {
+        margin: 0;
+    }
+    .no-print {
+        display: none !important;
+    }
+    .print-area {
+        margin: 20mm;
+        width: 170mm;
     }
 }
