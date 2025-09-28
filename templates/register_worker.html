@@ -3,96 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>okooya</title>
-    <style>
-        /* General Container */
-        .register-container {
-            max-width: 900px;
-            margin: auto;
-            padding: 20px;
-            border: 1px solid #000;
-            background: #fff;
-            font-family: Arial, sans-serif;
-        }
-
-        /* Official Header Row (Logo + Text + Passport) */
-        .official-header-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-
-        .company-logo img {
-            height: 120px;   /* same height as passport */
-        }
-
-        .passport-preview img {
-            height: 120px;
-            width: 100px;
-            object-fit: cover;
-            border: 1px solid #000;
-        }
-
-        .official-header {
-            flex: 1;
-            padding: 0 20px;
-        }
-
-        /* Form Layout */
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;  /* two columns */
-            gap: 15px 40px;
-            margin-bottom: 20px;
-        }
-        .form-grid label {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 3px;
-        }
-        .form-grid input {
-            border: none;
-            border-bottom: 1px solid #000;
-            width: 100%;
-            padding: 3px;
-            background: transparent;
-            outline: none;
-        }
-
-        /* Submit Button */
-        .form-submit {
-            text-align: center;
-            margin-top: 20px;
-        }
-        .form-submit input,
-        .form-submit button {
-            padding: 10px 20px;
-            font-size: 16px;
-            font-weight: bold;
-            background: #004080;
-            color: #fff;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-            margin: 5px;
-        }
-        .form-submit input:hover,
-        .form-submit button:hover {
-            background: #0066cc;
-        }
-
-        /* Hide elements when printing */
-        @media print {
-            .no-print {
-                display: none;
-            }
-            body {
-                margin: 0;
-            }
-        }
-    </style>
+    <title>Okoya Worker Registration</title>
+    <!-- Link to external CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <div class="register-container print-area">
@@ -100,8 +13,7 @@
         <!-- Official Header Row with Logo (Left), Text (Center), Passport (Right) -->
         <div class="official-header-row">
             <div class="company-logo">
-                <img src="AKIIKAH LOGO.jpg" 
-                     alt="Company Logo" id="company-logo">
+                <img src="{{ url_for('static', filename='AKIIKAH LOGO.jpg') }}" alt="Company Logo" id="company-logo">
             </div>
 
             <div class="official-header">
@@ -120,11 +32,11 @@
         <!-- Passport Upload (hidden when printing) -->
         <div class="passport-box no-print">
             <label for="passport">Upload Passport Photograph</label><br><br>
-            <input type="file" id="passport" name="passport" accept="image/*"> <br><br>
+            <input type="file" id="passport" name="passport" accept="image/*"><br><br>
         </div>
 
-        <!-- Form -->
-        <form method="post" enctype="multipart/form-data" class="register-form">
+        <!-- Worker Registration Form -->
+        <form method="POST" enctype="multipart/form-data" class="register-form">
 
             <div class="form-grid">
                 <div><label>Name:</label><input type="text" name="name" required></div>
@@ -136,7 +48,7 @@
                 <div><label>Position:</label><input type="text" name="position" required></div>
                 <div><label>Amount of Salary:</label><input type="number" name="amount_of_salary" required></div>
                 <div><label>Date of Employment:</label><input type="date" name="date_of_employment" required></div>
-                <div><label>Guarrantor:</label><input type="text" name="guarantor" required></div>
+                <div><label>Guarantor:</label><input type="text" name="guarantor" required></div>
                 <div><label>National ID:</label><input type="text" name="national_id" required></div>
                 <div><label>Nationality:</label><input type="text" name="nationality" required></div>
                 <div><label>Ethnic Group:</label><input type="text" name="ethnic_group" required></div>
@@ -148,7 +60,7 @@
                 <div><label>Bank Account:</label><input type="number" name="bank_account" required></div>
             </div>
 
-            <!-- Submit -->
+            <!-- Submit and Print Buttons -->
             <div class="form-submit no-print">
                 <input type="submit" value="Register Worker">
                 <button type="button" onclick="window.print()">Print Form</button>

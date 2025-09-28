@@ -1,84 +1,90 @@
 /* =========================
    Register Worker Page
    ========================= */
+
+/* General Container */
 .register-container {
     max-width: 900px;
-    margin: 40px auto;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #000;
     background: #fff;
-    padding: 30px 40px;
-    border-radius: 12px;
-    box-shadow: 0 0 12px rgba(0,0,0,0.1);
+    font-family: Arial, sans-serif;
 }
 
-.register-header {
+/* Official Header Row (Logo + Text + Passport) */
+.official-header-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 25px;
-}
-
-.company-logo {
-    height: 80px;
-}
-
-.passport-box {
-    text-align: right;
-}
-.passport-box label {
-    font-weight: bold;
-    margin-bottom: 5px;
-    display: inline-block;
-}
-.passport-box input {
-    margin-top: 8px;
-}
-
-.form-title {
+    margin-bottom: 15px;
     text-align: center;
-    margin-bottom: 20px;
-    color: #0d47a1;
 }
 
-.register-form {
+.company-logo img {
+    height: 120px;   /* same height as passport */
+}
+
+.passport-preview img {
+    height: 120px;
+    width: 100px;
+    object-fit: cover;
+    border: 1px solid #000;
+}
+
+.official-header {
+    flex: 1;
+    padding: 0 20px;
+}
+
+/* Form Layout */
+.form-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 25px;
+    grid-template-columns: 1fr 1fr;  /* two columns */
+    gap: 15px 40px;
+    margin-bottom: 20px;
 }
 
-.form-column {
-    display: flex;
-    flex-direction: column;
-}
-
-.form-column label {
-    margin-bottom: 5px;
+.form-grid label {
+    display: block;
     font-weight: bold;
-    text-align: left;
+    margin-bottom: 3px;
 }
 
-.form-column input {
+.form-grid input {
+    border: none;
+    border-bottom: 1px solid #000;
     width: 100%;
-    padding: 8px;
-    margin-bottom: 12px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
+    padding: 3px;
+    background: transparent;
+    outline: none;
 }
 
+/* Submit Button */
 .form-submit {
-    grid-column: span 2;
     text-align: center;
     margin-top: 20px;
 }
 
-.form-submit input[type="submit"] {
+.form-submit input,
+.form-submit button {
     padding: 10px 20px;
-    font-size: 1rem;
-    border-radius: 6px;
+    font-size: 16px;
+    font-weight: bold;
+    background: #004080;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    margin: 5px;
 }
 
-/* =========================
-   Extra Controls (Back + Print)
-   ========================= */
+.form-submit input:hover,
+.form-submit button:hover {
+    background: #0066cc;
+}
+
+/* Extra Controls (Back + Print) */
 .form-controls {
     text-align: center;
     margin-bottom: 20px;
@@ -96,9 +102,7 @@
     text-decoration: underline;
 }
 
-/* =========================
-   Section Titles
-   ========================= */
+/* Section Titles */
 .section-title {
     grid-column: span 2;
     margin: 15px 0 10px;
@@ -114,13 +118,12 @@
 @media print {
     body {
         margin: 0;
-        padding: 0;
+    }
+    .no-print {
+        display: none !important;
     }
     .print-area {
         margin: 20mm;
         width: 170mm; /* Keep inside A4 */
-    }
-    .no-print {
-        display: none !important;
     }
 }
