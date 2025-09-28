@@ -2,20 +2,22 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Okoya Food Staff Management</title>
+    <title>{% block title %}Okoya Food Staff Management{% endblock %}</title>
 
-    <!-- ✅ Favicon links -->
+    <!-- Favicon links -->
     <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='apple-touch-icon.png') }}">
     <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='favicon-32x32.png') }}">
     <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='favicon-16x16.png') }}">
     <link rel="manifest" href="{{ url_for('static', filename='site.webmanifest') }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
 
+    <!-- Main stylesheet -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
+    <!-- Top Bar -->
     <div class="top-bar">
-        <div style="display: flex; align-items: center;">
+        <div style="display: flex; align-items: center; gap: 1rem;">
             <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo">
             <strong>Okoya Food Staff Management</strong>
         </div>
@@ -27,6 +29,7 @@
         </div>
     </div>
 
+    <!-- Flash Messages -->
     {% with messages = get_flashed_messages() %}
         {% if messages %}
             <ul class="flash-messages">
@@ -37,16 +40,22 @@
         {% endif %}
     {% endwith %}
 
-    {% block content %}{% endblock %}
+    <!-- Main Content -->
+    <main>
+        {% block content %}
+        <!-- Child templates will inject content here -->
+        {% endblock %}
+    </main>
 
+    <!-- Theme Script -->
     <script>
-        // THEME SUPPORT
         function setTheme(theme) {
             const body = document.body;
             body.classList.remove("light-theme", "dark-theme", "blue-theme", "red-theme");
             body.classList.add(`${theme}-theme`);
             localStorage.setItem("selectedTheme", theme);
         }
+
         window.onload = function () {
             const savedTheme = localStorage.getItem("selectedTheme");
             if (savedTheme) setTheme(savedTheme);

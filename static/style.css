@@ -43,13 +43,28 @@
 /* =========================
    Header Text Styling
    ========================= */
-.official-header h1,
-.official-header h3,
-.official-header p {
-    font-family: "Arial Black", Arial, sans-serif;
+.company-name {
     color: green;
-    margin: 5px 0;
-    text-align: center;
+}
+
+.company-motto {
+    color: goldenrod;  /* deep yellow */
+    font-weight: bold;
+}
+
+.company-address {
+    color: black;
+    font-weight: bold;  /* bold black */
+}
+
+.form-title {
+    color: goldenrod;  /* deep yellow */
+    font-weight: bold;
+}
+
+.form-note {
+    color: black;
+    font-weight: bold;  /* bold black */
 }
 
 /* Form Layout */
