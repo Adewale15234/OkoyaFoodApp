@@ -23,9 +23,9 @@
 
 .company-logo img {
     height: 120px;      /* same height as passport */
-    width: 120px;       /* make logo square for consistency */
-    object-fit: contain; /* ensure full logo fits without distortion */
-    border-radius: 10px; /* optional rounded corners for style */
+    width: 120px;       /* square logo */
+    object-fit: contain; /* ensure full logo fits */
+    border-radius: 10px; /* optional rounded corners */
 }
 
 .passport-preview img {
@@ -38,6 +38,18 @@
 .official-header {
     flex: 1;
     padding: 0 20px;
+}
+
+/* =========================
+   Header Text Styling
+   ========================= */
+.official-header h1,
+.official-header h3,
+.official-header p {
+    font-family: "Arial Black", Arial, sans-serif;
+    color: green;
+    margin: 5px 0;
+    text-align: center;
 }
 
 /* Form Layout */
