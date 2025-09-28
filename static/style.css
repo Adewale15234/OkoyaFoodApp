@@ -28,11 +28,7 @@ body {
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     margin-bottom: 30px;
 
-    /* Background Logo */
-    background-image: url('../static/logo.png'); /* path to your logo */
-    background-size: 100px 100px;
-    background-repeat: no-repeat;
-    background-position: right top;
+    /* Background removed */
     background-color: #f7f9fc;
     position: relative;
 }
