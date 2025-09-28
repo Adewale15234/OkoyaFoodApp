@@ -2,26 +2,36 @@
 {% block content %}
 <h1>Attendance</h1>
 <a href="{{ url_for('dashboard') }}" class="back-link">← Back to Dashboard</a>
-<table>
-    <tr>
-        <th>Worker Name</th>
-        <th>Attendance Status</th>
-    </tr>
-    {% for worker in workers %}
-    <tr>
-        <td>{{ worker.name }}</td>
-        <td>
-            <form method="post">
-                <select name="attendance_status">
-                    <option value="Present">Present</option>
-                    <option value="Absent">Absent</option>
-                </select>
-                <input type="hidden" name="worker_name" value="{{ worker.name }}">
-                <input type="hidden" name="worker_id" value="{{ worker.id }}">
-                <input type="submit" value="Submit">
-            </form>
-        </td>
-    </tr>
-    {% endfor %}
-</table>
+
+<div class="attendance-table-container">
+    <table class="attendance-table">
+        <thead>
+            <tr>
+                <th>Worker Name</th>
+                <th>Status</th>
+                <th>Submit</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for worker in workers %}
+            <tr>
+                <td>{{ worker.name }}</td>
+                <td>
+                    <form method="post">
+                        <select name="attendance_status" class="attendance-select">
+                            <option value="Present">Present</option>
+                            <option value="Absent">Absent</option>
+                        </select>
+                        <input type="hidden" name="worker_name" value="{{ worker.name }}">
+                        <input type="hidden" name="worker_id" value="{{ worker.id }}">
+                </td>
+                <td>
+                        <button type="submit" class="submit-button">Submit</button>
+                    </form>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
 {% endblock %}
