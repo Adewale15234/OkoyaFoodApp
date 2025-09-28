@@ -38,17 +38,12 @@
 
     <!-- Dashboard Cards -->
     <section class="dashboard-cards">
-        <!-- Check if admin session exists to show register -->
-        {% if session.get('admin') %}
-            <a href="{{ url_for('register_worker') }}" class="dashboard-card">📋 Register Worker</a>
-        {% endif %}
+        <a href="{{ url_for('register_worker') }}" class="dashboard-card">📋 Register Worker</a>
         <a href="{{ url_for('attendance') }}" class="dashboard-card">🕒 Mark Attendance</a>
-        {% if session.get('admin') %}
-            <a href="{{ url_for('salary') }}" class="dashboard-card">💰 Record Salary</a>
-            <a href="{{ url_for('attendance_history') }}" class="dashboard-card">📅 Attendance History</a>
-            <a href="{{ url_for('salary_history') }}" class="dashboard-card">🧾 Salary History</a>
-            <a href="{{ url_for('workers_name') }}" class="dashboard-card">👥 View Workers</a>
-        {% endif %}
+        <a href="{{ url_for('salary') }}" class="dashboard-card">💰 Record Salary</a>
+        <a href="{{ url_for('attendance_history') }}" class="dashboard-card">📅 Attendance History</a>
+        <a href="{{ url_for('salary_history') }}" class="dashboard-card">🧾 Salary History</a>
+        <a href="{{ url_for('workers_name') }}" class="dashboard-card">👥 View Workers</a>
         <a href="{{ url_for('logout') }}" class="dashboard-card logout-card">🚪 Logout</a>
     </section>
 </div>
