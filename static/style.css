@@ -476,3 +476,26 @@ tbody td {
 .action-buttons form {
     margin: 0;     /* Remove default margin from form */
 }
+.dashboard-header {
+    display: flex;
+    justify-content: space-between; /* Push left and right sides apart */
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    background-color: #f7f9fc;
+}
+
+.header-links a {
+    margin-left: 15px;
+    font-weight: bold;
+    color: #004080;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.header-links a:hover {
+    color: #0066cc;
+    text-decoration: underline;
+}

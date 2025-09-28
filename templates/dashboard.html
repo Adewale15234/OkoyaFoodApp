@@ -1,15 +1,27 @@
-{% extends 'base.html' %} 
+{% extends 'base.html' %}
 {% block content %}
 <div class="dashboard-wrapper">
 
     <!-- Header -->
     <header class="dashboard-header">
-        <div class="header-text">
-            <h1 class="company-name">OKOYA FOOD COMPANY LIMITED</h1>
-            <h2 class="company-motto">POVERTY ERADICTION, REDUCE INEQUALITY AND LEAVE NO ONE BEHIND</h2>
-            <p class="company-address">KM 7 Idi APA community, along Ilesha Ibaruba express way, Shaki, Oyo State, Nigeria</p>
-            <p class="greeting">👋 Hello, Admin! Welcome back.</p>
-            <p class="today-date">📅 Today: <span id="todayDate"></span></p>
+        <!-- Left: Logo + Company Info -->
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="dashboard-logo">
+            <div class="header-text">
+                <h1 class="company-name">OKOYA FOOD COMPANY LIMITED</h1>
+                <h2 class="company-motto">POVERTY ERADICTION, REDUCE INEQUALITY AND LEAVE NO ONE BEHIND</h2>
+                <p class="company-address">KM 7 Idi APA community, along Ilesha Ibaruba express way, Shaki, Oyo State, Nigeria</p>
+                <p class="greeting">👋 Hello, Admin! Welcome back.</p>
+                <p class="today-date">📅 Today: <span id="todayDate"></span></p>
+            </div>
+        </div>
+
+        <!-- Right: Dashboard / Logout Links -->
+        <div class="header-links">
+            <a href="{{ url_for('dashboard') }}">🏠 Dashboard</a>
+            {% if session.get('admin') %}
+                <a href="{{ url_for('logout') }}">🚪 Logout</a>
+            {% endif %}
         </div>
     </header>
 
