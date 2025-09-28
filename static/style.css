@@ -1,4 +1,6 @@
-/* ======== Dashboard ======== */
+/* =========================
+   Dashboard Styles
+   ========================= */
 .dashboard-wrapper {
     max-width: 1200px;
     margin: 30px auto;
@@ -15,7 +17,7 @@
 }
 
 .dashboard-logo {
-    width: 80px; /* smaller, better fit */
+    width: 80px;
     height: 80px;
     object-fit: contain;
     border-radius: 10px;
@@ -54,7 +56,6 @@
     color: #fff;
 }
 
-/* Dashboard Welcome Text */
 .dashboard-welcome {
     text-align: center;
     font-size: 1.5rem;
@@ -62,7 +63,6 @@
     color: #004080;
 }
 
-/* Cards Layout */
 .dashboard-cards {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -111,5 +111,166 @@
     .dashboard-logo {
         width: 70px;
         height: 70px;
+    }
+}
+
+/* =========================
+   Worker Registration Page
+   ========================= */
+.register-container {
+    max-width: 900px;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #000;
+    background: #fff;
+    font-family: Arial, sans-serif;
+}
+
+.official-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.company-logo img {
+    height: 120px;
+    width: 120px;
+    object-fit: contain;
+    border-radius: 10px;
+}
+
+.passport-preview img {
+    height: 120px;
+    width: 100px;
+    object-fit: cover;
+    border: 1px solid #000;
+}
+
+.official-header {
+    flex: 1;
+    padding: 0 20px;
+}
+
+/* Header Text Styling for Worker Registration */
+.company-name {
+    color: green; /* OKOYA FOOD COMPANY LIMITED */
+    font-weight: bold;
+    font-family: "Arial Black", Arial, sans-serif;
+}
+
+.company-motto {
+    color: #FFD700; /* Deep Yellow */
+    font-weight: bold;
+    font-family: "Arial Black", Arial, sans-serif;
+}
+
+.company-address {
+    color: black;
+    font-weight: bold; /* bold black */
+    font-family: "Arial Black", Arial, sans-serif;
+}
+
+.form-title {
+    color: #FFD700; /* Deep Yellow */
+    font-weight: bold;
+    font-family: "Arial Black", Arial, sans-serif;
+}
+
+.form-note {
+    color: black;
+    font-weight: bold; /* bold black */
+    font-family: "Arial Black", Arial, sans-serif;
+}
+
+/* Form Layout */
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px 40px;
+    margin-bottom: 20px;
+}
+
+.form-grid label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 3px;
+}
+
+.form-grid input {
+    border: none;
+    border-bottom: 1px solid #000;
+    width: 100%;
+    padding: 3px;
+    background: transparent;
+    outline: none;
+}
+
+/* Submit Button */
+.form-submit {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.form-submit input,
+.form-submit button {
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    background: #004080;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    margin: 5px;
+}
+
+.form-submit input:hover,
+.form-submit button:hover {
+    background: #0066cc;
+}
+
+/* Extra Controls (Back + Print) */
+.form-controls {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 0.95rem;
+}
+
+.form-controls a {
+    color: #0f62fe;
+    text-decoration: none;
+    font-weight: bold;
+    margin: 0 5px;
+}
+
+.form-controls a:hover {
+    text-decoration: underline;
+}
+
+/* Section Titles */
+.section-title {
+    grid-column: span 2;
+    margin: 15px 0 10px;
+    font-size: 1.1rem;
+    color: #444;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 5px;
+}
+
+/* =========================
+   Print Styles
+   ========================= */
+@media print {
+    body {
+        margin: 0;
+    }
+    .no-print {
+        display: none !important;
+    }
+    .print-area {
+        margin: 20mm;
+        width: 170mm;
     }
 }
