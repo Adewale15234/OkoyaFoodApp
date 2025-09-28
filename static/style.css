@@ -466,3 +466,13 @@ tbody td {
         gap: 1rem;
     }
 }
+/* Make Delete and Edit buttons inline inside the Action column */
+.action-buttons {
+    display: flex;
+    gap: 5px;      /* Space between buttons */
+    align-items: center;
+}
+
+.action-buttons form {
+    margin: 0;     /* Remove default margin from form */
+}
