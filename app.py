@@ -256,19 +256,37 @@ def attendance():
             return redirect(url_for('attendance'))
     return render_template('attendance.html', workers=workers)
 
+from calendar import monthrange
+
 @app.route('/salary', methods=['GET', 'POST'])
 def salary():
     if 'admin' not in session:
         return redirect(url_for('login'))
 
     workers = Worker.query.all()
+    today = datetime.today()
+    current_year = today.year
+    current_month = today.month
+    total_days_in_month = monthrange(current_year, current_month)[1]  # e.g., 30
+
     salary_data = []
     for worker in workers:
-        total_days_present = Attendance.query.filter_by(worker_id=worker.id, status="Present").count()
+        # Count days present this month
+        total_days_present = Attendance.query.filter(
+            Attendance.worker_id == worker.id,
+            Attendance.status == "Present",
+            db.extract('year', Attendance.date) == current_year,
+            db.extract('month', Attendance.date) == current_month
+        ).count()
+
+        # Calculate salary proportionally
+        calculated_salary = (total_days_present / total_days_in_month) * worker.amount_of_salary
+
         salary_data.append({
             'id': worker.id,
             'name': worker.name,
             'total_days_present': total_days_present,
+            'calculated_salary': round(calculated_salary, 2),
             'bank_name': worker.bank_name or '',
             'bank_account': worker.bank_account or '',
             'bank_account_name': worker.bank_account_name or ''
@@ -277,33 +295,34 @@ def salary():
     if request.method == 'POST':
         try:
             worker_id = int(request.form.get('worker_id'))
-            amount_input = request.form.get('amount')
-            amount = float(amount_input.strip())
+            worker = Worker.query.get(worker_id)
+            total_days_present = Attendance.query.filter(
+                Attendance.worker_id == worker.id,
+                Attendance.status == "Present",
+                db.extract('year', Attendance.date) == current_year,
+                db.extract('month', Attendance.date) == current_month
+            ).count()
 
-            bank_name = request.form.get('bank_name')
-            bank_account = request.form.get('bank_account')
-            bank_account_name = request.form.get('bank_account_name')
-
-            total_days_present = Attendance.query.filter_by(worker_id=worker_id, status="Present").count()
+            calculated_salary = (total_days_present / total_days_in_month) * worker.amount_of_salary
 
             new_salary = Salary(
-                worker_id=worker_id,
+                worker_id=worker.id,
                 total_days_present=total_days_present,
-                daily_rate=0,  # Not used currently
-                amount=amount,
-                bank_name=bank_name,
-                bank_account=bank_account,
-                bank_account_name=bank_account_name
+                daily_rate=worker.amount_of_salary / total_days_in_month,
+                amount=round(calculated_salary, 2),
+                bank_name=worker.bank_name,
+                bank_account=worker.bank_account,
+                bank_account_name=worker.bank_account_name
             )
             db.session.add(new_salary)
             db.session.commit()
-            flash("Salary recorded successfully.")
+            flash(f"Salary for {worker.name} recorded successfully.")
             return redirect(url_for('salary_history'))
 
         except Exception as e:
             db.session.rollback()
             logging.error(f"Error recording salary: {e}")
-            flash("There was an error recording the salary. Please check the values.", "error")
+            flash("There was an error recording the salary. Please try again.", "error")
 
     return render_template('salary.html', salary_data=salary_data)
 

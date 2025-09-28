@@ -2,11 +2,12 @@
 {% block content %}
 <h1>Salary</h1>
 <a href="{{ url_for('dashboard') }}" class="back-link">← Back to Dashboard</a>
+
 <table>
     <tr>
         <th>Worker Name</th>
         <th>Total Days Present</th>
-        <th>Amount (₦)</th>
+        <th>Calculated Salary (₦)</th>
         <th>Bank Account Name</th>
         <th>Bank Name</th>
         <th>Account Number</th>
@@ -14,26 +15,18 @@
     </tr>
     {% for worker in salary_data %}
     <tr>
-    <form method="post">
-        <td>{{ worker.name }}</td>
-        <td>{{ worker.total_days_present or 0 }}</td>
-        <td>
-            <input type="number" name="amount" step="0.01" required>
-            <input type="hidden" name="worker_id" value="{{ worker.id }}">
-        </td>
-        <td>
-            <input type="text" name="bank_account_name" value="{{ worker.bank_account_name or '' }}" readonly>
-        </td>
-        <td>
-            <input type="text" name="bank_name" value="{{ worker.bank_name or '' }}" readonly>
-        </td>
-        <td>
-            <input type="text" name="bank_account" value="{{ worker.bank_account or '' }}" readonly>
-        </td>
-        <td>
-            <input type="submit" value="Save Salary">
-        </td>
-    </form>
+        <form method="post">
+            <td>{{ worker.name }}</td>
+            <td>{{ worker.total_days_present }}</td>
+            <td>
+                <input type="number" name="calculated_salary" value="{{ worker.calculated_salary }}" readonly>
+                <input type="hidden" name="worker_id" value="{{ worker.id }}">
+            </td>
+            <td><input type="text" name="bank_account_name" value="{{ worker.bank_account_name }}" readonly></td>
+            <td><input type="text" name="bank_name" value="{{ worker.bank_name }}" readonly></td>
+            <td><input type="text" name="bank_account" value="{{ worker.bank_account }}" readonly></td>
+            <td><input type="submit" value="Save Salary"></td>
+        </form>
     </tr>
     {% endfor %}
 </table>
