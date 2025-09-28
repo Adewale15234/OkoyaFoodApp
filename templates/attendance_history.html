@@ -4,30 +4,17 @@
 <h1>Attendance History</h1>
 
 {% set current_month = None %}
-{% set current_week = None %}
 
 {% for record in attendance_records|sort(attribute='date') %}
     {% set record_month = record.date.strftime('%B %Y') %}
-    {% set record_week = record.date.isocalendar()[1] %} {# ISO week number #}
 
-    {# New Month Header #}
+    {# New Month Header & Table #}
     {% if record_month != current_month %}
         {% if not loop.first %}
             </tbody>
             </table>
         {% endif %}
         <h2 class="month-header">{{ record_month }}</h2>
-        {% set current_month = record_month %}
-        {% set current_week = None %}
-    {% endif %}
-
-    {# New Week Header & Table #}
-    {% if record_week != current_week %}
-        {% if current_week is not none %}
-            </tbody>
-            </table>
-        {% endif %}
-        <h3 class="week-header">Week {{ record_week }}</h3>
         <div class="attendance-table-container">
             <table class="attendance-table">
                 <thead>
@@ -38,7 +25,7 @@
                     </tr>
                 </thead>
                 <tbody>
-        {% set current_week = record_week %}
+        {% set current_month = record_month %}
     {% endif %}
 
     <tr class="attendance-row">
