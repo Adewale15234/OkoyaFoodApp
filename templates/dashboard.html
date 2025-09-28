@@ -1,31 +1,39 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="dashboard-container">
-    <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="dashboard-logo">
-    <h2 class="greeting">👋 Hello, Admin! Welcome back.</h2>
-    <p class="today-date">📅 Today: <span id="todayDate"></span></p>
-    <div class="theme-controls">
+<div class="dashboard-wrapper">
+    <header class="dashboard-header">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="dashboard-logo">
+        <div>
+            <h2>👋 Hello, Admin!</h2>
+            <p class="today-date">📅 Today: <span id="todayDate"></span></p>
+        </div>
+    </header>
+
+    <section class="theme-controls">
         <button onclick="setTheme('light')">☀️ Light</button>
         <button onclick="setTheme('dark')">🌙 Dark</button>
         <button onclick="setTheme('blue')">🔵 Blue</button>
         <button onclick="setTheme('red')">🔴 Red</button>
-    </div>
-    <h1>Welcome to Okoya Food Staff Management</h1>
-    <nav class="dashboard-nav">
-        <a href="{{ url_for('register_worker') }}">📋 Register Worker</a>
-        <a href="{{ url_for('attendance') }}">🕒 Mark Attendance</a>
-        <a href="{{ url_for('salary') }}">💰 Record Salary</a>
-        <a href="{{ url_for('attendance_history') }}">📅 Attendance History</a>
-        <a href="{{ url_for('salary_history') }}">🧾 Salary History</a>
-        <a href="{{ url_for('workers_name') }}">👥 View Registered Workers</a>
-        <a href="{{ url_for('logout') }}" class="logout-btn">🚪 Logout</a>
-    </nav>
+    </section>
+
+    <h1 class="dashboard-welcome">Welcome to Okoya Food Staff Management</h1>
+
+    <section class="dashboard-cards">
+        <a href="{{ url_for('register_worker') }}" class="dashboard-card">📋 Register Worker</a>
+        <a href="{{ url_for('attendance') }}" class="dashboard-card">🕒 Mark Attendance</a>
+        <a href="{{ url_for('salary') }}" class="dashboard-card">💰 Record Salary</a>
+        <a href="{{ url_for('attendance_history') }}" class="dashboard-card">📅 Attendance History</a>
+        <a href="{{ url_for('salary_history') }}" class="dashboard-card">🧾 Salary History</a>
+        <a href="{{ url_for('workers_name') }}" class="dashboard-card">👥 View Workers</a>
+        <a href="{{ url_for('logout') }}" class="dashboard-card logout-card">🚪 Logout</a>
+    </section>
 </div>
+
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const today = new Date();
-        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-        document.getElementById('todayDate').textContent = today.toLocaleDateString('en-US', options);
-    });
+document.addEventListener('DOMContentLoaded', function () {
+    const today = new Date();
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    document.getElementById('todayDate').textContent = today.toLocaleDateString('en-US', options);
+});
 </script>
 {% endblock %}
