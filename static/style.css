@@ -162,17 +162,79 @@ body {
 /* =========================
    Register Worker Page
    ========================= */
+/* =========================
+   Register Worker Page
+   ========================= */
+
+/* General Container */
 .register-container {
     max-width: 900px;
     margin: auto;
     padding: 20px;
     border: 1px solid #000;
     background: #fff;
+    font-family: Arial, sans-serif;
 }
 
+/* Official Header Row (Logo + Text + Passport) */
+.official-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.company-logo img {
+    height: 120px;      /* same height as passport */
+    width: 120px;       /* square logo */
+    object-fit: contain; /* ensure full logo fits */
+    border-radius: 10px; /* optional rounded corners */
+}
+
+.passport-preview img {
+    height: 120px;
+    width: 100px;
+    object-fit: cover;
+    border: 1px solid #000;
+}
+
+.official-header {
+    flex: 1;
+    padding: 0 20px;
+}
+
+/* =========================
+   Header Text Styling
+   ========================= */
+.company-name {
+    color: green;
+}
+
+.company-motto {
+    color: goldenrod;  /* deep yellow */
+    font-weight: bold;
+}
+
+.company-address {
+    color: black;
+    font-weight: bold;  /* bold black */
+}
+
+.form-title {
+    color: goldenrod;  /* deep yellow */
+    font-weight: bold;
+}
+
+.form-note {
+    color: black;
+    font-weight: bold;  /* bold black */
+}
+
+/* Form Layout */
 .form-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr;  /* two columns */
     gap: 15px 40px;
     margin-bottom: 20px;
 }
@@ -192,6 +254,7 @@ body {
     outline: none;
 }
 
+/* Submit Button */
 .form-submit {
     text-align: center;
     margin-top: 20px;
@@ -215,19 +278,48 @@ body {
     background: #0066cc;
 }
 
-/* Back Link Styling */
-.back-link {
-    display: inline-block;
-    margin: 10px 0 15px;
-    font-weight: bold;
-    color: #004080;
-    text-decoration: none;
-    transition: color 0.3s;
+/* Extra Controls (Back + Print) */
+.form-controls {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 0.95rem;
 }
 
-.back-link:hover {
-    color: #0066cc;
+.form-controls a {
+    color: #0f62fe;
+    text-decoration: none;
+    font-weight: bold;
+    margin: 0 5px;
+}
+
+.form-controls a:hover {
     text-decoration: underline;
+}
+
+/* Section Titles */
+.section-title {
+    grid-column: span 2;
+    margin: 15px 0 10px;
+    font-size: 1.1rem;
+    color: #444;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 5px;
+}
+
+/* =========================
+   Print Styles
+   ========================= */
+@media print {
+    body {
+        margin: 0;
+    }
+    .no-print {
+        display: none !important;
+    }
+    .print-area {
+        margin: 20mm;
+        width: 170mm; /* Keep inside A4 */
+    }
 }
 
 /* =========================
