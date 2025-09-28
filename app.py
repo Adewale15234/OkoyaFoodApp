@@ -349,6 +349,43 @@ def salary_history():
 
     return render_template('salary_history.html', salary_records=salary_records)
 
+# ----------------------- NEW: Secretary Attendance Route -----------------------
+@app.route('/secretary_attendance', methods=['POST'])
+def secretary_attendance():
+    try:
+        # Find the secretary worker entry (filter by position)
+        secretary = Worker.query.filter_by(position='Secretary').first()
+        if not secretary:
+            flash("Secretary not found in the system.", "error")
+            return redirect(url_for('login'))
+
+        # Check if already marked today
+        today = datetime.now().date()
+        existing_record = Attendance.query.filter(
+            Attendance.worker_id == secretary.id,
+            db.func.date(Attendance.date) == today
+        ).first()
+
+        if existing_record:
+            flash("Attendance already marked for today.", "info")
+        else:
+            attendance = Attendance(
+                worker_id=secretary.id,
+                status='Present',
+                date=datetime.now()
+            )
+            db.session.add(attendance)
+            db.session.commit()
+            flash("Secretary attendance marked successfully.", "success")
+
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f"Error marking secretary attendance: {e}")
+        flash("An error occurred while marking attendance.", "error")
+
+    return redirect(url_for('login'))
+# ------------------------------------------------------------------------------
+
 # Run migrations using Flask-Migrate (instead of db.create_all)
 def run_migrations():
     with app.app_context():
