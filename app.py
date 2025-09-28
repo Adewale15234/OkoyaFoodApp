@@ -182,6 +182,45 @@ def workers_name():
     workers = Worker.query.all()
     return render_template('workers_name.html', workers=workers)
 
+@app.route('/edit_worker/<int:worker_id>', methods=['GET', 'POST'])
+def edit_worker(worker_id):
+    if 'admin' not in session:
+        return redirect(url_for('login'))
+
+    worker = Worker.query.get_or_404(worker_id)
+
+    if request.method == 'POST':
+        try:
+            # Update worker fields from form
+            worker.name = request.form['name']
+            worker.phone_number = request.form['phone_number']
+            worker.date_of_birth = datetime.strptime(request.form['date_of_birth'], '%Y-%m-%d')
+            worker.gender = request.form['gender']
+            worker.qualifications = request.form['qualifications']
+            worker.position = request.form['position']
+            worker.national_id = request.form['national_id']
+            worker.nationality = request.form['nationality']
+            worker.home_address = request.form['home_address']
+            worker.ethnic_group = request.form['ethnic_group']
+            worker.place_of_residence = request.form['place_of_residence']
+            worker.disability = request.form.get('disability')
+            worker.email = request.form['email']
+            worker.date_of_employment = datetime.strptime(request.form['date_of_employment'], '%Y-%m-%d')
+            worker.amount_of_salary = float(request.form['amount_of_salary'])
+            worker.bank_name = request.form.get('bank_name')
+            worker.bank_account = request.form.get('bank_account')
+            worker.guarantor = request.form.get('guarantor')
+            worker.bank_account_name = request.form.get('bank_account_name')
+
+            db.session.commit()
+            flash('Worker details updated successfully.')
+            return redirect(url_for('workers_name'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f"Error updating worker: {e}", "error")
+
+    return render_template('edit_worker.html', worker=worker)
+
 @app.route('/delete_worker/<int:worker_id>', methods=['POST'])
 def delete_worker(worker_id):
     if 'admin' not in session:
