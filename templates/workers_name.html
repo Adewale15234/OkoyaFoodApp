@@ -3,82 +3,80 @@
 <h1>Registered Workers</h1>
 <a href="{{ url_for('dashboard') }}" class="back-link">← Back to Dashboard</a>
 
-<div style="overflow-x:auto;">
-<table>
-    <thead>
-        <tr>
-            <th>Code</th>
-            <th>Name</th>
-            <th>Phone</th>
-            <th>Position</th>
-            <th>Employment Date</th>
-            <th>Email</th>
-            <th>Details</th>
-            <th>Action</th>
-        </tr>
-    </thead>
-    <tbody>
-    {% for worker in workers %}
-        <tr>
-            <td>{{ worker.worker_code or '—' }}</td>
-            <td>{{ worker.name }}</td>
-            <td>{{ worker.phone_number or '—' }}</td>
-            <td>{{ worker.position or '—' }}</td>
-            <td>{{ worker.date_of_employment.strftime('%Y-%m-%d') if worker.date_of_employment else '—' }}</td>
-            <td>{{ worker.email or '—' }}</td>
-            <td>
-                <button type="button" onclick="toggleDetails({{ worker.id }})">
-                    {{ 'Hide' if worker.id in request.args.getlist('open') else 'Details' }}
-                </button>
-            </td>
-            <td>
-                <form action="{{ url_for('delete_worker', worker_id=worker.id) }}" method="post"
-                      onsubmit="return confirm('Are you sure you want to delete this worker?');">
-                    <button type="submit" class="delete-button">Delete</button>
-                </form>
-                <a href="{{ url_for('edit_worker', worker_id=worker.id) }}" class="edit-button">Edit</a>
-            </td>
-        </tr>
+<div class="workers-table-container">
+    <table>
+        <thead>
+            <tr>
+                <th>Code</th>
+                <th>Name</th>
+                <th>Phone</th>
+                <th>Position</th>
+                <th>Employment Date</th>
+                <th>Email</th>
+                <th>Details</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for worker in workers %}
+            <tr>
+                <td data-label="Code">{{ worker.worker_code or '—' }}</td>
+                <td data-label="Name">{{ worker.name }}</td>
+                <td data-label="Phone">{{ worker.phone_number or '—' }}</td>
+                <td data-label="Position">{{ worker.position or '—' }}</td>
+                <td data-label="Employment Date">{{ worker.date_of_employment.strftime('%Y-%m-%d') if worker.date_of_employment else '—' }}</td>
+                <td data-label="Email">{{ worker.email or '—' }}</td>
+                <td data-label="Details">
+                    <button type="button" onclick="toggleDetails({{ worker.id }})">
+                        {{ 'Hide' if worker.id in request.args.getlist('open') else 'Details' }}
+                    </button>
+                </td>
+                <td data-label="Action">
+                    <form action="{{ url_for('delete_worker', worker_id=worker.id) }}" method="post"
+                          onsubmit="return confirm('Are you sure you want to delete this worker?');">
+                        <button type="submit" class="delete-button">Delete</button>
+                    </form>
+                    <a href="{{ url_for('edit_worker', worker_id=worker.id) }}" class="edit-button">Edit</a>
+                </td>
+            </tr>
 
-        <!-- Collapsible details row -->
-        <tr id="details-{{ worker.id }}" class="details-row" style="display:none;">
-            <td colspan="8" style="background:#fbfbfb;">
-                <div style="display:flex; gap:2rem; flex-wrap:wrap;">
-
-                    <!-- Personal Info -->
+            <!-- Collapsible details row -->
+            <tr id="details-{{ worker.id }}" class="details-row" style="display:none;">
+                <td colspan="8">
                     <div>
-                        <strong>DOB:</strong> {{ worker.date_of_birth.strftime('%Y-%m-%d') if worker.date_of_birth else '—' }}<br>
-                        <strong>Gender:</strong> {{ worker.gender or '—' }}<br>
-                        <strong>Qualifications:</strong> {{ worker.qualifications or '—' }}<br>
-                        <strong>National ID:</strong> {{ worker.national_id or '—' }}<br>
-                        <strong>Nationality:</strong> {{ worker.nationality or '—' }}<br>
-                        <strong>Email:</strong> {{ worker.email or '—' }}<br>
-                        <strong>Date of Employment:</strong> {{ worker.date_of_employment.strftime('%Y-%m-%d') if worker.date_of_employment else '—' }}
-                    </div>
+                        <!-- Personal Info -->
+                        <div>
+                            <strong>DOB:</strong> {{ worker.date_of_birth.strftime('%Y-%m-%d') if worker.date_of_birth else '—' }}<br>
+                            <strong>Gender:</strong> {{ worker.gender or '—' }}<br>
+                            <strong>Qualifications:</strong> {{ worker.qualifications or '—' }}<br>
+                            <strong>National ID:</strong> {{ worker.national_id or '—' }}<br>
+                            <strong>Nationality:</strong> {{ worker.nationality or '—' }}<br>
+                            <strong>Email:</strong> {{ worker.email or '—' }}<br>
+                            <strong>Date of Employment:</strong> {{ worker.date_of_employment.strftime('%Y-%m-%d') if worker.date_of_employment else '—' }}
+                        </div>
 
-                    <!-- Address Info -->
-                    <div>
-                        <strong>Home Address:</strong> {{ worker.home_address or '—' }}<br>
-                        <strong>Ethnic Group:</strong> {{ worker.ethnic_group or '—' }}<br>
-                        <strong>Place of Residence:</strong> {{ worker.place_of_residence or '—' }}<br>
-                        <strong>Disability:</strong> {{ worker.disability or '—' }}
-                    </div>
+                        <!-- Address Info -->
+                        <div>
+                            <strong>Home Address:</strong> {{ worker.home_address or '—' }}<br>
+                            <strong>Ethnic Group:</strong> {{ worker.ethnic_group or '—' }}<br>
+                            <strong>Place of Residence:</strong> {{ worker.place_of_residence or '—' }}<br>
+                            <strong>Disability:</strong> {{ worker.disability or '—' }}
+                        </div>
 
-                    <!-- Salary & Bank Info -->
-                    <div>
-                        <strong>Amount of Salary:</strong> {{ worker.amount_of_salary or '—' }}<br>
-                        <strong>Guarantor:</strong> {{ worker.guarantor or '—' }}<br>
-                        <strong>Bank Account Name:</strong> {{ worker.bank_account_name or '—' }}<br>
-                        <strong>Bank Name:</strong> {{ worker.bank_name or '—' }}<br>
-                        <strong>Bank Account:</strong> {{ worker.bank_account or '—' }}
+                        <!-- Salary & Bank Info -->
+                        <div>
+                            <strong>Amount of Salary:</strong> {{ worker.amount_of_salary or '—' }}<br>
+                            <strong>Guarantor:</strong> {{ worker.guarantor or '—' }}<br>
+                            <strong>Bank Account Name:</strong> {{ worker.bank_account_name or '—' }}<br>
+                            <strong>Bank Name:</strong> {{ worker.bank_name or '—' }}<br>
+                            <strong>Bank Account:</strong> {{ worker.bank_account or '—' }}
+                        </div>
                     </div>
-
-                </div>
-            </td>
-        </tr>
-    {% endfor %}
-    </tbody>
-</table>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
 </div>
 
 <script>
