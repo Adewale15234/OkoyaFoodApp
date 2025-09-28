@@ -8,6 +8,21 @@
     <a href="#" onclick="window.print()">🖨️ Print This Page</a>
 </nav>
 
+<!-- Month Filter Dropdown -->
+<div class="no-print">
+    <form method="get" action="{{ url_for('salary_history') }}">
+        <label for="month_filter">Filter by Month:</label>
+        <select name="month" id="month_filter" onchange="this.form.submit()">
+            <option value="">-- All Months --</option>
+            {% for month in available_months %}
+                <option value="{{ month }}" {% if month == selected_month %}selected{% endif %}>
+                    {{ month }}
+                </option>
+            {% endfor %}
+        </select>
+    </form>
+</div>
+
 <div class="print-area">
     {% if salary_records %}
         <table>
@@ -18,7 +33,7 @@
                     <th>Total Days Present</th>
                     <th>Amount Paid (₦)</th>
                     <th>Bank Name</th>
-                <th>Bank Account</th>
+                    <th>Bank Account</th>
                     <th>Payment Date</th>
                 </tr>
             </thead>
