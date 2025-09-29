@@ -4,15 +4,13 @@
 
 {% if secretary %}
     <!-- Secretary sees Logout button -->
-    <a href="{{ url_for('logout') }}" class="logout-button" style="display:inline-block; padding:10px 15px; background:#dc3545; color:white; text-decoration:none; border-radius:5px; margin-bottom:20px;">
-        Logout
-    </a>
+    <a href="{{ url_for('logout') }}" class="logout-button">Logout</a>
 {% else %}
     <!-- Admin sees back to dashboard -->
     <a href="{{ url_for('dashboard') }}" class="back-link">← Back to Dashboard</a>
 {% endif %}
 
-<div class="attendance-table-container" style="margin-top:20px;">
+<div class="attendance-table-container">
     <table class="attendance-table">
         <thead>
             <tr>

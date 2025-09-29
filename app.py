@@ -270,10 +270,11 @@ from datetime import date
 
 @app.route('/attendance', methods=['GET', 'POST'])
 def attendance():
-    if 'admin' not in session:
+    if 'admin' not in session and 'secretary' not in session:
         return redirect(url_for('login'))
 
     workers = Worker.query.all()
+    secretary = 'secretary' in session  # ✅ detect if secretary
 
     if request.method == 'POST':
         worker_id = request.form.get('worker_id')
@@ -282,28 +283,23 @@ def attendance():
         if worker_id and status:
             today = date.today()
 
-            # ✅ Check if already marked today
             existing = Attendance.query.filter_by(worker_id=worker_id, date=today).first()
             if existing:
                 flash('Attendance already submitted for this worker today.', 'warning')
             else:
-                attendance = Attendance(
-                    worker_id=worker_id,
-                    status=status,
-                    date=today
-                )
+                attendance = Attendance(worker_id=worker_id, status=status, date=today)
                 db.session.add(attendance)
                 db.session.commit()
                 flash('Attendance marked successfully.', 'success')
 
         return redirect(url_for('attendance'))
 
-    return render_template('attendance.html', workers=workers)
+    return render_template('attendance.html', workers=workers, secretary=secretary)
 
 @app.route('/salary', methods=['GET', 'POST'])
 def salary():
-    if 'admin' not in session:
-        return redirect(url_for('login'))
+    if 'admin' not in session and 'secretary' not in session:
+    return redirect(url_for('login'))
 
     workers = Worker.query.all()
     today = datetime.today()
@@ -375,6 +371,8 @@ def attendance_history():
     records = Attendance.query.order_by(Attendance.date.desc()).all()
     return render_template('attendance_history.html', attendance_records=records)
 
+from datetime import datetime
+
 @app.route('/salary_history')
 def salary_history():
     if 'admin' not in session:
@@ -389,7 +387,11 @@ def salary_history():
         except:
             record.total_days_present = 0  # fallback in case of error
 
-    return render_template('salary_history.html', salary_records=salary_records)
+    return render_template(
+        'salary_history.html',
+        salary_records=salary_records,
+        now=datetime.now()  # ✅ pass "now" so template can use it
+    )
 
 # Run migrations using Flask-Migrate (instead of db.create_all)
 def run_migrations():
