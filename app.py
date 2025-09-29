@@ -75,8 +75,10 @@ class Worker(db.Model):
 class Attendance(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     worker_id = db.Column(db.Integer, db.ForeignKey('workers.id'), nullable=False)
-    date = db.Column(db.DateTime, nullable=False, default=db.func.current_timestamp())
+    date = db.Column(db.Date, nullable=False, default=db.func.current_date())  # ✅ store only the day
     status = db.Column(db.String(10), nullable=False)
+
+    worker = db.relationship('Worker', backref='attendances')
 
 class Salary(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -235,34 +237,46 @@ def delete_worker(worker_id):
     db.session.commit()
     flash('Worker deleted successfully.')
     return redirect(url_for('workers_name'))
-    
+
 # Alias route for secretary_attendance (fix BuildError)
 @app.route('/secretary_attendance', methods=['GET', 'POST'])
 def secretary_attendance():
     # Reuse the attendance function logic
     return redirect(url_for('attendance'))
 
+from datetime import date
+
 @app.route('/attendance', methods=['GET', 'POST'])
 def attendance():
     if 'admin' not in session:
         return redirect(url_for('login'))
+
     workers = Worker.query.all()
+
     if request.method == 'POST':
         worker_id = request.form.get('worker_id')
         status = request.form.get('attendance_status')
-        if worker_id and status:
-            attendance = Attendance(
-                worker_id=worker_id,
-                status=status,
-                date=datetime.now()
-            )
-            db.session.add(attendance)
-            db.session.commit()
-            flash('Attendance marked successfully.')
-            return redirect(url_for('attendance'))
-    return render_template('attendance.html', workers=workers)
 
-from calendar import monthrange
+        if worker_id and status:
+            today = date.today()
+
+            # ✅ Check if already marked today
+            existing = Attendance.query.filter_by(worker_id=worker_id, date=today).first()
+            if existing:
+                flash('Attendance already submitted for this worker today.', 'warning')
+            else:
+                attendance = Attendance(
+                    worker_id=worker_id,
+                    status=status,
+                    date=today
+                )
+                db.session.add(attendance)
+                db.session.commit()
+                flash('Attendance marked successfully.', 'success')
+
+        return redirect(url_for('attendance'))
+
+    return render_template('attendance.html', workers=workers)
 
 @app.route('/salary', methods=['GET', 'POST'])
 def salary():
