@@ -2,6 +2,7 @@
 {% block content %}
 <h2 class="print-area">Salary History</h2>
 
+<!-- Top navigation (hidden when printing) -->
 <nav class="no-print">
     <a href="{{ url_for('dashboard') }}">Dashboard</a> |
     <a href="{{ url_for('logout') }}">Logout</a> |
@@ -9,7 +10,7 @@
 </nav>
 
 <!-- Month Filter Dropdown -->
-<div class="no-print">
+<div class="filter-section">
     <form method="get" action="{{ url_for('salary_history') }}">
         <label for="month_filter">Filter by Month:</label>
         <select name="month" id="month_filter" onchange="this.form.submit()">
@@ -21,17 +22,24 @@
             {% endfor %}
         </select>
     </form>
+    {% if selected_month %}
+        <p class="selected-month">Showing results for: <strong>{{ selected_month }}</strong></p>
+    {% else %}
+        <p class="selected-month">Showing results for: <strong>All Months</strong></p>
+    {% endif %}
 </div>
 
+<!-- Salary History Table -->
 <div class="print-area">
     {% if salary_records %}
-        <table>
+        <table class="salary-table">
             <thead>
                 <tr>
                     <th>Worker ID</th>
                     <th>Name</th>
                     <th>Total Days Present</th>
                     <th>Amount Paid (₦)</th>
+                    <th>Bank Account Name</th>
                     <th>Bank Name</th>
                     <th>Bank Account</th>
                     <th>Payment Date</th>
@@ -44,6 +52,7 @@
                         <td>{{ record.worker.name }}</td>
                         <td>{{ record.total_days_present }}</td>
                         <td>₦{{ "%.2f"|format(record.amount) }}</td>
+                        <td>{{ record.bank_account_name }}</td>
                         <td>{{ record.bank_name }}</td>
                         <td>{{ record.bank_account }}</td>
                         <td>{{ record.payment_date.strftime('%Y-%m-%d %H:%M') }}</td>
@@ -55,4 +64,7 @@
         <p>No salary records available.</p>
     {% endif %}
 </div>
+
+<!-- Link external CSS -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/salary_history.css') }}">
 {% endblock %}

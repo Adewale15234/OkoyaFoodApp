@@ -593,3 +593,83 @@ tbody td {
     from { opacity: 0; transform: translateY(30px); }
     to { opacity: 1; transform: translateY(0); }
 }
+/* =========================
+   Salary History Page
+   ========================= */
+.salary-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    font-size: 14px;
+    background: #fff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.salary-table th,
+.salary-table td {
+    border: 1px solid #ddd;
+    padding: 10px 12px;
+    text-align: left;
+    color: #004080;
+}
+
+.salary-table th {
+    background-color: #004080;
+    color: #fff;
+    font-weight: bold;
+}
+
+.filter-section {
+    margin: 15px 0;
+}
+
+.filter-section label {
+    font-weight: bold;
+    margin-right: 8px;
+    color: #004080;
+}
+
+.filter-section select {
+    padding: 6px 10px;
+    border-radius: 5px;
+    border: 1px solid #004080;
+    background: #f0f4f8;
+    color: #004080;
+    cursor: pointer;
+}
+
+.filter-section select:hover {
+    background: #dce6f5;
+}
+
+.selected-month {
+    font-style: italic;
+    margin-top: 8px;
+    color: #333;
+}
+
+/* Print styles for Salary History */
+@media print {
+    .no-print {
+        display: none !important;
+    }
+    body {
+        margin: 0;
+        padding: 0;
+    }
+    .salary-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+    }
+    .salary-table th,
+    .salary-table td {
+        border: 1px solid #000;
+        padding: 6px;
+    }
+    h2, .selected-month {
+        margin: 10px 0;
+    }
+}
