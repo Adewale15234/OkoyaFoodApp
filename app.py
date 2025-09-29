@@ -6,6 +6,9 @@ from calendar import monthrange   # ✅ Add this line
 import os
 import logging
 
+# Secretary entrance (hardcoded for now)
+SECRETARY_PASSWORD = os.environ.get('SECRETARY_PASSWORD', 'secret123')
+
 # Logging setup
 logging.basicConfig(level=logging.INFO)
 
@@ -114,6 +117,26 @@ def login():
         else:
             error = 'Invalid username or password.'
     return render_template('login.html', error=error)
+
+@app.route('/logout')
+def logout():
+    session.pop('admin', None)
+    session.pop('secretary', None)
+    flash("You have been logged out.")
+    return redirect(url_for('login'))
+
+@app.route('/secretary_login', methods=['GET', 'POST'])
+def secretary_login():
+    error = None
+    if request.method == 'POST':
+        password = request.form.get('password')
+        if password == SECRETARY_PASSWORD:
+            session['secretary'] = True
+            session.permanent = True
+            return redirect(url_for('attendance'))
+        else:
+            error = "Invalid entrance password."
+    return render_template('secretary_login.html', error=error)
 
 @app.route('/logout')
 def logout():
