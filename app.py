@@ -51,13 +51,11 @@ class Worker(db.Model):
     email = db.Column(db.String(100), nullable=False)
     date_of_employment = db.Column(db.Date, nullable=False)
 
-    # amount_of_salary: Float to accept decimals
     amount_of_salary = db.Column(db.Float, nullable=False)
     bank_name = db.Column(db.String(100), nullable=True)
     bank_account = db.Column(db.String(50), nullable=True)
-
-    guarantor = db.Column(db.String(100), nullable=False)
     bank_account_name = db.Column(db.String(100), nullable=False)
+    guarantor = db.Column(db.String(100), nullable=False)
 
     attendance_records = db.relationship(
         'Attendance',
@@ -72,13 +70,14 @@ class Worker(db.Model):
         cascade="all, delete-orphan"
     )
 
+
 class Attendance(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     worker_id = db.Column(db.Integer, db.ForeignKey('workers.id'), nullable=False)
-    date = db.Column(db.Date, nullable=False, default=db.func.current_date())  # ✅ store only the day
+    date = db.Column(db.Date, nullable=False, default=db.func.current_date())
     status = db.Column(db.String(10), nullable=False)
+    # ✅ Removed conflicting relationship here
 
-    worker = db.relationship('Worker', backref='attendances')
 
 class Salary(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -88,7 +87,6 @@ class Salary(db.Model):
     amount = db.Column(db.Float, nullable=False)
     bank_name = db.Column(db.String(100), nullable=True)
     bank_account = db.Column(db.String(50), nullable=True)
-    # Add bank_account_name to snapshot who the payment was made to
     bank_account_name = db.Column(db.String(100), nullable=True)
     payment_date = db.Column(db.DateTime, nullable=False, default=db.func.current_timestamp())
 
