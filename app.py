@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate, upgrade  # ✅ 'upgrade' is now imported
 from datetime import datetime
+from calendar import monthrange   # ✅ Add this line
 import os
 import logging
 
