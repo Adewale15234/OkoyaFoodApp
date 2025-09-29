@@ -800,3 +800,68 @@ tbody td {
 .submit-button:hover {
     background: #218838;
 }
+/* ===== Choose Login Page ===== */
+.choose-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 90vh;
+    background: #f5f7fa;
+}
+
+.choose-card {
+    background: white;
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    text-align: center;
+    width: 100%;
+    max-width: 500px;
+}
+
+.choose-title {
+    font-size: 28px;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.choose-subtitle {
+    font-size: 16px;
+    color: #666;
+    margin-bottom: 30px;
+}
+
+.login-options {
+    display: flex;
+    justify-content: space-around;
+    gap: 20px;
+}
+
+.choose-btn {
+    flex: 1;
+    padding: 15px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.admin-btn {
+    background: #007bff;
+    color: white;
+}
+
+.admin-btn:hover {
+    background: #0056b3;
+}
+
+.secretary-btn {
+    background: #28a745;
+    color: white;
+}
+
+.secretary-btn:hover {
+    background: #1e7e34;
+}

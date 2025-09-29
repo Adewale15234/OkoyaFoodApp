@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="choose-wrapper">
+    <div class="choose-card">
+        <h1 class="choose-title">Welcome to Okoya Staff Manager</h1>
+        <p class="choose-subtitle">Please select your login type:</p>
+        <div class="login-options">
+            <a href="{{ url_for('login') }}" class="choose-btn admin-btn">Admin Login</a>
+            <a href="{{ url_for('secretary_login') }}" class="choose-btn secretary-btn">Secretary Login</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

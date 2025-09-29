@@ -371,6 +371,10 @@ def attendance_history():
 
 from datetime import datetime
 
+@app.route('/')
+def choose_login():
+    return render_template('choose_login.html')
+
 @app.route('/salary_history')
 def salary_history():
     if 'admin' not in session:
