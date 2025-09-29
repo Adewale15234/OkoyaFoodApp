@@ -1,26 +1,61 @@
 {% extends 'base.html' %}
 {% block content %}
-<a href="{{ url_for('dashboard') }}" class="back-link">← Back to Dashboard</a>
-<h1>Attendance History</h1>
+<a href="{{ url_for('dashboard') }}" class="back-link no-print">← Back to Dashboard</a>
+<h1 class="print-area">Attendance History</h1>
 
-<div class="attendance-table-container">
-    <table class="attendance-table">
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Worker</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for record in attendance_records|sort(attribute='date', reverse=true) %}
-            <tr>
-                <td>{{ record.date.strftime('%d %b %Y') }}</td>
-                <td>{{ record.worker.name }}</td>
-                <td>{{ record.status }}</td>
-            </tr>
+<!-- Top navigation (hidden when printing) -->
+<nav class="no-print">
+    <a href="{{ url_for('dashboard') }}">Dashboard</a> |
+    <a href="{{ url_for('logout') }}">Logout</a> |
+    <a href="#" onclick="window.print()">🖨️ Print This Page</a>
+</nav>
+
+<!-- Month Filter Dropdown -->
+<div class="filter-section no-print">
+    <form method="get" action="{{ url_for('attendance_history') }}">
+        <label for="month_filter">Filter by Month:</label>
+        <select name="month" id="month_filter" onchange="this.form.submit()">
+            <option value="">-- All Months --</option>
+            {% for month in available_months %}
+                <option value="{{ month }}" {% if month == selected_month %}selected{% endif %}>
+                    {{ month }}
+                </option>
             {% endfor %}
-        </tbody>
-    </table>
+        </select>
+    </form>
+    {% if selected_month %}
+        <p class="selected-month">Showing results for: <strong>{{ selected_month }}</strong></p>
+    {% else %}
+        <p class="selected-month">Showing results for: <strong>All Months</strong></p>
+    {% endif %}
 </div>
+
+<!-- Attendance History Table -->
+<div class="attendance-table-container print-area">
+    {% if attendance_records %}
+        <table class="attendance-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Worker</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in attendance_records|sort(attribute='date', reverse=true) %}
+                <tr>
+                    <td>{{ record.date.strftime('%d %b %Y') }}</td>
+                    <td>{{ record.worker.name }}</td>
+                    <td>{{ record.status }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No attendance records available.</p>
+    {% endif %}
+</div>
+
+<!-- Link external CSS -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/attendance_history.css') }}">
 {% endblock %}
