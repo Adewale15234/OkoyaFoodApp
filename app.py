@@ -138,12 +138,6 @@ def secretary_login():
             error = "Invalid entrance password."
     return render_template('secretary_login.html', error=error)
 
-@app.route('/logout')
-def logout():
-    session.pop('admin', None)
-    flash("You have been logged out.")
-    return redirect(url_for('login'))
-
 @app.route('/dashboard')
 def dashboard():
     if 'admin' not in session:
