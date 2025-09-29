@@ -235,6 +235,12 @@ def delete_worker(worker_id):
     db.session.commit()
     flash('Worker deleted successfully.')
     return redirect(url_for('workers_name'))
+    
+# Alias route for secretary_attendance (fix BuildError)
+@app.route('/secretary_attendance', methods=['GET', 'POST'])
+def secretary_attendance():
+    # Reuse the attendance function logic
+    return redirect(url_for('attendance'))
 
 @app.route('/attendance', methods=['GET', 'POST'])
 def attendance():
