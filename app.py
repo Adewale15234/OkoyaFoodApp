@@ -293,13 +293,17 @@ def attendance():
 @app.route('/salary', methods=['GET', 'POST'])
 def salary():
     if 'admin' not in session and 'secretary' not in session:
-    return redirect(url_for('login'))
+        return redirect(url_for('login'))
 
     workers = Worker.query.all()
     today = datetime.today()
     current_year = today.year
     current_month = today.month
     total_days_in_month = monthrange(current_year, current_month)[1]  # e.g., 30
+
+    # Safety: monthrange should never return 0, but guard anyway
+    if total_days_in_month == 0:
+        total_days_in_month = 1
 
     salary_data = []
     for worker in workers:
