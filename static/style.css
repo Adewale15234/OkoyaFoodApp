@@ -673,3 +673,76 @@ tbody td {
         margin: 10px 0;
     }
 }
+/* =========================
+   Print Header Design
+   ========================= */
+.print-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.print-logo {
+    width: 100px;
+    height: auto;
+}
+
+.print-favicon {
+    width: 60px;
+    height: 60px;
+}
+
+.print-header-text {
+    text-align: center;
+    flex: 1;
+}
+
+.print-header-text .company-name {
+    font-size: 1.8rem;
+    color: green;
+    margin: 0;
+    font-weight: bold;
+}
+
+.print-header-text .company-motto {
+    font-size: 1.1rem;
+    color: goldenrod;
+    margin: 3px 0;
+    font-weight: bold;
+}
+
+.print-header-text .company-address {
+    font-size: 0.9rem;
+    color: black;
+    font-weight: bold;
+}
+
+/* =========================
+   Report Titles
+   ========================= */
+.report-title {
+    text-align: center;
+    color: #004080;
+    margin: 20px 0 5px;
+    font-size: 1.4rem;
+    font-weight: bold;
+}
+
+.report-date {
+    text-align: center;
+    color: #555;
+    margin-bottom: 15px;
+    font-style: italic;
+}
+
+/* =========================
+   Signature Section
+   ========================= */
+.signature-section {
+    margin-top: 50px;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 40px;
+    font-weight: bold;
+}
