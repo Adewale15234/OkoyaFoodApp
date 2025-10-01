@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
-<h2 class="print-area">Salary History</h2>
+<a href="{{ url_for('dashboard') }}" class="back-link no-print">← Back to Dashboard</a>
+<h1 class="no-print">Salary History</h1>
 
 <!-- Top navigation (hidden when printing) -->
 <nav class="no-print">
@@ -33,13 +34,13 @@
 <div class="print-area">
     <!-- Print Header -->
     <div class="print-header">
-        <img src="{{ url_for('static', filename='images/android-chrome-512x512.png') }}" alt="Company Logo" class="print-logo">
+        <img src="{{ url_for('static', filename='android-chrome-512x512.png') }}" alt="Company Logo" class="print-logo">
         <div class="print-header-text">
             <h1 class="company-name">Okoya Food Co., Staff Manager</h1>
             <p class="company-motto">"Quality Service, Trusted Management"</p>
             <p class="company-address">Saki, Oyo State, Nigeria</p>
         </div>
-        <img src="{{ url_for('static', filename='images/android-chrome-512x512.png') }}" alt="Favicon" class="print-favicon">
+        <img src="{{ url_for('static', filename='android-chrome-512x512.png') }}" alt="Favicon" class="print-favicon">
     </div>
     <hr>
 

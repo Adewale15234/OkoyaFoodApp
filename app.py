@@ -322,76 +322,90 @@ def salary():
     return render_template('salary.html', salary_data=salary_data)
 
 from datetime import datetime
+from sqlalchemy import extract
 
 @app.route('/attendance_history')
 def attendance_history():
     if 'admin' not in session and 'secretary' not in session:
         return redirect(url_for('login'))
 
-    # Get selected month from query params
     selected_month = request.args.get('month')
 
     # Query all attendance records
     attendance_records = Attendance.query.order_by(Attendance.date.desc()).all()
 
-    # Generate available months dynamically from records
+    # Generate available months dynamically
     available_months = sorted(
         list(set(record.date.strftime("%B %Y") for record in attendance_records)),
         reverse=True
     )
 
-    # Filter if a month is selected
+    # Filter by selected month using SQLAlchemy extract
     if selected_month:
-        attendance_records = [
-            record for record in attendance_records
-            if record.date.strftime("%B %Y") == selected_month
-        ]
+        month_dt = datetime.strptime(selected_month, "%B %Y")
+        attendance_records = Attendance.query.filter(
+            extract('month', Attendance.date) == month_dt.month,
+            extract('year', Attendance.date) == month_dt.year
+        ).order_by(Attendance.date.desc()).all()
 
     return render_template(
         "attendance_history.html",
         attendance_records=attendance_records,
         available_months=available_months,
         selected_month=selected_month,
-        now=datetime.now()  # <-- just add this line
+        now=datetime.now()
     )
+
+from sqlalchemy import extract
 
 @app.route('/salary_history')
 def salary_history():
     if 'admin' not in session and 'secretary' not in session:
         return redirect(url_for('login'))
 
-    # Get selected month from query params
     selected_month = request.args.get('month')
 
-    # Query all salary records
-    salary_records = Salary.query.order_by(Salary.payment_date.desc()).all()
+    # Start query
+    query = Salary.query
 
-    # Generate available months dynamically from payment_date
+    # Filter by selected month if provided
+    if selected_month:
+        month_dt = datetime.strptime(selected_month, "%B %Y")
+        query = query.filter(
+            extract('month', Salary.payment_date) == month_dt.month,
+            extract('year', Salary.payment_date) == month_dt.year
+        )
+
+    # Order by latest payment
+    salary_records = query.order_by(Salary.payment_date.desc()).all()
+
+    # Generate available months dynamically
     available_months = sorted(
-        list(set(record.payment_date.strftime("%B %Y") for record in salary_records)),
+        list(set(record.payment_date.strftime("%B %Y") for record in Salary.query.all())),
         reverse=True
     )
 
-    # Filter if a month is selected
-    if selected_month:
-        salary_records = [
-            record for record in salary_records
-            if record.payment_date.strftime("%B %Y") == selected_month
-        ]
-
-    # Safely attach total_days_present for display only
+    # Attach total_days_present for display
     for record in salary_records:
-        try:
-            record.total_days_present = Attendance.query.filter_by(worker_id=record.worker_id, status="Present").count()
-        except:
-            record.total_days_present = 0  # fallback
+        if selected_month:
+            month_dt = datetime.strptime(selected_month, "%B %Y")
+            record.total_days_present = Attendance.query.filter(
+                Attendance.worker_id == record.worker_id,
+                Attendance.status == "Present",
+                extract('month', Attendance.date) == month_dt.month,
+                extract('year', Attendance.date) == month_dt.year
+            ).count()
+        else:
+            record.total_days_present = Attendance.query.filter_by(
+                worker_id=record.worker_id, status="Present"
+            ).count()
 
     return render_template(
         'salary_history.html',
         salary_records=salary_records,
         available_months=available_months,
         selected_month=selected_month,
-        now=datetime.now()  # ✅ pass "now" so template can use it
+        now=datetime.now()
     )
 
 @app.route('/')

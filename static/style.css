@@ -1,867 +1,229 @@
 /* =========================
-   General Styles
-   ========================= */
-body {
-    font-family: 'Arial', sans-serif;
-    background: #f7f9fc;
-    margin: 0;
-    padding: 0;
-}
-
-/* =========================
-   Dashboard & Header Styles
-   ========================= */
-.dashboard-wrapper {
-    max-width: 1200px;
-    margin: 30px auto;
-    padding: 20px;
-}
-
-.dashboard-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 20px;
-    padding: 20px;
-    border-radius: 15px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    background-color: #f7f9fc;
-    margin-bottom: 30px;
-}
-
-.dashboard-logo {
-    width: 80px;
-    height: 80px;
-    object-fit: contain;
-    border-radius: 10px;
-    border: 1px solid #ccc;
-    background: #fff;
-    padding: 5px;
-}
-
-.header-text {
-    flex: 1;
-    text-align: left;
-}
-
-.header-links a {
-    margin-left: 15px;
-    font-weight: bold;
-    color: #004080;
-    text-decoration: none;
-    transition: color 0.3s;
-}
-
-.header-links a:hover {
-    color: #0066cc;
-    text-decoration: underline;
-}
-
-/* Text Styling */
-.company-name {
-    color: green;
-    font-weight: bold;
-    font-size: 1.8rem;
-    margin: 0;
-}
-
-.company-motto {
-    color: goldenrod;
-    font-weight: bold;
-    font-size: 1.2rem;
-    margin: 5px 0;
-}
-
-.company-address {
-    color: black;
-    font-weight: bold;
-    margin: 5px 0;
-}
-
-.greeting {
-    font-size: 1.2rem;
-    color: #004080;
-    margin: 10px 0 0;
-}
-
-.today-date {
-    font-size: 1rem;
-    color: #666;
-}
-
-/* Theme Buttons */
-.theme-controls {
-    margin-bottom: 25px;
-}
-
-.theme-controls button {
-    padding: 8px 14px;
-    margin-right: 10px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: bold;
-    background: #e0e0e0;
-    transition: all 0.3s;
-}
-
-.theme-controls button:hover {
-    background: #004080;
-    color: #fff;
-}
-
-/* Dashboard Welcome */
-.dashboard-welcome {
-    text-align: center;
-    font-size: 1.5rem;
-    margin-bottom: 30px;
-    color: #004080;
-    font-weight: bold;
-}
-
-/* Cards Layout */
-.dashboard-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 20px;
-}
-
-.dashboard-card {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #f0f4f8;
-    border-radius: 12px;
-    padding: 30px;
-    font-size: 1.1rem;
-    text-decoration: none;
-    color: #004080;
-    font-weight: bold;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    text-align: center;
-}
-
-.dashboard-card:hover {
-    background: #004080;
-    color: #fff;
-    transform: translateY(-5px);
-    box-shadow: 0 6px 12px rgba(0,0,0,0.2);
-}
-
-.logout-card {
-    background: #ff4d4f;
-    color: #fff;
-}
-
-.logout-card:hover {
-    background: #cc0000;
-    color: #fff;
-}
-
-/* =========================
-   Register Worker Page
-   ========================= */
-/* =========================
-   Register Worker Page
-   ========================= */
-
-/* General Container */
-.register-container {
-    max-width: 900px;
-    margin: auto;
-    padding: 20px;
-    border: 1px solid #000;
-    background: #fff;
-    font-family: Arial, sans-serif;
-}
-
-/* Official Header Row (Logo + Text + Passport) */
-.official-header-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
-    text-align: center;
-}
-
-.company-logo img {
-    height: 120px;      /* same height as passport */
-    width: 120px;       /* square logo */
-    object-fit: contain; /* ensure full logo fits */
-    border-radius: 10px; /* optional rounded corners */
-}
-
-.passport-preview img {
-    height: 120px;
-    width: 100px;
-    object-fit: cover;
-    border: 1px solid #000;
-}
-
-.official-header {
-    flex: 1;
-    padding: 0 20px;
-}
-
-/* =========================
-   Header Text Styling
-   ========================= */
-.company-name {
-    color: green;
-}
-
-.company-motto {
-    color: goldenrod;  /* deep yellow */
-    font-weight: bold;
-}
-
-.company-address {
-    color: black;
-    font-weight: bold;  /* bold black */
-}
-
-.form-title {
-    color: goldenrod;  /* deep yellow */
-    font-weight: bold;
-}
-
-.form-note {
-    color: black;
-    font-weight: bold;  /* bold black */
-}
-
-/* Form Layout */
-.form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;  /* two columns */
-    gap: 15px 40px;
-    margin-bottom: 20px;
-}
-
-.form-grid label {
-    display: block;
-    font-weight: bold;
-    margin-bottom: 3px;
-}
-
-.form-grid input {
-    border: none;
-    border-bottom: 1px solid #000;
-    width: 100%;
-    padding: 3px;
-    background: transparent;
-    outline: none;
-}
-
-/* Submit Button */
-.form-submit {
-    text-align: center;
-    margin-top: 20px;
-}
-
-.form-submit input,
-.form-submit button {
-    padding: 10px 20px;
-    font-size: 16px;
-    font-weight: bold;
-    background: #004080;
-    color: #fff;
-    border: none;
-    cursor: pointer;
-    border-radius: 5px;
-    margin: 5px;
-}
-
-.form-submit input:hover,
-.form-submit button:hover {
-    background: #0066cc;
-}
-
-/* Extra Controls (Back + Print) */
-.form-controls {
-    text-align: center;
-    margin-bottom: 20px;
-    font-size: 0.95rem;
-}
-
-.form-controls a {
-    color: #0f62fe;
-    text-decoration: none;
-    font-weight: bold;
-    margin: 0 5px;
-}
-
-.form-controls a:hover {
-    text-decoration: underline;
-}
-
-/* Section Titles */
-.section-title {
-    grid-column: span 2;
-    margin: 15px 0 10px;
-    font-size: 1.1rem;
-    color: #444;
-    border-bottom: 2px solid #eee;
-    padding-bottom: 5px;
-}
-
-/* =========================
-   Print Styles
+   Auto-fit Print Styles for Landscape/Portrait
    ========================= */
 @media print {
-    body {
+    body, html {
         margin: 0;
+        padding: 0;
+        font-size: 12px;
     }
+
     .no-print {
         display: none !important;
     }
+
     .print-area {
-        margin: 20mm;
-        width: 170mm; /* Keep inside A4 */
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
+        padding: 10mm;
     }
-}
 
-/* =========================
-   Registered Workers Table
-   ========================= */
-.workers-table-container,
-.attendance-table-container {
-    overflow-x: auto;
-    margin-top: 20px;
-}
-
-table,
-.attendance-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-family: 'Arial', sans-serif;
-    background: #fff;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    border-radius: 10px;
-    overflow: hidden;
-}
-
-thead {
-    background: #004080;
-    color: #fff;
-}
-
-thead th {
-    padding: 12px 15px;
-    text-align: left;
-    font-weight: bold;
-    white-space: nowrap;
-}
-
-tbody tr {
-    border-bottom: 1px solid #e0e0e0;
-    transition: background 0.3s;
-}
-
-tbody tr:nth-child(even) {
-    background: #f9f9f9;
-}
-
-tbody tr:hover {
-    background: #e6f0ff;
-}
-
-tbody td {
-    padding: 10px 15px;
-    color: #004080;
-    vertical-align: middle;
-    text-align: center;
-}
-
-/* Attendance Table Specific */
-.attendance-select {
-    padding: 6px 10px;
-    border-radius: 5px;
-    border: 1px solid #004080;
-    font-weight: bold;
-    cursor: pointer;
-    background: #f0f4f8;
-    color: #004080;
-}
-
-.attendance-select:hover {
-    background: #dce6f5;
-}
-
-.submit-button {
-    padding: 6px 12px;
-    border-radius: 6px;
-    border: none;
-    background: #004080;
-    color: #fff;
-    font-weight: bold;
-    cursor: pointer;
-    transition: 0.3s;
-}
-
-.submit-button:hover {
-    background: #0066cc;
-}
-
-/* Responsive Adjustments */
-@media (max-width: 768px) {
-    .dashboard-header {
-        flex-direction: column;
+    .print-header {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
         align-items: center;
-        text-align: center;
-    }
-    .header-text {
-        text-align: center;
-    }
-    .dashboard-logo {
-        width: 70px;
-        height: 70px;
+        flex-wrap: wrap;
         margin-bottom: 10px;
     }
 
-    thead {
-        display: none;
+    .print-logo,
+    .print-favicon {
+        width: 80px;
+        height: auto;
     }
-    tbody td {
-        display: block;
+
+    .print-header-text {
+        flex: 1;
+        text-align: center;
+        min-width: 200px;
+    }
+
+    table {
         width: 100%;
-        text-align: right;
-        padding-left: 50%;
-        position: relative;
+        border-collapse: collapse;
+        page-break-inside: auto;
+        font-size: 11px;
     }
-    tbody td::before {
-        content: attr(data-label);
-        position: absolute;
-        left: 15px;
+
+    th, td {
+        border: 1px solid #000 !important;
+        padding: 5px !important;
+        text-align: center;
+        word-wrap: break-word;
+    }
+
+    thead {
+        display: table-header-group;
+    }
+
+    tfoot {
+        display: table-footer-group;
+    }
+
+    tr {
+        page-break-inside: avoid;
+        page-break-after: auto;
+    }
+
+    .signature-section {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        margin-top: 40px;
+        padding: 0 20px;
+    }
+
+    .signature-section div {
         width: 45%;
-        text-align: left;
-        font-weight: bold;
-        color: #004080;
+        margin-top: 20px;
+        text-align: center;
+    }
+
+    h2, .report-title, .report-date, .selected-month {
+        text-align: center;
+        page-break-after: avoid;
+    }
+
+    /* Force landscape if table is too wide */
+    @page {
+        size: auto; /* auto-detect portrait/landscape */
+        margin: 15mm;
     }
 }
-/* Month Header */
-.month-header {
-    background-color: #e8f5e9; /* light green */
-    color: #2e7d32; /* dark green */
-    padding: 10px 15px;
-    border-radius: 8px;
-    margin-top: 30px;
-    font-size: 1.5rem;
-    font-weight: bold;
-}
-
-/* Week Header */
-.week-header {
-    background-color: #f1f8e9; /* lighter green */
-    color: #33691e; /* darker green */
-    padding: 8px 12px;
-    border-radius: 6px;
-    margin-top: 15px;
-    font-size: 1.2rem;
-    font-weight: bold;
-}
-
-/* Attendance Table */
-.attendance-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 20px;
-    border: 2px solid #2e7d32;
-}
-
-.attendance-table th, .attendance-table td {
-    padding: 10px;
-    text-align: center;
-    border: 1px solid #2e7d32;
-}
-
-.attendance-table th {
-    background-color: #2e7d32;
-    color: #fff;
-}
-
-/* Alternating rows */
-.attendance-table tbody tr:nth-child(even) {
-    background-color: #e8f5e9;
-}
-
-.attendance-table tbody tr:nth-child(odd) {
-    background-color: #f1f8e9;
-}
-
-/* Hover effect */
-.attendance-table tbody tr:hover {
-    background-color: #c8e6c9;
-}
 /* =========================
-   Login Page Styles
+   Print Styles for Salary & Attendance
    ========================= */
-.login-wrapper {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    background: linear-gradient(135deg, #004080, #0066cc);
-    padding: 20px;
-}
-
-.login-card {
-    background: #fff;
-    border-radius: 15px;
-    padding: 40px 30px;
-    max-width: 420px;
-    width: 100%;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.2);
-    text-align: center;
-    animation: fadeInUp 0.8s ease;
-}
-
-.login-header {
-    margin-bottom: 20px;
-}
-
-.login-logo {
-    width: 80px;
-    height: 80px;
-    object-fit: contain;
-    margin-bottom: 10px;
-}
-
-.login-title {
-    color: #004080;
-    margin: 20px 0 15px;
-    font-size: 1.5rem;
-    font-weight: bold;
-}
-
-.login-error {
-    color: red;
-    font-weight: bold;
-    margin-bottom: 15px;
-}
-
-.login-form {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-.form-group {
-    text-align: left;
-}
-
-.form-group label {
-    font-weight: bold;
-    margin-bottom: 5px;
-    display: block;
-    color: #004080;
-}
-
-.form-group input {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #004080;
-    border-radius: 8px;
-    outline: none;
-    transition: border 0.3s;
-}
-
-.form-group input:focus {
-    border-color: #0066cc;
-    box-shadow: 0 0 4px rgba(0,102,204,0.4);
-}
-
-.login-btn {
-    background: #004080;
-    color: #fff;
-    font-weight: bold;
-    padding: 12px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.3s;
-}
-
-.login-btn:hover {
-    background: #0066cc;
-    transform: translateY(-2px);
-}
-
-/* Animation */
-@keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(30px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-/* =========================
-   Salary History Page
-   ========================= */
-.salary-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 15px;
-    font-size: 14px;
-    background: #fff;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    border-radius: 10px;
-    overflow: hidden;
-}
-
-.salary-table th,
-.salary-table td {
-    border: 1px solid #ddd;
-    padding: 10px 12px;
-    text-align: left;
-    color: #004080;
-}
-
-.salary-table th {
-    background-color: #004080;
-    color: #fff;
-    font-weight: bold;
-}
-
-.filter-section {
-    margin: 15px 0;
-}
-
-.filter-section label {
-    font-weight: bold;
-    margin-right: 8px;
-    color: #004080;
-}
-
-.filter-section select {
-    padding: 6px 10px;
-    border-radius: 5px;
-    border: 1px solid #004080;
-    background: #f0f4f8;
-    color: #004080;
-    cursor: pointer;
-}
-
-.filter-section select:hover {
-    background: #dce6f5;
-}
-
-.selected-month {
-    font-style: italic;
-    margin-top: 8px;
-    color: #333;
-}
-
-/* Print styles for Salary History */
 @media print {
-    .no-print {
-        display: none !important;
-    }
     body {
         margin: 0;
         padding: 0;
+        font-family: Arial, sans-serif;
+        color: #000;
     }
-    .salary-table {
+
+    /* Hide navigation and filters */
+    .no-print {
+        display: none !important;
+    }
+
+    /* Printable area */
+    .print-area {
+        margin: 10mm;
+        width: 100%;
+        overflow-x: auto;
+        page-break-after: always;
+    }
+
+    /* Table styling for print */
+    table {
         width: 100%;
         border-collapse: collapse;
-        font-size: 14px;
+        font-size: 12px;
+        page-break-inside: auto;
     }
-    .salary-table th,
-    .salary-table td {
+
+    thead {
+        display: table-header-group; /* repeat header on each page */
+    }
+
+    tbody {
+        display: table-row-group;
+    }
+
+    th, td {
         border: 1px solid #000;
-        padding: 6px;
+        padding: 6px 8px;
+        text-align: center;
+        word-break: break-word;
     }
-    h2, .selected-month {
-        margin: 10px 0;
+
+    th {
+        background-color: #ccc;
+        font-weight: bold;
     }
-}
-/* =========================
-   Print Header Design
-   ========================= */
-.print-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
-}
 
-.print-logo {
-    width: 100px;
-    height: auto;
-}
+    /* Header for print */
+    .print-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
 
-.print-favicon {
-    width: 60px;
-    height: 60px;
-}
+    .print-logo {
+        width: 100px;
+        height: auto;
+    }
 
-.print-header-text {
-    text-align: center;
-    flex: 1;
-}
+    .print-favicon {
+        width: 60px;
+        height: 60px;
+    }
 
-.print-header-text .company-name {
-    font-size: 1.8rem;
-    color: green;
-    margin: 0;
-    font-weight: bold;
-}
+    .print-header-text {
+        text-align: center;
+        flex: 1;
+    }
 
-.print-header-text .company-motto {
-    font-size: 1.1rem;
-    color: goldenrod;
-    margin: 3px 0;
-    font-weight: bold;
-}
+    .print-header-text .company-name {
+        font-size: 1.8rem;
+        color: green;
+        margin: 0;
+        font-weight: bold;
+    }
 
-.print-header-text .company-address {
-    font-size: 0.9rem;
-    color: black;
-    font-weight: bold;
-}
+    .print-header-text .company-motto {
+        font-size: 1.1rem;
+        color: goldenrod;
+        margin: 3px 0;
+        font-weight: bold;
+    }
 
-/* =========================
-   Report Titles
-   ========================= */
-.report-title {
-    text-align: center;
-    color: #004080;
-    margin: 20px 0 5px;
-    font-size: 1.4rem;
-    font-weight: bold;
-}
+    .print-header-text .company-address {
+        font-size: 0.9rem;
+        color: black;
+        font-weight: bold;
+    }
 
-.report-date {
-    text-align: center;
-    color: #555;
-    margin-bottom: 15px;
-    font-style: italic;
-}
+    /* Report titles */
+    .report-title {
+        text-align: center;
+        color: #004080;
+        margin: 20px 0 5px;
+        font-size: 1.4rem;
+        font-weight: bold;
+    }
 
-/* =========================
-   Signature Section
-   ========================= */
-.signature-section {
-    margin-top: 50px;
-    display: flex;
-    justify-content: space-between;
-    padding: 0 40px;
-    font-weight: bold;
-}
-/* Buttons */
-.logout-button {
-    display: inline-block;
-    padding: 10px 15px;
-    background: #dc3545;
-    color: white;
-    text-decoration: none;
-    border-radius: 5px;
-    margin-bottom: 20px;
-}
+    .report-date {
+        text-align: center;
+        color: #555;
+        margin-bottom: 15px;
+        font-style: italic;
+    }
 
-.back-link {
-    display: inline-block;
-    padding: 8px 12px;
-    background: #007bff;
-    color: white;
-    text-decoration: none;
-    border-radius: 5px;
-    margin-bottom: 20px;
-}
+    /* Signature Section */
+    .signature-section {
+        margin-top: 50px;
+        display: flex;
+        justify-content: space-between;
+        padding: 0 40px;
+        font-weight: bold;
+    }
 
-/* Table */
-.attendance-table-container {
-    margin-top: 20px;
-}
+    /* Handle landscape if table is too wide */
+    @page {
+        size: auto;
+        margin: 10mm;
+    }
 
-.attendance-table {
-    width: 100%;
-    border-collapse: collapse;
-}
+    table {
+        page-break-inside: auto;
+    }
 
-.attendance-table th,
-.attendance-table td {
-    padding: 10px;
-    border: 1px solid #ddd;
-    text-align: center;
-}
-
-.attendance-select {
-    padding: 5px;
-}
-
-.submit-button {
-    padding: 5px 10px;
-    background: #28a745;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.submit-button:hover {
-    background: #218838;
-}
-/* ===== Choose Login Page ===== */
-.choose-wrapper {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 90vh;
-    background: #f5f7fa;
-}
-
-.choose-card {
-    background: white;
-    padding: 40px;
-    border-radius: 15px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-    text-align: center;
-    width: 100%;
-    max-width: 500px;
-}
-
-.choose-title {
-    font-size: 28px;
-    margin-bottom: 10px;
-    color: #333;
-}
-
-.choose-subtitle {
-    font-size: 16px;
-    color: #666;
-    margin-bottom: 30px;
-}
-
-.login-options {
-    display: flex;
-    justify-content: space-around;
-    gap: 20px;
-}
-
-.choose-btn {
-    flex: 1;
-    padding: 15px;
-    border-radius: 10px;
-    text-decoration: none;
-    font-size: 18px;
-    font-weight: bold;
-    text-align: center;
-    transition: all 0.3s ease;
-}
-
-.admin-btn {
-    background: #007bff;
-    color: white;
-}
-
-.admin-btn:hover {
-    background: #0056b3;
-}
-
-.secretary-btn {
-    background: #28a745;
-    color: white;
-}
-
-.secretary-btn:hover {
-    background: #1e7e34;
+    tr {
+        page-break-inside: avoid;
+        page-break-after: auto;
+    }
 }
