@@ -101,43 +101,7 @@ PASSWORD = os.environ.get('ADMIN_PASSWORD', 'Alayinde001')
 
 # Routes
 ...
-@app.route('/')
-def choose_login():
-    return render_template('choose_login.html')
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    error = None
-    if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
-        if username == USERNAME and password == PASSWORD:
-            session['admin'] = username
-            session.permanent = True
-            return redirect(url_for('dashboard'))
-        else:
-            error = 'Invalid username or password.'
-    return render_template('login.html', error=error)
-
-@app.route('/logout')
-def logout():
-    session.pop('admin', None)
-    session.pop('secretary', None)
-    flash("You have been logged out.")
-    return redirect(url_for('login'))
-
-@app.route('/secretary_login', methods=['GET', 'POST'])
-def secretary_login():
-    error = None
-    if request.method == 'POST':
-        password = request.form.get('password')
-        if password == SECRETARY_PASSWORD:
-            session['secretary'] = True
-            session.permanent = True
-            return redirect(url_for('attendance'))
-        else:
-            error = "Invalid entrance password."
-    return render_template('secretary_login.html', error=error)
 
 @app.route('/register', methods=['GET', 'POST']) 
 def register_worker():
@@ -383,11 +347,9 @@ def salary_history():
         salary_records=salary_records,
         now=datetime.now()  # ✅ pass "now" so template can use it
     )
-# Landing page → choose login type
 @app.route('/')
 def choose_login():
     return render_template('choose_login.html')
-
 
 # Admin login
 @app.route('/login', methods=['GET', 'POST'])
