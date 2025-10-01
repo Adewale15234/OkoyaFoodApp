@@ -100,9 +100,10 @@ USERNAME = os.environ.get('ADMIN_USERNAME', 'admin')
 PASSWORD = os.environ.get('ADMIN_PASSWORD', 'Alayinde001')
 
 # Routes
+...
 @app.route('/')
-def home():
-    return redirect(url_for('login'))
+def choose_login():
+    return render_template('choose_login.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -137,12 +138,6 @@ def secretary_login():
         else:
             error = "Invalid entrance password."
     return render_template('secretary_login.html', error=error)
-
-@app.route('/dashboard')
-def dashboard():
-    if 'admin' not in session:
-        return redirect(url_for('login'))
-    return render_template('dashboard.html')
 
 @app.route('/register', methods=['GET', 'POST']) 
 def register_worker():
@@ -369,12 +364,6 @@ def attendance_history():
     records = Attendance.query.order_by(Attendance.date.desc()).all()
     return render_template('attendance_history.html', attendance_records=records)
 
-from datetime import datetime
-
-@app.route('/')
-def choose_login():
-    return render_template('choose_login.html')
-
 @app.route('/salary_history')
 def salary_history():
     if 'admin' not in session:
@@ -394,6 +383,66 @@ def salary_history():
         salary_records=salary_records,
         now=datetime.now()  # ✅ pass "now" so template can use it
     )
+# Landing page → choose login type
+@app.route('/')
+def choose_login():
+    return render_template('choose_login.html')
+
+
+# Admin login
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    error = None
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        if username == USERNAME and password == PASSWORD:
+            session['admin'] = username
+            session.permanent = True
+            return redirect(url_for('dashboard'))
+        else:
+            error = 'Invalid username or password.'
+    return render_template('login.html', error=error)
+
+
+# Secretary login
+@app.route('/secretary_login', methods=['GET', 'POST'])
+def secretary_login():
+    error = None
+    if request.method == 'POST':
+        password = request.form.get('password')
+        if password == SECRETARY_PASSWORD:
+            session['secretary'] = True
+            session.permanent = True
+            return redirect(url_for('secretary_dashboard'))  # ✅ send to secretary dashboard
+        else:
+            error = "Invalid entrance password."
+    return render_template('secretary_login.html', error=error)
+
+
+# Logout
+@app.route('/logout')
+def logout():
+    session.pop('admin', None)
+    session.pop('secretary', None)
+    flash("You have been logged out.")
+    return redirect(url_for('choose_login'))  # ✅ back to choose login
+
+
+# Admin dashboard
+@app.route('/dashboard')
+def dashboard():
+    if 'admin' not in session:
+        return redirect(url_for('login'))
+    return render_template('dashboard.html')
+
+
+# Secretary dashboard
+@app.route('/secretary_dashboard')
+def secretary_dashboard():
+    if 'secretary' not in session:
+        return redirect(url_for('secretary_login'))
+    return render_template('secretary_dashboard.html')
 
 # Run migrations using Flask-Migrate (instead of db.create_all)
 def run_migrations():
