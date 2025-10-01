@@ -323,10 +323,34 @@ def salary():
 
 @app.route('/attendance_history')
 def attendance_history():
-    if 'admin' not in session:
+    if 'admin' not in session and 'secretary' not in session:
         return redirect(url_for('login'))
-    records = Attendance.query.order_by(Attendance.date.desc()).all()
-    return render_template('attendance_history.html', attendance_records=records)
+
+    # Get selected month from query params
+    selected_month = request.args.get('month')
+
+    # Query all attendance records
+    attendance_records = Attendance.query.order_by(Attendance.date.desc()).all()
+
+    # Generate available months dynamically from records
+    available_months = sorted(
+        list(set(record.date.strftime("%B %Y") for record in attendance_records)),
+        reverse=True
+    )
+
+    # Filter if a month is selected
+    if selected_month:
+        attendance_records = [
+            record for record in attendance_records
+            if record.date.strftime("%B %Y") == selected_month
+        ]
+
+    return render_template(
+        "attendance_history.html",
+        attendance_records=attendance_records,
+        available_months=available_months,
+        selected_month=selected_month
+    )
 
 @app.route('/salary_history')
 def salary_history():
