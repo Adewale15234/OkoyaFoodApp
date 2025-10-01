@@ -321,6 +321,8 @@ def salary():
 
     return render_template('salary.html', salary_data=salary_data)
 
+from datetime import datetime
+
 @app.route('/attendance_history')
 def attendance_history():
     if 'admin' not in session and 'secretary' not in session:
@@ -349,7 +351,8 @@ def attendance_history():
         "attendance_history.html",
         attendance_records=attendance_records,
         available_months=available_months,
-        selected_month=selected_month
+        selected_month=selected_month,
+        now=datetime.now()  # <-- just add this line
     )
 
 @app.route('/salary_history')
@@ -390,7 +393,7 @@ def salary_history():
         selected_month=selected_month,
         now=datetime.now()  # ✅ pass "now" so template can use it
     )
-    
+
 @app.route('/')
 def choose_login():
     return render_template('choose_login.html')
