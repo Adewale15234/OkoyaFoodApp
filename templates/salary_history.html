@@ -1,3 +1,4 @@
+    {% endif %}
 {% extends 'base.html' %}
 {% block content %}
 <h2 class="print-area">Salary History</h2>
@@ -31,23 +32,23 @@
 
 <!-- Printable Section -->
 <div class="print-area">
-    <!-- Header for print -->
+    <!-- Print Header -->
     <div class="print-header">
-        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Company Logo" class="print-logo">
+        <img src="{{ url_for('static', filename='images/android-chrome-512x512.png') }}" alt="Company Logo" class="print-logo">
         <div class="print-header-text">
             <h1 class="company-name">Okoya Food Co., Staff Manager</h1>
             <p class="company-motto">"Quality Service, Trusted Management"</p>
             <p class="company-address">Saki, Oyo State, Nigeria</p>
         </div>
-        <img src="{{ url_for('static', filename='images/favicon.png') }}" alt="Favicon" class="print-favicon">
+        <img src="{{ url_for('static', filename='images/android-chrome-512x512.png') }}" alt="Favicon" class="print-favicon">
     </div>
     <hr>
 
-    <!-- Title -->
+    <!-- Report Title -->
     <h2 class="report-title">Salary Payment Report</h2>
     <p class="report-date">Printed on: {{ now.strftime('%d %B %Y, %I:%M %p') }}</p>
 
-    <!-- Salary History Table -->
+    <!-- Salary Table -->
     {% if salary_records %}
         <table class="salary-table">
             <thead>
@@ -94,6 +95,5 @@
     </div>
 </div>
 
-<!-- Link external CSS -->
 <link rel="stylesheet" href="{{ url_for('static', filename='css/salary_history.css') }}">
 {% endblock %}

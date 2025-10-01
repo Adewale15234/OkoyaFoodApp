@@ -32,15 +32,15 @@
 
 <!-- Printable Section -->
 <div class="print-area">
-    <!-- Letterhead / Print Header -->
+    <!-- Print Header -->
     <div class="print-header">
-        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Company Logo" class="print-logo">
+        <img src="{{ url_for('static', filename='images/android-chrome-512x512.png') }}" alt="Company Logo" class="print-logo">
         <div class="print-header-text">
             <h1 class="company-name">Okoya Food Co., Staff Manager</h1>
             <p class="company-motto">"Quality Service, Trusted Management"</p>
             <p class="company-address">Saki, Oyo State, Nigeria</p>
         </div>
-        <img src="{{ url_for('static', filename='images/favicon.png') }}" alt="Favicon" class="print-favicon">
+        <img src="{{ url_for('static', filename='images/android-chrome-512x512.png') }}" alt="Favicon" class="print-favicon">
     </div>
     <hr>
 
@@ -48,7 +48,7 @@
     <h2 class="report-title">Attendance Report</h2>
     <p class="report-date">Printed on: {{ now.strftime('%d %B %Y, %I:%M %p') }}</p>
 
-    <!-- Attendance History Table -->
+    <!-- Attendance Table -->
     {% if attendance_records %}
         <table class="attendance-table">
             <thead>
@@ -85,6 +85,5 @@
     </div>
 </div>
 
-<!-- Link external CSS -->
 <link rel="stylesheet" href="{{ url_for('static', filename='css/attendance_history.css') }}">
 {% endblock %}
