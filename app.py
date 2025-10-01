@@ -354,23 +354,43 @@ def attendance_history():
 
 @app.route('/salary_history')
 def salary_history():
-    if 'admin' not in session:
+    if 'admin' not in session and 'secretary' not in session:
         return redirect(url_for('login'))
 
+    # Get selected month from query params
+    selected_month = request.args.get('month')
+
+    # Query all salary records
     salary_records = Salary.query.order_by(Salary.payment_date.desc()).all()
+
+    # Generate available months dynamically from payment_date
+    available_months = sorted(
+        list(set(record.payment_date.strftime("%B %Y") for record in salary_records)),
+        reverse=True
+    )
+
+    # Filter if a month is selected
+    if selected_month:
+        salary_records = [
+            record for record in salary_records
+            if record.payment_date.strftime("%B %Y") == selected_month
+        ]
 
     # Safely attach total_days_present for display only
     for record in salary_records:
         try:
             record.total_days_present = Attendance.query.filter_by(worker_id=record.worker_id, status="Present").count()
         except:
-            record.total_days_present = 0  # fallback in case of error
+            record.total_days_present = 0  # fallback
 
     return render_template(
         'salary_history.html',
         salary_records=salary_records,
+        available_months=available_months,
+        selected_month=selected_month,
         now=datetime.now()  # ✅ pass "now" so template can use it
     )
+    
 @app.route('/')
 def choose_login():
     return render_template('choose_login.html')
