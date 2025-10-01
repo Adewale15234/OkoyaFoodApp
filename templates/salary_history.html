@@ -35,9 +35,9 @@
     <div class="print-header">
         <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Company Logo" class="print-logo">
         <div class="print-header-text">
-            <h1 class="company-name">Okoya Food Staff Manager</h1>
+            <h1 class="company-name">Okoya Food Co., Staff Manager</h1>
             <p class="company-motto">"Quality Service, Trusted Management"</p>
-            <p class="company-address">Ibadan, Oyo State, Nigeria</p>
+            <p class="company-address">Saki, Oyo State, Nigeria</p>
         </div>
         <img src="{{ url_for('static', filename='images/favicon.png') }}" alt="Favicon" class="print-favicon">
     </div>
@@ -69,8 +69,8 @@
                         <td>{{ record.worker.name }}</td>
                         <td>{{ record.total_days_present }}</td>
                         <td>₦{{ "%.2f"|format(record.amount) }}</td>
-                        <td>{{ record.bank_name }}</td>
                         <td>{{ record.bank_account_name }}</td>
+                        <td>{{ record.bank_name }}</td>
                         <td>{{ record.bank_account }}</td>
                         <td>{{ record.payment_date.strftime('%Y-%m-%d %H:%M') }}</td>
                     </tr>

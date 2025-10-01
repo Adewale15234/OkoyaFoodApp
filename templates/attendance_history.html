@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 <a href="{{ url_for('dashboard') }}" class="back-link no-print">← Back to Dashboard</a>
-<h1 class="print-area">Attendance History</h1>
+<h1 class="no-print">Attendance History</h1>
 
 <!-- Top navigation (hidden when printing) -->
 <nav class="no-print">
@@ -30,8 +30,25 @@
     {% endif %}
 </div>
 
-<!-- Attendance History Table -->
-<div class="attendance-table-container print-area">
+<!-- Printable Section -->
+<div class="print-area">
+    <!-- Letterhead / Print Header -->
+    <div class="print-header">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Company Logo" class="print-logo">
+        <div class="print-header-text">
+            <h1 class="company-name">Okoya Food Co., Staff Manager</h1>
+            <p class="company-motto">"Quality Service, Trusted Management"</p>
+            <p class="company-address">Saki, Oyo State, Nigeria</p>
+        </div>
+        <img src="{{ url_for('static', filename='images/favicon.png') }}" alt="Favicon" class="print-favicon">
+    </div>
+    <hr>
+
+    <!-- Report Title -->
+    <h2 class="report-title">Attendance Report</h2>
+    <p class="report-date">Printed on: {{ now.strftime('%d %B %Y, %I:%M %p') }}</p>
+
+    <!-- Attendance History Table -->
     {% if attendance_records %}
         <table class="attendance-table">
             <thead>
@@ -54,6 +71,18 @@
     {% else %}
         <p>No attendance records available.</p>
     {% endif %}
+
+    <!-- Signature Section -->
+    <div class="signature-section">
+        <div>
+            __________________________ <br>
+            Manager’s Signature
+        </div>
+        <div>
+            __________________________ <br>
+            HR/Secretary Signature
+        </div>
+    </div>
 </div>
 
 <!-- Link external CSS -->
