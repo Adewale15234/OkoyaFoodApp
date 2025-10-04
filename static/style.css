@@ -578,66 +578,234 @@ button, input[type="submit"] {
     }
 
     /* =========================
-       Register Worker Print Styles
-       ========================= */
+   REGISTER WORKER PAGE
+   ========================= */
+
+/* General Container */
+.register-container {
+    max-width: 900px;
+    margin: 30px auto;
+    padding: 25px;
+    border: 1px solid #000;
+    background: #fff;
+    font-family: Arial, sans-serif;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    border-radius: 8px;
+}
+
+/* Official Header Row (Logo + Text + Passport) */
+.official-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    text-align: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.company-logo img {
+    height: 120px;              /* same height as passport */
+    width: 120px;               /* square logo */
+    object-fit: contain;        /* ensure full logo fits */
+    border-radius: 10px;
+    border: 1px solid #ccc;
+}
+
+.passport-preview img {
+    height: 120px;
+    width: 100px;
+    object-fit: cover;
+    border: 1px solid #000;
+    border-radius: 8px;
+    background: #f9f9f9;
+}
+
+.official-header {
+    flex: 1;
+    padding: 0 20px;
+}
+
+/* =========================
+   HEADER TEXT STYLING
+   ========================= */
+.company-name {
+    color: green;
+    font-weight: 700;
+    font-size: 1.8rem;
+    margin: 5px 0;
+}
+
+.company-motto {
+    color: goldenrod;
+    font-weight: bold;
+    margin: 5px 0;
+}
+
+.company-address {
+    color: black;
+    font-weight: bold;
+    font-size: 0.95rem;
+}
+
+.form-title {
+    color: #064420;
+    margin-top: 8px;
+    font-weight: bold;
+}
+
+.form-note {
+    font-style: italic;
+    color: #444;
+    font-size: 0.9rem;
+}
+
+/* =========================
+   FORM GRID
+   ========================= */
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 20px;
+}
+
+.form-grid label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.form-grid input {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #aaa;
+    border-radius: 5px;
+    font-size: 0.95rem;
+}
+
+/* =========================
+   PASSPORT UPLOAD + BUTTONS
+   ========================= */
+.passport-box {
+    margin: 20px 0;
+}
+
+.form-submit {
+    margin-top: 20px;
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+.form-submit input[type="submit"],
+.form-submit button {
+    padding: 10px 18px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.form-submit input[type="submit"] {
+    background: #28a745;
+    color: #fff;
+}
+
+.form-submit input[type="submit"]:hover {
+    background: #218838;
+}
+
+.form-submit button {
+    background: #007bff;
+    color: #fff;
+}
+
+.form-submit button:hover {
+    background: #0056b3;
+}
+
+/* =========================
+   PRINT STYLES
+   ========================= */
+@media print {
+    body {
+        background: #fff !important;
+    }
+
+    .no-print {
+        display: none !important;
+    }
+
     .register-container {
-        margin: 20mm auto;
-        width: 170mm; /* Fit A4 */
+        box-shadow: none;
         border: 1px solid #000;
+        width: 100%;
+        margin: 0;
         padding: 15px;
-        background: #fff;
     }
+
     .official-header-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        text-align: center;
-        margin-bottom: 10px;
+        flex-wrap: nowrap;
+        gap: 0;
     }
-    .company-logo img, .passport-preview img {
-        height: 120px;
-        object-fit: cover;
+
+    .company-logo img,
+    .passport-preview img {
+        border: 1px solid #000;
     }
-    .official-header {
-        flex: 1;
-        padding: 0 10px;
+
+    @page {
+        size: A4 portrait;
+        margin: 15mm;
     }
+}
+
+/* =========================
+   RESPONSIVE (Mobile)
+   ========================= */
+@media (max-width: 768px) {
     .form-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 10px 20px;
+        grid-template-columns: 1fr;
     }
-    .form-grid label, .form-grid input {
-        font-size: 12px;
+
+    .official-header-row {
+        flex-direction: column;
+        text-align: center;
     }
-    .form-submit, .form-controls {
-        display: none; /* Hide buttons/links on print */
-    }
-    .section-title {
-        font-size: 14px;
-        border-bottom: 1px solid #000;
-        padding-bottom: 3px;
+
+    .company-logo img,
+    .passport-preview img {
+        height: 100px;
+        width: 100px;
     }
 }
+/* =========================
+   REGISTER WORKER PAGE
+   ========================= */
+```).  
 
-    /* Force auto page size */
-    @page { size: auto; margin: 10mm; }
-}
+---
 
-    /* Handle landscape if table is too wide */
-@page {
-    size: auto;
-    margin: 10mm;
-}
+### 🧠 In short:
+✔️ Remove → old "Register Worker Print Styles" section  
+✔️ Paste → new "REGISTER WORKER PAGE" section (the big one you just sent)  
+✔️ Save the file → `static/style.css`  
+✔️ Reload your **Register Worker** page in the browser  
 
-table {
-    page-break-inside: auto;
-}
+---
 
-tr {
-    page-break-inside: avoid;
-    page-break-after: auto;
-}
+You’ll see:
+- Cleaner white form layout  
+- Properly sized **company logo** and **passport**  
+- Aligned header text (company name, motto, address)  
+- Looks official both **on screen and in print (A4)**  
+
+---
+
+Would you like me to show how to make the **Print button** (if you have one) print just the registration form cleanly — hiding menus and background?
+
 /* =========================
    GLOBAL STYLES
    ========================= */
