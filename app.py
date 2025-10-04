@@ -187,7 +187,7 @@ def workers_name():
     workers = Worker.query.all()
     return render_template('workers_name.html', workers=workers)
 
-   @app.route('/client_form', methods=['GET', 'POST'])
+  @app.route('/client_form', methods=['GET', 'POST'])
 def client_form():
     # Sample product list, can later pull from DB
     products = ["CASHEW NUT", "MAIZE", "SOYA BEANS", "RICE"]
@@ -217,10 +217,10 @@ def client_form():
             db.session.commit()
             flash("Client order submitted successfully!", "success")
             return redirect(url_for('client_form'))
-        except Exception as e:
+        except Exception:
             db.session.rollback()
             flash("Error submitting order. Please check your input.", "error")
-    
+
     return render_template('client_form.html', products=products)
     
 @app.route('/edit_worker/<int:worker_id>', methods=['GET', 'POST'])
