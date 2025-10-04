@@ -77,6 +77,8 @@ class Worker(db.Model):
 
 # --- Client Order Model ---
 class Order(db.Model):
+    __tablename__ = 'orders'  # ✅ Use plural or a safe name instead of 'order'
+    
     id = db.Column(db.Integer, primary_key=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     name = db.Column(db.String(150))
