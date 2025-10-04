@@ -82,7 +82,6 @@ class Order(db.Model):
     name = db.Column(db.String(150))
     email = db.Column(db.String(150))
     items = db.Column(db.String(50))
-    tonnage = db.Column(db.Float, nullable=True)
     number_of_bags = db.Column(db.Integer, nullable=True)
     kilograms = db.Column(db.Float, nullable=True)
     unit_price = db.Column(db.Float, nullable=True)
@@ -180,6 +179,7 @@ def workers_name():
         return redirect(url_for('login'))
     workers = Worker.query.all()
     return render_template('workers_name.html', workers=workers)
+
 @app.route('/client_form', methods=['GET', 'POST'])
 def client_form():
     products = ["CASHEW NUT", "MAIZE", "SOYA BEANS", "RICE"]
@@ -187,6 +187,10 @@ def client_form():
     if request.method == 'POST':
         try:
             data = request.form
+            kilograms = float(data.get('kilograms')) if data.get('kilograms') else 0
+            unit_price = float(data.get('unit_price')) if data.get('unit_price') else 0
+            total_amount = kilograms * unit_price
+
             order = Order(
                 name=data.get('name', '').strip(),
                 email=data.get('email', '').strip(),
@@ -194,11 +198,10 @@ def client_form():
                 bank_name=data.get('bank_name', '').strip(),
                 items=data.get('items', '').strip(),
                 description=data.get('description', '').strip(),
-                tonnage=float(data.get('tonnage')) if data.get('tonnage') else None,
                 number_of_bags=int(data.get('number_of_bags')) if data.get('number_of_bags') else None,
-                kilograms=float(data.get('kilograms')) if data.get('kilograms') else None,
-                unit_price=float(data.get('unit_price')) if data.get('unit_price') else None,
-                total_amount=float(data.get('total_amount')) if data.get('total_amount') else None,
+                kilograms=kilograms,
+                unit_price=unit_price,
+                total_amount=total_amount,
                 driver_name=data.get('driver_name', '').strip(),
                 vehicle_plate_number=data.get('vehicle_plate_number', '').strip(),
                 phone_number=data.get('phone_number', '').strip(),
@@ -207,11 +210,11 @@ def client_form():
             )
             db.session.add(order)
             db.session.commit()
-            flash("Client order submitted successfully!", "success")
+            flash(f"Client order submitted successfully! Total Amount: {total_amount:.2f}", "success")
             return redirect(url_for('client_form'))
-        except Exception:
+        except Exception as e:
             db.session.rollback()
-            flash("Error submitting order. Please check your input.", "error")
+            flash(f"Error submitting order. Please check your input. ({str(e)})", "error")
 
     return render_template('client_form.html', products=products)
 
