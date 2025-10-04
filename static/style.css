@@ -520,6 +520,9 @@ h1, h2, h3, p {
 /* =========================
    CHOOSE LOGIN PAGE
    ========================= */
+/* =========================
+   CHOOSE LOGIN PAGE
+   ========================= */
 .choose-wrapper {
     display: flex;
     justify-content: center;
@@ -570,6 +573,7 @@ h1, h2, h3, p {
 .admin-btn {
     background: #064420;
 }
+
 .admin-btn:hover {
     background: #086636;
 }
@@ -577,12 +581,13 @@ h1, h2, h3, p {
 .secretary-btn {
     background: #0b6b34;
 }
+
 .secretary-btn:hover {
     background: #0e8a4d;
 }
 
 /* =========================
-   LOGIN PAGES (Admin & Secretary)
+   ADMIN & SECRETARY LOGIN PAGES
    ========================= */
 .login-wrapper {
     display: flex;
@@ -592,6 +597,13 @@ h1, h2, h3, p {
     background: linear-gradient(135deg, #064420, #0b6b34);
 }
 
+.login-card {
+    background: #fff;
+    padding: 35px;
+    border-radius: 15px;
+    width: 400px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+}
 
 .login-header {
     text-align: center;
@@ -649,6 +661,7 @@ h1, h2, h3, p {
     outline: none;
     transition: all 0.2s ease;
 }
+
 .login-form input:focus {
     border-color: #086636;
     box-shadow: 0 0 5px rgba(8,102,54,0.5);
@@ -665,6 +678,7 @@ h1, h2, h3, p {
     cursor: pointer;
     transition: all 0.3s ease;
 }
+
 .login-btn:hover {
     background: #086636;
 }
@@ -682,18 +696,29 @@ h1, h2, h3, p {
     font-weight: bold;
     transition: all 0.3s ease;
 }
+
 .login-wrapper a:hover {
     text-decoration: underline;
 }
 
 /* =========================
-   RESPONSIVE
+   RESPONSIVE (Mobile)
    ========================= */
 @media (max-width: 500px) {
     .choose-card, .login-card {
         padding: 25px 20px;
+        width: 90%;
     }
+
     .login-logo {
         width: 80px;
+    }
+
+    .choose-title {
+        font-size: 1.5rem;
+    }
+
+    .login-title {
+        font-size: 1.2rem;
     }
 }
