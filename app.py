@@ -98,6 +98,24 @@ class Order(db.Model):
     def __repr__(self):
         return f"<Order {self.id} - {self.name} - {self.items}>"
 
+class Order(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(150))
+    email = db.Column(db.String(150))
+    items = db.Column(db.String(50))
+    tonnage = db.Column(db.Float, nullable=True)
+    number_of_bags = db.Column(db.Integer, nullable=True)
+    kilograms = db.Column(db.Float, nullable=True)
+    unit_price = db.Column(db.Float, nullable=True)
+    total_amount = db.Column(db.Float, nullable=True)
+    date_needed = db.Column(db.String(50))
+    driver_name = db.Column(db.String(100))
+    vehicle_plate_number = db.Column(db.String(50))
+    bank_name = db.Column(db.String(100))
+    account_number = db.Column(db.String(50))
+    description = db.Column(db.String(255))
+    status = db.Column(db.String(20), default="Pending")  # <-- New field
+
 class Attendance(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     worker_id = db.Column(db.Integer, db.ForeignKey('workers.id'), nullable=False)
@@ -222,7 +240,37 @@ def client_form():
             flash("Error submitting order. Please check your input.", "error")
 
     return render_template('client_form.html', products=products)
-    
+
+    @app.route('/orders_overview')
+def orders_overview():
+    if 'admin' not in session:
+        flash("Please login as Admin to continue.", "danger")
+        return redirect(url_for('login'))
+
+    # Fetch orders grouped by product type
+    soya_orders = Order.query.filter(Order.items == "SOYA BEANS").all()
+    cashew_orders = Order.query.filter(Order.items == "CASHEW NUT").all()
+    maize_orders = Order.query.filter(Order.items == "MAIZE").all()
+    rice_orders = Order.query.filter(Order.items == "RICE").all()
+
+    return render_template('orders_overview.html',
+                           soya_orders=soya_orders,
+                           cashew_orders=cashew_orders,
+                           maize_orders=maize_orders,
+                           rice_orders=rice_orders)
+
+    @app.route('/confirm_order/<int:order_id>', methods=['POST'])
+def confirm_order(order_id):
+    if 'admin' not in session:
+        flash("Please login as Admin to continue.", "danger")
+        return redirect(url_for('login'))
+
+    order = Order.query.get_or_404(order_id)
+    order.status = "Confirmed"
+    db.session.commit()
+    flash(f"Order {order.id} marked as Confirmed!", "success")
+    return redirect(request.referrer)  # redirect back to the same page
+
 @app.route('/edit_worker/<int:worker_id>', methods=['GET', 'POST'])
 def edit_worker(worker_id):
     if 'admin' not in session:

@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="dashboard-wrapper">
+    <h1 class="dashboard-title">Orders Overview</h1>
+
+    <!-- SOYA BEANS ORDERS -->
+    {% if soya_orders %}
+    <div class="order-card">
+        <h2>Soya Beans Orders</h2>
+        <table class="orders-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Tonnage</th>
+                    <th>Bags</th>
+                    <th>Kgs</th>
+                    <th>Unit Price</th>
+                    <th>Total Amount</th>
+                    <th>Date Needed</th>
+                    <th>Driver</th>
+                    <th>Vehicle</th>
+                    <th>Bank</th>
+                    <th>Account</th>
+                    <th>Description</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in soya_orders %}
+                <tr>
+                    <td>{{ order.id }}</td>
+                    <td>{{ order.name }}</td>
+                    <td>{{ order.email }}</td>
+                    <td>{{ order.tonnage or '-' }}</td>
+                    <td>{{ order.number_of_bags or '-' }}</td>
+                    <td>{{ order.kilograms or '-' }}</td>
+                    <td>{{ order.unit_price or '-' }}</td>
+                    <td>{{ order.total_amount or '-' }}</td>
+                    <td>{{ order.date_needed }}</td>
+                    <td>{{ order.driver_name or '-' }}</td>
+                    <td>{{ order.vehicle_plate_number or '-' }}</td>
+                    <td>{{ order.bank_name or '-' }}</td>
+                    <td>{{ order.account_number or '-' }}</td>
+                    <td>{{ order.description or '-' }}</td>
+                    <td>{{ order.status }}</td>
+                    <td>
+                        {% if order.status != 'Confirmed' %}
+                        <form action="{{ url_for('confirm_order', order_id=order.id) }}" method="POST">
+                            <button type="submit" class="confirm-btn">Confirm</button>
+                        </form>
+                        {% else %}
+                        <button class="confirm-btn confirmed" disabled>Confirmed</button>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+    <!-- Repeat similar blocks for Cashew, Maize, Rice -->
+    {% if cashew_orders %}
+        {% include 'partials/orders_table.html' with orders=cashew_orders title='Cashew Nut Orders' %}
+    {% endif %}
+    {% if maize_orders %}
+        {% include 'partials/orders_table.html' with orders=maize_orders title='Maize Orders' %}
+    {% endif %}
+    {% if rice_orders %}
+        {% include 'partials/orders_table.html' with orders=rice_orders title='Rice Orders' %}
+    {% endif %}
+
+</div>
+{% endblock %}

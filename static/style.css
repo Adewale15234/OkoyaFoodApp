@@ -413,6 +413,63 @@ body {
     background: linear-gradient(135deg, #09a74f, #11cc64);
     box-shadow: 0 6px 15px rgba(10, 166, 77, 0.4);
 }
+/* =========================
+   STYLISH ORDERS TABLE
+   ========================= */
+.orders-table {
+    width: 100%;
+    border-collapse: collapse;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+    background: #f7fff7;
+    font-family: 'Poppins', sans-serif;
+}
+
+.orders-table th,
+.orders-table td {
+    padding: 12px 10px;
+    text-align: center;
+    border-bottom: 1px solid #ccc;
+}
+
+.orders-table th {
+    background: linear-gradient(135deg, #067d3c, #09a74f);
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.orders-table tr:nth-child(even) {
+    background: #e6f2ef;
+}
+
+.orders-table tr:hover {
+    background: #d0e6da;
+    transition: all 0.3s ease;
+}
+
+/* Confirm Button */
+.confirm-btn {
+    padding: 6px 14px;
+    border-radius: 8px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: #fff;
+    background: linear-gradient(135deg, #09a74f, #0dc95d);
+}
+
+.confirm-btn:hover {
+    background: linear-gradient(135deg, #0dc95d, #11e06a);
+}
+
+/* Confirmed State */
+.confirmed {
+    background: #28a745 !important;
+    cursor: default;
+}
 
 /* =========================
    TABLES
@@ -482,7 +539,8 @@ button, input[type="submit"] {
 /* DETAILS ROW */
 .details-row td {
     background: #f1f1f1;
-}/* =========================
+}
+/* =========================
    DASHBOARD
    ========================= */
 .dashboard-wrapper {
