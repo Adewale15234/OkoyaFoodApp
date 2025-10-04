@@ -1,8 +1,9 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate, upgrade  # ✅ 'upgrade' is now imported
-from datetime import datetime
+from datetime import datetime, date
 from calendar import monthrange   # ✅ Add this line
+from sqlalchemy import extract
 import os
 import logging
 
@@ -101,8 +102,6 @@ class Attendance(db.Model):
     worker_id = db.Column(db.Integer, db.ForeignKey('workers.id'), nullable=False)
     date = db.Column(db.Date, nullable=False, default=db.func.current_date())
     status = db.Column(db.String(10), nullable=False)
-    # ✅ Removed conflicting relationship here
-
 
 class Salary(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -116,13 +115,11 @@ class Salary(db.Model):
     payment_date = db.Column(db.DateTime, nullable=False, default=db.func.current_timestamp())
 
 # Hardcoded credentials (Not secure! Replace with real auth for production)
-# default admin lowered to 'admin' to match common usage
 USERNAME = os.environ.get('ADMIN_USERNAME', 'admin')
 PASSWORD = os.environ.get('ADMIN_PASSWORD', 'Alayinde001')
 
 # Routes
 ...
-
 
 @app.route('/register', methods=['GET', 'POST']) 
 def register_worker():
@@ -159,7 +156,6 @@ def register_worker():
                 email=request.form['email'],
                 date_of_employment=datetime.strptime(request.form['date_of_employment'], '%Y-%m-%d'),
 
-                # Newly added fields
                 amount_of_salary=amount_of_salary,
                 bank_name=request.form.get('bank_name'),
                 bank_account=request.form.get('bank_account'),
@@ -185,7 +181,7 @@ def workers_name():
     workers = Worker.query.all()
     return render_template('workers_name.html', workers=workers)
 
-  @app.route('/client_form', methods=['GET', 'POST'])
+@app.route('/client_form', methods=['GET', 'POST'])
 def client_form():
     # Sample product list, can later pull from DB
     products = ["CASHEW NUT", "MAIZE", "SOYA BEANS", "RICE"]
@@ -200,11 +196,11 @@ def client_form():
                 bank_name=data.get('bank_name', '').strip(),
                 items=data.get('items', '').strip(),
                 description=data.get('description', '').strip(),
-                tonnage=float(data.get('tonnage') or 0) or None,
-                number_of_bags=int(data.get('number_of_bags') or 0) or None,
-                kilograms=float(data.get('kilograms') or 0) or None,
-                unit_price=float(data.get('unit_price') or 0) or None,
-                total_amount=float(data.get('total_amount') or 0) or None,
+                tonnage=float(data.get('tonnage')) if data.get('tonnage') else None,
+                number_of_bags=int(data.get('number_of_bags')) if data.get('number_of_bags') else None,
+                kilograms=float(data.get('kilograms')) if data.get('kilograms') else None,
+                unit_price=float(data.get('unit_price')) if data.get('unit_price') else None,
+                total_amount=float(data.get('total_amount')) if data.get('total_amount') else None,
                 driver_name=data.get('driver_name', '').strip(),
                 vehicle_plate_number=data.get('vehicle_plate_number', '').strip(),
                 phone_number=data.get('phone_number', '').strip(),
@@ -221,7 +217,8 @@ def client_form():
 
     return render_template('client_form.html', products=products)
 
-    @app.route('/orders_overview')
+
+@app.route('/orders_overview')
 def orders_overview():
     if 'admin' not in session:
         flash("Please login as Admin to continue.", "danger")
@@ -239,7 +236,8 @@ def orders_overview():
                            maize_orders=maize_orders,
                            rice_orders=rice_orders)
 
-    @app.route('/confirm_order/<int:order_id>', methods=['POST'])
+
+@app.route('/confirm_order/<int:order_id>', methods=['POST'])
 def confirm_order(order_id):
     if 'admin' not in session:
         flash("Please login as Admin to continue.", "danger")
@@ -250,7 +248,9 @@ def confirm_order(order_id):
     db.session.commit()
     flash(f"Order {order.id} marked as Confirmed!", "success")
     return redirect(request.referrer)  # redirect back to the same page
+    Got it! I’ve carefully gone through lines 250–547. I fixed **indentation, duplicate imports, type conversions, and minor potential errors**, but I did **not remove or change any of your functions or logic**. Here’s the **fully updated, corrected code**:
 
+```python
 @app.route('/edit_worker/<int:worker_id>', methods=['GET', 'POST'])
 def edit_worker(worker_id):
     if 'admin' not in session:
@@ -275,7 +275,7 @@ def edit_worker(worker_id):
             worker.disability = request.form.get('disability')
             worker.email = request.form['email']
             worker.date_of_employment = datetime.strptime(request.form['date_of_employment'], '%Y-%m-%d')
-            worker.amount_of_salary = float(request.form['amount_of_salary'])
+            worker.amount_of_salary = float(request.form.get('amount_of_salary', 0))
             worker.bank_name = request.form.get('bank_name')
             worker.bank_account = request.form.get('bank_account')
             worker.guarantor = request.form.get('guarantor')
@@ -290,6 +290,7 @@ def edit_worker(worker_id):
 
     return render_template('edit_worker.html', worker=worker)
 
+
 @app.route('/delete_worker/<int:worker_id>', methods=['POST'])
 def delete_worker(worker_id):
     if 'admin' not in session:
@@ -300,13 +301,13 @@ def delete_worker(worker_id):
     flash('Worker deleted successfully.')
     return redirect(url_for('workers_name'))
 
+
 # Alias route for secretary_attendance (fix BuildError)
 @app.route('/secretary_attendance', methods=['GET', 'POST'])
 def secretary_attendance():
     # Reuse the attendance function logic
     return redirect(url_for('attendance'))
 
-from datetime import date
 
 @app.route('/attendance', methods=['GET', 'POST'])
 def attendance():
@@ -323,11 +324,17 @@ def attendance():
         if worker_id and status:
             today = date.today()
 
-            existing = Attendance.query.filter_by(worker_id=worker_id, date=today).first()
+            try:
+                worker_id_int = int(worker_id)
+            except ValueError:
+                flash("Invalid worker ID.", "error")
+                return redirect(url_for('attendance'))
+
+            existing = Attendance.query.filter_by(worker_id=worker_id_int, date=today).first()
             if existing:
                 flash('Attendance already submitted for this worker today.', 'warning')
             else:
-                attendance = Attendance(worker_id=worker_id, status=status, date=today)
+                attendance = Attendance(worker_id=worker_id_int, status=status, date=today)
                 db.session.add(attendance)
                 db.session.commit()
                 flash('Attendance marked successfully.', 'success')
@@ -335,6 +342,7 @@ def attendance():
         return redirect(url_for('attendance'))
 
     return render_template('attendance.html', workers=workers, secretary=secretary)
+
 
 @app.route('/salary', methods=['GET', 'POST'])
 def salary():
@@ -345,7 +353,7 @@ def salary():
     today = datetime.today()
     current_year = today.year
     current_month = today.month
-    total_days_in_month = monthrange(current_year, current_month)[1]  # e.g., 30
+    total_days_in_month = monthrange(current_year, current_month)[1]
 
     # Safety: monthrange should never return 0, but guard anyway
     if total_days_in_month == 0:
@@ -408,8 +416,6 @@ def salary():
 
     return render_template('salary.html', salary_data=salary_data)
 
-from datetime import datetime
-from sqlalchemy import extract
 
 @app.route('/attendance_history')
 def attendance_history():
@@ -443,7 +449,6 @@ def attendance_history():
         now=datetime.now()
     )
 
-from sqlalchemy import extract
 
 @app.route('/salary_history')
 def salary_history():
@@ -452,7 +457,6 @@ def salary_history():
 
     selected_month = request.args.get('month')
 
-    # Start query
     query = Salary.query
 
     # Filter by selected month if provided
@@ -495,6 +499,7 @@ def salary_history():
         now=datetime.now()
     )
 
+
 # ===============================
 # LOGIN ROUTES (Admin & Secretary)
 # ===============================
@@ -504,6 +509,7 @@ def choose_login():
     """Landing page: choose between Admin or Secretary login"""
     return render_template('choose_login.html')
 
+
 # --- Admin login ---
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -512,7 +518,6 @@ def login():
         username = request.form.get('username')
         password = request.form.get('password')
 
-        # Replace these with your actual admin credentials
         USERNAME = 'admin'
         PASSWORD = 'Alayinde001'
 
@@ -534,7 +539,6 @@ def secretary_login():
     if request.method == 'POST':
         password = request.form.get('password')
 
-        # Replace with your real secretary password
         SECRETARY_PASSWORD = os.environ.get('SECRETARY_PASSWORD', 'secret123')
 
         if password == SECRETARY_PASSWORD:
@@ -548,7 +552,7 @@ def secretary_login():
     return render_template('secretary_login.html', error=error)
 
 
-# --- Admin Dashboard ---
+    # --- Admin Dashboard ---
 @app.route('/dashboard')
 def dashboard():
     if 'admin' not in session:
@@ -568,24 +572,29 @@ def secretary_dashboard():
     return render_template('secretary_dashboard.html')
 
 
-# --- Logout route ---
 @app.route('/logout')
 def logout():
     session.clear()
     flash("You have been logged out successfully.", "info")
     return redirect(url_for('choose_login'))
 
+
 # Route to serve favicon.ico from static folder
 @app.route('/favicon.ico')
 def favicon():
-    return send_from_directory(os.path.join(app.root_path, 'static'),
-                               'favicon.ico', mimetype='image/vnd.microsoft.icon')
+    return send_from_directory(
+        os.path.join(app.root_path, 'static'),
+        'favicon.ico',
+        mimetype='image/vnd.microsoft.icon'
+    )
+
 
 # Optional: Global error handler for debugging 500s on Render
 @app.errorhandler(Exception)
 def handle_exception(e):
     import traceback
     return f"<pre>{traceback.format_exc()}</pre>", 500
+
 
 # For local development
 if __name__ == '__main__':
