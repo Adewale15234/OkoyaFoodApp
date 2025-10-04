@@ -87,7 +87,7 @@
 }
 
 /* =========================
-   MODERN DASHBOARD (Emerald Green Theme)
+   MODERN DASHBOARD (Emerald Green Theme) - CLEAN
    ========================= */
 .dashboard-container {
     min-height: 100vh;
@@ -118,7 +118,7 @@
 }
 
 .dashboard-logo {
-    width: 70px;              /* increased height */
+    width: 70px;
     height: 70px;
     object-fit: cover;
     border-radius: 14px;
@@ -132,7 +132,7 @@
 
 .company-name {
     font-size: 1.7rem;
-    color: #00ff6a;          /* bright green accent */
+    color: #00ff6a;
     font-weight: 700;
 }
 
@@ -208,7 +208,7 @@
 }
 
 .dashboard-welcome h1 span {
-    color: #00ff6a; /* matches brand green */
+    color: #00ff6a;
 }
 
 .dashboard-welcome p {
@@ -247,15 +247,23 @@
 
 /* CARD COLOR VARIANTS */
 .dash-card.green { background: #0a8f43; color: #fff; }
-.dash-card.teal { background: #00796b; color: #fff; }
-.dash-card.gold { background: #b8860b; color: #fff; }
-.dash-card.blue { background: #1976d2; color: #fff; }
-.dash-card.purple { background: #6a1b9a; color: #fff; }
-.dash-card.grey { background: #455a64; color: #fff; }
-.dash-card.red { background: #d32f2f; color: #fff; }
+.dash-card.teal  { background: #00796b; color: #fff; }
+.dash-card.gold  { background: #b8860b; color: #fff; }
+.dash-card.blue  { background: #1976d2; color: #fff; }
+.dash-card.purple{ background: #6a1b9a; color: #fff; }
+.dash-card.grey  { background: #455a64; color: #fff; }
+.dash-card.red   { background: #d32f2f; color: #fff; }
 
 .dash-card:hover {
     opacity: 0.9;
+}
+
+/* LOGOUT CARD (explicit) */
+.logout-card {
+    background: #dc3545;
+    color: #fff;
+    padding: 10px;
+    border-radius: 8px;
 }
 
 /* RESPONSIVE DESIGN */
@@ -278,14 +286,6 @@
         font-size: 1.6rem;
     }
 }
-} .logout-card { background: #dc3545; color: #fff; }
-)  
-
-👉 **Replace that entire section** with the new modern one:
-css 
-/* ========================= 
-    MODERN DASHBOARD (Deep Green Theme)
-   ========================= */
 /* =========================
    TABLES
    ========================= */
