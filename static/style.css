@@ -518,56 +518,63 @@ h1, h2, h3, p {
    FLASH MESSAGES
    ========================= */
 /* =========================
-   CHOOSE LOGIN PAGE
-   ========================= */
-/* =========================
-   CHOOSE LOGIN PAGE
+   CHOOSE LOGIN PAGE (Deep Green Theme)
    ========================= */
 .choose-wrapper {
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    background: linear-gradient(to bottom, #064420, #0b6b34);
+    background: linear-gradient(145deg, #023020, #064420, #0b6b34);
+    color: #fff;
+    font-family: 'Poppins', sans-serif;
 }
 
 .choose-card {
-    background: #fff;
-    padding: 40px 30px;
-    border-radius: 15px;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    background: #ffffff;
+    padding: 45px 35px;
+    border-radius: 18px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
     text-align: center;
-    max-width: 450px;
+    max-width: 460px;
     width: 90%;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.choose-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
 .choose-title {
-    font-size: 1.8rem;
+    font-size: 2rem;
     color: #064420;
-    font-weight: bold;
-    margin-bottom: 10px;
+    font-weight: 700;
+    margin-bottom: 12px;
 }
 
 .choose-subtitle {
     font-size: 1.1rem;
-    color: #333;
+    color: #444;
     margin-bottom: 25px;
 }
 
 .login-options {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 18px;
 }
 
 .choose-btn {
-    padding: 12px 20px;
-    border-radius: 8px;
-    font-weight: bold;
+    padding: 14px;
+    border-radius: 10px;
+    font-weight: 600;
     font-size: 1rem;
-    color: #fff;
+    letter-spacing: 0.5px;
+    border: none;
+    cursor: pointer;
     transition: all 0.3s ease;
-    display: block;
+    color: #fff;
 }
 
 .admin-btn {
@@ -576,6 +583,7 @@ h1, h2, h3, p {
 
 .admin-btn:hover {
     background: #086636;
+    box-shadow: 0 4px 10px rgba(8, 102, 54, 0.3);
 }
 
 .secretary-btn {
@@ -584,25 +592,32 @@ h1, h2, h3, p {
 
 .secretary-btn:hover {
     background: #0e8a4d;
+    box-shadow: 0 4px 10px rgba(14, 138, 77, 0.3);
 }
 
 /* =========================
-   ADMIN & SECRETARY LOGIN PAGES
+   LOGIN PAGE (Admin & Secretary)
    ========================= */
 .login-wrapper {
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    background: linear-gradient(135deg, #064420, #0b6b34);
+    background: linear-gradient(160deg, #023020, #064420, #0b6b34);
+    font-family: 'Poppins', sans-serif;
 }
 
 .login-card {
     background: #fff;
-    padding: 35px;
-    border-radius: 15px;
-    width: 400px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+    padding: 40px 30px;
+    border-radius: 18px;
+    width: 420px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+    transition: all 0.3s ease;
+}
+
+.login-card:hover {
+    transform: translateY(-3px);
 }
 
 .login-header {
@@ -611,34 +626,37 @@ h1, h2, h3, p {
 }
 
 .login-logo {
-    width: 100px;
+    width: 90px;
     height: auto;
     margin-bottom: 12px;
-    border-radius: 10px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
 .company-name {
-    font-size: 1.5rem;
+    font-size: 1.6rem;
     color: #064420;
-    font-weight: bold;
+    font-weight: 700;
+    margin-top: 5px;
 }
 
 .company-motto {
     color: goldenrod;
     font-weight: bold;
     margin: 5px 0;
+    font-size: 0.95rem;
 }
 
 .company-address {
-    font-size: 0.9rem;
-    color: #333;
+    font-size: 0.85rem;
+    color: #444;
 }
 
 .login-title {
     text-align: center;
     font-size: 1.4rem;
     color: #064420;
-    font-weight: bold;
+    font-weight: 600;
     margin-bottom: 20px;
 }
 
@@ -647,7 +665,7 @@ h1, h2, h3, p {
 }
 
 .login-form label {
-    font-weight: bold;
+    font-weight: 600;
     display: block;
     margin-bottom: 5px;
     color: #064420;
@@ -656,15 +674,16 @@ h1, h2, h3, p {
 .login-form input {
     width: 100%;
     padding: 10px 12px;
-    border-radius: 8px;
+    border-radius: 10px;
     border: 1px solid #ccc;
     outline: none;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
 }
 
 .login-form input:focus {
     border-color: #086636;
-    box-shadow: 0 0 5px rgba(8,102,54,0.5);
+    box-shadow: 0 0 6px rgba(8, 102, 54, 0.4);
 }
 
 .login-btn {
@@ -672,8 +691,8 @@ h1, h2, h3, p {
     padding: 12px;
     background: #064420;
     color: #fff;
-    font-weight: bold;
-    border-radius: 8px;
+    font-weight: 700;
+    border-radius: 10px;
     border: none;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -681,20 +700,23 @@ h1, h2, h3, p {
 
 .login-btn:hover {
     background: #086636;
+    box-shadow: 0 4px 10px rgba(8, 102, 54, 0.3);
 }
 
 .login-error {
     color: #dc3545;
     margin-bottom: 10px;
     text-align: center;
+    font-weight: bold;
 }
 
 .login-wrapper a {
     display: inline-block;
     margin-top: 15px;
     color: #0b6b34;
-    font-weight: bold;
+    font-weight: 600;
     transition: all 0.3s ease;
+    text-decoration: none;
 }
 
 .login-wrapper a:hover {
@@ -711,11 +733,11 @@ h1, h2, h3, p {
     }
 
     .login-logo {
-        width: 80px;
+        width: 70px;
     }
 
     .choose-title {
-        font-size: 1.5rem;
+        font-size: 1.6rem;
     }
 
     .login-title {
