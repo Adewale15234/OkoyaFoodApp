@@ -51,7 +51,6 @@ body {
 .login-header {
     margin-bottom: 25px;
 }
-
 .login-logo {
     width: 90px;
     height: 90px;
@@ -60,14 +59,12 @@ body {
     border: 3px solid rgba(255, 255, 255, 0.6);
     box-shadow: 0 0 15px rgba(0, 255, 106, 0.6);
 }
-
 .company-name {
     font-size: 1.6rem;
     font-weight: 700;
     margin-top: 10px;
     color: #00ff6a;
 }
-
 .company-motto {
     color: #ffe082;
     font-weight: 600;
@@ -79,14 +76,12 @@ body {
     margin-bottom: 18px;
     text-align: left;
 }
-
 .form-group label {
     display: block;
     font-weight: 600;
     margin-bottom: 6px;
     color: #e0e0e0;
 }
-
 .form-group input {
     width: 100%;
     padding: 10px 12px;
@@ -98,7 +93,6 @@ body {
     outline: none;
     transition: all 0.3s ease;
 }
-
 .form-group input:focus {
     box-shadow: 0 0 8px rgba(0, 255, 106, 0.8);
     border: 1px solid #00ff6a;
@@ -118,7 +112,6 @@ body {
     transition: all 0.3s ease;
     margin-top: 10px;
 }
-
 .login-btn:hover {
     background: #00e85a;
     box-shadow: 0 4px 12px rgba(0, 255, 106, 0.4);
@@ -132,22 +125,20 @@ body {
     font-weight: 600;
 }
 
-/* RESPONSIVE */
+/* RESPONSIVE LOGIN */
 @media (max-width: 480px) {
     .login-card {
         width: 90%;
         padding: 30px 25px;
     }
-
     .company-name {
         font-size: 1.3rem;
     }
 }
 
 /* =========================
-   OKOYA FOOD STAFF MANAGER - EMERALD DASHBOARD THEME
+   EMERALD DASHBOARD THEME
    ========================= */
-
 .dashboard-container {
     min-height: 100vh;
     background: linear-gradient(135deg, #013d22, #045e32, #078f4a);
@@ -157,9 +148,7 @@ body {
     overflow-x: hidden;
 }
 
-/* =========================
-   HEADER SECTION
-   ========================= */
+/* HEADER */
 .dashboard-header {
     display: flex;
     justify-content: space-between;
@@ -179,7 +168,6 @@ body {
     align-items: center;
     gap: 18px;
 }
-
 .dashboard-logo {
     width: 75px;
     height: 75px;
@@ -189,24 +177,20 @@ body {
     box-shadow: 0 5px 18px rgba(0,0,0,0.4);
     background: rgba(255,255,255,0.1);
 }
-
 .company-info {
     line-height: 1.5;
 }
-
 .company-name {
     font-size: 1.9rem;
     color: #aef5c4;
     font-weight: 700;
     letter-spacing: 0.5px;
 }
-
 .company-motto {
     font-size: 1rem;
     color: #f2fbe9;
     font-weight: 500;
 }
-
 .company-address {
     font-size: 0.9rem;
     color: #cce4d3;
@@ -217,25 +201,21 @@ body {
     text-align: right;
     min-width: 240px;
 }
-
 .greeting {
     font-size: 1rem;
     color: #eafaf0;
     margin-bottom: 5px;
 }
-
 .today-date {
     font-size: 0.9rem;
     color: #cfe7d6;
     margin-bottom: 10px;
 }
-
 .header-links {
     display: flex;
     gap: 10px;
     justify-content: flex-end;
 }
-
 .nav-btn {
     background: linear-gradient(135deg, #067d3c, #09a74f);
     color: #fff;
@@ -247,57 +227,46 @@ body {
     border: none;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
 }
-
 .nav-btn:hover {
     background: linear-gradient(135deg, #09a74f, #11cc64);
     transform: translateY(-2px);
     box-shadow: 0 6px 14px rgba(10, 166, 77, 0.4);
 }
-
 .logout-btn {
     background: linear-gradient(135deg, #b71c1c, #e53935);
 }
-
 .logout-btn:hover {
     background: linear-gradient(135deg, #e53935, #f66464);
 }
 
-/* =========================
-   WELCOME SECTION
-   ========================= */
+/* WELCOME SECTION */
 .dashboard-welcome {
     text-align: center;
     margin: 55px 0 30px 0;
 }
-
 .dashboard-welcome h1 {
     font-size: 2.2rem;
     font-weight: 700;
     color: #ffffff;
     letter-spacing: 1px;
 }
-
 .dashboard-welcome h1 span {
     color: #aef5c4;
     text-shadow: 0 0 10px rgba(174,245,196,0.4);
 }
-
 .dashboard-welcome p {
     color: #dfe8e2;
     font-size: 1.05rem;
     margin-top: 10px;
 }
 
-/* =========================
-   DASHBOARD GRID / CARDS
-   ========================= */
+/* DASHBOARD GRID / CARDS */
 .dashboard-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
     gap: 25px;
     margin-top: 30px;
 }
-
 .dash-card {
     display: flex;
     align-items: center;
@@ -314,8 +283,6 @@ body {
     position: relative;
     overflow: hidden;
 }
-
-/* Subtle accent on hover */
 .dash-card::before {
     content: "";
     position: absolute;
@@ -326,51 +293,42 @@ body {
     background: rgba(10, 166, 77, 0.08);
     transition: all 0.4s ease;
 }
-
 .dash-card:hover::before {
     left: 0;
 }
-
 .dash-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 10px 25px rgba(0,0,0,0.35);
 }
-
-/* SOFT COLOR TAGS */
 .dash-card.green  { border-left: 6px solid #0aa64d; }
 .dash-card.teal   { border-left: 6px solid #009688; }
 .dash-card.gold   { border-left: 6px solid #c49b0b; }
 .dash-card.blue   { border-left: 6px solid #1976d2; }
 .dash-card.purple { border-left: 6px solid #7b1fa2; }
 
-/* =========================
-   RESPONSIVE DESIGN
-   ========================= */
+/* RESPONSIVE DASHBOARD */
 @media (max-width: 768px) {
     .dashboard-header {
         flex-direction: column;
         text-align: center;
     }
-
     .user-panel {
         text-align: center;
         margin-top: 20px;
     }
-
     .dashboard-logo {
         width: 65px;
         height: 65px;
     }
-
     .dashboard-welcome h1 {
         font-size: 1.6rem;
     }
-
     .dashboard-grid {
         grid-template-columns: 1fr;
         gap: 18px;
     }
 }
+
 /* =========================
    TABLES
    ========================= */
@@ -380,92 +338,66 @@ table {
     margin-bottom: 20px;
     background: #fff;
 }
-
 th, td {
     border: 1px solid #ccc;
     padding: 10px;
     text-align: center;
 }
-
 th {
     background: #007bff;
     color: #fff;
 }
-
 .attendance-table-container, .workers-table-container {
     overflow-x: auto;
 }
 
-/* Buttons */
+/* BUTTONS */
 button, input[type="submit"] {
     padding: 6px 12px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
 }
-
 .submit-button {
     background: #28a745;
     color: #fff;
 }
-
 .submit-button:hover {
     background: #218838;
 }
-
 .edit-button {
     background: #ffc107;
     color: #333;
     padding: 5px 10px;
     text-decoration: none;
 }
-
 .edit-button:hover {
     background: #e0a800;
 }
-
 .delete-button {
     background: #dc3545;
     color: #fff;
     padding: 5px 10px;
 }
-
 .delete-button:hover {
     background: #c82333;
 }
 
-/* Back link */
+/* BACK LINK */
 .back-link {
     display: inline-block;
     margin-bottom: 15px;
     text-decoration: none;
     color: #007bff;
 }
-
 .back-link:hover {
     text-decoration: underline;
 }
 
-/* Details row toggle */
+/* DETAILS ROW */
 .details-row td {
     background: #f1f1f1;
-}
-
-/* =========================
-   Print styles (keep your existing code)
-   ========================= */
-/* =========================
-   Auto-fit Print Styles for Landscape/Portrait
-   ========================= */
-/* =========================
-   SCREEN STYLES (for normal display)
-   ========================= */
-
-/* Flash messages */
-
-
-
-/* =========================
+}/* =========================
    DASHBOARD
    ========================= */
 .dashboard-wrapper {
@@ -540,7 +472,7 @@ button, input[type="submit"] {
         page-break-after: always;
     }
 
-    /* Print header (existing) */
+    /* Print header */
     .print-header {
         display: flex;
         justify-content: space-between;
@@ -573,7 +505,6 @@ button, input[type="submit"] {
         font-weight: bold;
     }
 
-    /* Table styling for print (existing) */
     table {
         width: 100%;
         border-collapse: collapse;
@@ -611,11 +542,31 @@ button, input[type="submit"] {
         text-align: center;
     }
 
-    /* =========================
+    /* REGISTER WORKER PAGE PRINT */
+    .register-container {
+        box-shadow: none;
+        border: 1px solid #000;
+        width: 100%;
+        margin: 0;
+        padding: 15px;
+    }
+    .official-header-row {
+        flex-wrap: nowrap;
+        gap: 0;
+    }
+    .company-logo img,
+    .passport-preview img {
+        border: 1px solid #000;
+    }
+    @page {
+        size: A4 portrait;
+        margin: 15mm;
+    }
+}
+
+/* =========================
    REGISTER WORKER PAGE
    ========================= */
-
-/* General Container */
 .register-container {
     max-width: 900px;
     margin: 30px auto;
@@ -626,8 +577,6 @@ button, input[type="submit"] {
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     border-radius: 8px;
 }
-
-/* Official Header Row (Logo + Text + Passport) */
 .official-header-row {
     display: flex;
     justify-content: space-between;
@@ -637,15 +586,13 @@ button, input[type="submit"] {
     flex-wrap: wrap;
     gap: 10px;
 }
-
 .company-logo img {
-    height: 120px;              /* same height as passport */
-    width: 120px;               /* square logo */
-    object-fit: contain;        /* ensure full logo fits */
+    height: 120px;
+    width: 120px;
+    object-fit: contain;
     border-radius: 10px;
     border: 1px solid #ccc;
 }
-
 .passport-preview img {
     height: 120px;
     width: 100px;
@@ -654,61 +601,46 @@ button, input[type="submit"] {
     border-radius: 8px;
     background: #f9f9f9;
 }
-
 .official-header {
     flex: 1;
     padding: 0 20px;
 }
-
-/* =========================
-   HEADER TEXT STYLING
-   ========================= */
 .company-name {
     color: green;
     font-weight: 700;
     font-size: 1.8rem;
     margin: 5px 0;
 }
-
 .company-motto {
     color: goldenrod;
     font-weight: bold;
     margin: 5px 0;
 }
-
 .company-address {
     color: black;
     font-weight: bold;
     font-size: 0.95rem;
 }
-
 .form-title {
     color: #064420;
     margin-top: 8px;
     font-weight: bold;
 }
-
 .form-note {
     font-style: italic;
     color: #444;
     font-size: 0.9rem;
 }
-
-/* =========================
-   FORM GRID
-   ========================= */
 .form-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 10px 20px;
 }
-
 .form-grid label {
     display: block;
     font-weight: bold;
     margin-bottom: 5px;
 }
-
 .form-grid input {
     width: 100%;
     padding: 8px 10px;
@@ -716,21 +648,15 @@ button, input[type="submit"] {
     border-radius: 5px;
     font-size: 0.95rem;
 }
-
-/* =========================
-   PASSPORT UPLOAD + BUTTONS
-   ========================= */
 .passport-box {
     margin: 20px 0;
 }
-
 .form-submit {
     margin-top: 20px;
     display: flex;
     gap: 15px;
     justify-content: center;
 }
-
 .form-submit input[type="submit"],
 .form-submit button {
     padding: 10px 18px;
@@ -741,59 +667,19 @@ button, input[type="submit"] {
     font-weight: 600;
     transition: all 0.3s ease;
 }
-
 .form-submit input[type="submit"] {
     background: #28a745;
     color: #fff;
 }
-
 .form-submit input[type="submit"]:hover {
     background: #218838;
 }
-
 .form-submit button {
     background: #007bff;
     color: #fff;
 }
-
 .form-submit button:hover {
     background: #0056b3;
-}
-
-/* =========================
-   PRINT STYLES
-   ========================= */
-@media print {
-    body {
-        background: #fff !important;
-    }
-
-    .no-print {
-        display: none !important;
-    }
-
-    .register-container {
-        box-shadow: none;
-        border: 1px solid #000;
-        width: 100%;
-        margin: 0;
-        padding: 15px;
-    }
-
-    .official-header-row {
-        flex-wrap: nowrap;
-        gap: 0;
-    }
-
-    .company-logo img,
-    .passport-preview img {
-        border: 1px solid #000;
-    }
-
-    @page {
-        size: A4 portrait;
-        margin: 15mm;
-    }
 }
 
 /* =========================
@@ -803,18 +689,17 @@ button, input[type="submit"] {
     .form-grid {
         grid-template-columns: 1fr;
     }
-
     .official-header-row {
         flex-direction: column;
         text-align: center;
     }
-
     .company-logo img,
     .passport-preview img {
         height: 100px;
         width: 100px;
     }
 }
+
 /* =========================
    GLOBAL STYLES
    ========================= */
@@ -825,12 +710,10 @@ body {
     background: linear-gradient(135deg, #f0f4f8, #d9e6f2);
     color: #333;
 }
-
 a {
     text-decoration: none;
     color: inherit;
 }
-
 h1, h2, h3, p {
     margin: 0;
 }
@@ -838,6 +721,8 @@ h1, h2, h3, p {
 /* =========================
    FLASH MESSAGES
    ========================= */
+/* KEEP THIS SECTION AS IS */
+
 /* =========================
    CHOOSE LOGIN PAGE (Deep Green Theme)
    ========================= */
@@ -932,7 +817,9 @@ h1, h2, h3, p {
     background: #fff;
     padding: 40px 30px;
     border-radius: 18px;
-    width: 420px;
+    width: 400px;
+    max-width: 420px;
+    margin: 50px auto;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
     transition: all 0.3s ease;
 }
@@ -947,9 +834,9 @@ h1, h2, h3, p {
 }
 
 .login-logo {
-    width: 90px;
+    width: 100px;
     height: auto;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
@@ -976,7 +863,7 @@ h1, h2, h3, p {
 .login-title {
     text-align: center;
     font-size: 1.4rem;
-    color: #064420;
+    color: #333;
     font-weight: 600;
     margin-bottom: 20px;
 }
@@ -1045,12 +932,89 @@ h1, h2, h3, p {
 }
 
 /* =========================
+   SECRETARY DASHBOARD (Emerald Theme)
+   ========================= */
+.dashboard-wrapper {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(145deg, #013d22, #046a34, #08a84c);
+    font-family: 'Poppins', sans-serif;
+    padding: 30px;
+}
+
+.dashboard-card {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 20px;
+    padding: 40px 35px;
+    width: 420px;
+    text-align: center;
+    color: #fff;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    animation: fadeIn 0.6s ease-in-out;
+}
+
+.dashboard-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #aef5c4;
+    margin-bottom: 10px;
+}
+
+.dashboard-subtitle {
+    font-size: 1.1rem;
+    color: #e0f2e9;
+    margin-bottom: 25px;
+}
+
+.dashboard-links {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.dashboard-btn {
+    padding: 14px;
+    border-radius: 10px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: #fff;
+    background: linear-gradient(135deg, #09a74f, #0dc95d);
+    text-decoration: none;
+}
+
+.dashboard-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(10, 166, 77, 0.4);
+}
+
+.logout-btn {
+    background: linear-gradient(135deg, #b71c1c, #e53935);
+}
+
+.logout-btn:hover {
+    background: linear-gradient(135deg, #e53935, #f66464);
+}
+
+/* Fade-in animation */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* =========================
    RESPONSIVE (Mobile)
    ========================= */
 @media (max-width: 500px) {
-    .choose-card, .login-card {
-        padding: 25px 20px;
+    .choose-card, .login-card, .dashboard-card {
         width: 90%;
+        padding: 25px 20px;
     }
 
     .login-logo {
@@ -1064,26 +1028,8 @@ h1, h2, h3, p {
     .login-title {
         font-size: 1.2rem;
     }
-}
-/* Secretary & Admin Login Styling Update */
-.login-logo {
-    width: 100px;
-    height: auto;
-    margin-bottom: 10px;
-}
 
-.login-card {
-    max-width: 400px;
-    margin: 50px auto;
-    padding: 25px;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    background-color: #fff;
-}
-
-.login-title {
-    text-align: center;
-    margin-bottom: 20px;
-    font-size: 1.4rem;
-    color: #333;
+    .dashboard-title {
+        font-size: 1.6rem;
+    }
 }
