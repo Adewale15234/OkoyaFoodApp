@@ -408,71 +408,85 @@ def salary_history():
         now=datetime.now()
     )
 
+# ===============================
+# LOGIN ROUTES (Admin & Secretary)
+# ===============================
+
 @app.route('/')
 def choose_login():
+    """Landing page: choose between Admin or Secretary login"""
     return render_template('choose_login.html')
 
-# Admin login
+# --- Admin login ---
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     error = None
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
+
+        # Replace these with your actual admin credentials
+        USERNAME = 'admin'
+        PASSWORD = 'Alayinde001'
+
         if username == USERNAME and password == PASSWORD:
             session['admin'] = username
             session.permanent = True
+            flash("Welcome Admin!", "success")
             return redirect(url_for('dashboard'))
         else:
             error = 'Invalid username or password.'
+
     return render_template('login.html', error=error)
 
 
-# Secretary login
+# --- Secretary login ---
 @app.route('/secretary_login', methods=['GET', 'POST'])
 def secretary_login():
     error = None
     if request.method == 'POST':
         password = request.form.get('password')
+
+        # Replace with your real secretary password
+        SECRETARY_PASSWORD = os.environ.get('SECRETARY_PASSWORD', 'secret123')
+
         if password == SECRETARY_PASSWORD:
             session['secretary'] = True
             session.permanent = True
-            return redirect(url_for('secretary_dashboard'))  # ✅ send to secretary dashboard
+            flash("Welcome Secretary!", "success")
+            return redirect(url_for('secretary_dashboard'))
         else:
             error = "Invalid entrance password."
+
     return render_template('secretary_login.html', error=error)
 
 
-# Logout
-@app.route('/logout')
-def logout():
-    session.pop('admin', None)
-    session.pop('secretary', None)
-    flash("You have been logged out.")
-    return redirect(url_for('choose_login'))  # ✅ back to choose login
-
-
-# Admin dashboard
+# --- Admin Dashboard ---
 @app.route('/dashboard')
 def dashboard():
     if 'admin' not in session:
+        flash("Please login as Admin to continue.", "danger")
         return redirect(url_for('login'))
+    # ... your existing dashboard logic ...
     return render_template('dashboard.html')
 
 
-# Secretary dashboard
+# --- Secretary Dashboard ---
 @app.route('/secretary_dashboard')
 def secretary_dashboard():
     if 'secretary' not in session:
+        flash("Please login as Secretary to continue.", "danger")
         return redirect(url_for('secretary_login'))
+    # ... your existing secretary dashboard logic ...
     return render_template('secretary_dashboard.html')
 
-# Run migrations using Flask-Migrate (instead of db.create_all)
-def run_migrations():
-    with app.app_context():
-        upgrade()
 
-run_migrations()
+# --- Logout route ---
+@app.route('/logout')
+def logout():
+    session.clear()
+    flash("You have been logged out successfully.", "info")
+    return redirect(url_for('choose_login'))
 
 # Route to serve favicon.ico from static folder
 @app.route('/favicon.ico')
