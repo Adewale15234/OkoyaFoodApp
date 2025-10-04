@@ -20,93 +20,156 @@
 }
 
 /* =========================
-   LOGIN PAGE
+   MODERN LOGIN PAGE (Emerald Theme)
    ========================= */
 
-.login-card {
-    background: #fff;
-    padding: 30px;
-    border-radius: 10px;
-    width: 400px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+body {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #003d1f, #046c34, #0a8f43);
+    font-family: 'Poppins', sans-serif;
+    color: #fff;
+    margin: 0;
+    padding: 0;
 }
 
-.login-header {
+/* LOGIN CARD */
+.login-card {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 18px;
+    padding: 40px 35px;
+    width: 380px;
     text-align: center;
-    margin-bottom: 20px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+/* LOGO + COMPANY TEXT */
+.login-header {
+    margin-bottom: 25px;
 }
 
 .login-logo {
-    width: 80px;
-    height: auto;
-    margin-bottom: 10px;
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid rgba(255, 255, 255, 0.6);
+    box-shadow: 0 0 15px rgba(0, 255, 106, 0.6);
 }
 
-.login-title {
-    font-size: 1.5rem;
-    margin-bottom: 15px;
+.company-name {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-top: 10px;
+    color: #00ff6a;
 }
 
+.company-motto {
+    color: #ffe082;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+/* FORM INPUTS */
 .form-group {
-    margin-bottom: 15px;
+    margin-bottom: 18px;
+    text-align: left;
 }
 
 .form-group label {
     display: block;
-    font-weight: bold;
-    margin-bottom: 5px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #e0e0e0;
 }
 
-.form-group input,
-.login-form select {
+.form-group input {
     width: 100%;
-    padding: 8px 10px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: none;
+    background: rgba(255, 255, 255, 0.9);
+    color: #000;
+    font-size: 1rem;
+    outline: none;
+    transition: all 0.3s ease;
 }
 
+.form-group input:focus {
+    box-shadow: 0 0 8px rgba(0, 255, 106, 0.8);
+    border: 1px solid #00ff6a;
+}
+
+/* LOGIN BUTTON */
 .login-btn {
     width: 100%;
-    padding: 10px;
-    background: #28a745;
+    padding: 12px;
+    background: #00b347;
     color: #fff;
-    font-weight: bold;
+    font-weight: 700;
     border: none;
-    border-radius: 5px;
+    border-radius: 10px;
+    font-size: 1rem;
     cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 10px;
 }
 
 .login-btn:hover {
-    background: #218838;
+    background: #00e85a;
+    box-shadow: 0 4px 12px rgba(0, 255, 106, 0.4);
+    transform: translateY(-2px);
 }
 
+/* ERROR MESSAGE */
 .login-error {
-    color: red;
-    text-align: center;
+    color: #ff5555;
     margin-bottom: 10px;
+    font-weight: 600;
+}
+
+/* RESPONSIVE */
+@media (max-width: 480px) {
+    .login-card {
+        width: 90%;
+        padding: 30px 25px;
+    }
+
+    .company-name {
+        font-size: 1.3rem;
+    }
 }
 
 /* =========================
-   MODERN DASHBOARD (Emerald Green Theme) - CLEAN
+   OKOYA FOOD STAFF MANAGER - EMERALD DASHBOARD THEME
    ========================= */
+
 .dashboard-container {
     min-height: 100vh;
-    background: linear-gradient(135deg, #003d1f, #046c34, #0a8f43);
-    color: #ffffff;
+    background: linear-gradient(135deg, #013d22, #045e32, #078f4a);
+    color: #f5f7f6;
     font-family: 'Poppins', sans-serif;
-    padding: 20px;
+    padding: 30px;
+    overflow-x: hidden;
 }
 
-/* HEADER SECTION */
+/* =========================
+   HEADER SECTION
+   ========================= */
 .dashboard-header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.06);
     border: 1px solid rgba(255, 255, 255, 0.12);
-    padding: 22px 26px;
+    padding: 25px 30px;
     border-radius: 20px;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(6px);
     flex-wrap: wrap;
 }
 
@@ -118,12 +181,13 @@
 }
 
 .dashboard-logo {
-    width: 70px;
-    height: 70px;
+    width: 75px;
+    height: 75px;
     object-fit: cover;
-    border-radius: 14px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-    border: 2px solid rgba(255,255,255,0.25);
+    border-radius: 15px;
+    border: 2px solid rgba(255,255,255,0.3);
+    box-shadow: 0 5px 18px rgba(0,0,0,0.4);
+    background: rgba(255,255,255,0.1);
 }
 
 .company-info {
@@ -131,20 +195,21 @@
 }
 
 .company-name {
-    font-size: 1.7rem;
-    color: #00ff6a;
+    font-size: 1.9rem;
+    color: #aef5c4;
     font-weight: 700;
+    letter-spacing: 0.5px;
 }
 
 .company-motto {
     font-size: 1rem;
-    color: #ffe082;
-    font-weight: 600;
+    color: #f2fbe9;
+    font-weight: 500;
 }
 
 .company-address {
     font-size: 0.9rem;
-    color: #d0d0d0;
+    color: #cce4d3;
 }
 
 /* USER PANEL */
@@ -155,13 +220,13 @@
 
 .greeting {
     font-size: 1rem;
+    color: #eafaf0;
     margin-bottom: 5px;
-    color: #fff;
 }
 
 .today-date {
     font-size: 0.9rem;
-    color: #cfd8dc;
+    color: #cfe7d6;
     margin-bottom: 10px;
 }
 
@@ -172,56 +237,64 @@
 }
 
 .nav-btn {
-    background: #056a2d;
+    background: linear-gradient(135deg, #067d3c, #09a74f);
     color: #fff;
-    padding: 9px 15px;
+    padding: 10px 18px;
     border-radius: 10px;
     text-decoration: none;
     font-weight: 600;
     transition: all 0.3s ease;
+    border: none;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
 }
 
 .nav-btn:hover {
-    background: #09a34a;
+    background: linear-gradient(135deg, #09a74f, #11cc64);
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(9, 163, 74, 0.5);
+    box-shadow: 0 6px 14px rgba(10, 166, 77, 0.4);
 }
 
 .logout-btn {
-    background: #b71c1c;
+    background: linear-gradient(135deg, #b71c1c, #e53935);
 }
 
 .logout-btn:hover {
-    background: #e53935;
+    background: linear-gradient(135deg, #e53935, #f66464);
 }
 
-/* WELCOME SECTION */
+/* =========================
+   WELCOME SECTION
+   ========================= */
 .dashboard-welcome {
     text-align: center;
-    margin: 40px 0 20px 0;
+    margin: 55px 0 30px 0;
 }
 
 .dashboard-welcome h1 {
-    font-size: 2rem;
+    font-size: 2.2rem;
     font-weight: 700;
     color: #ffffff;
+    letter-spacing: 1px;
 }
 
 .dashboard-welcome h1 span {
-    color: #00ff6a;
+    color: #aef5c4;
+    text-shadow: 0 0 10px rgba(174,245,196,0.4);
 }
 
 .dashboard-welcome p {
-    color: #e0e0e0;
-    font-size: 1rem;
+    color: #dfe8e2;
+    font-size: 1.05rem;
     margin-top: 10px;
 }
 
-/* DASHBOARD CARDS GRID */
+/* =========================
+   DASHBOARD GRID / CARDS
+   ========================= */
 .dashboard-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 25px;
     margin-top: 30px;
 }
 
@@ -230,14 +303,32 @@
     align-items: center;
     justify-content: center;
     background: #ffffff;
-    color: #046c34;
-    padding: 25px;
-    border-radius: 15px;
+    color: #024d27;
+    padding: 35px 20px;
+    border-radius: 16px;
     text-decoration: none;
     font-size: 1.1rem;
     font-weight: 600;
-    box-shadow: 0 6px 15px rgba(0,0,0,0.25);
+    box-shadow: 0 8px 22px rgba(0,0,0,0.25);
     transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Subtle accent on hover */
+.dash-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: rgba(10, 166, 77, 0.08);
+    transition: all 0.4s ease;
+}
+
+.dash-card:hover::before {
+    left: 0;
 }
 
 .dash-card:hover {
@@ -245,28 +336,16 @@
     box-shadow: 0 10px 25px rgba(0,0,0,0.35);
 }
 
-/* CARD COLOR VARIANTS */
-.dash-card.green { background: #0a8f43; color: #fff; }
-.dash-card.teal  { background: #00796b; color: #fff; }
-.dash-card.gold  { background: #b8860b; color: #fff; }
-.dash-card.blue  { background: #1976d2; color: #fff; }
-.dash-card.purple{ background: #6a1b9a; color: #fff; }
-.dash-card.grey  { background: #455a64; color: #fff; }
-.dash-card.red   { background: #d32f2f; color: #fff; }
+/* SOFT COLOR TAGS */
+.dash-card.green  { border-left: 6px solid #0aa64d; }
+.dash-card.teal   { border-left: 6px solid #009688; }
+.dash-card.gold   { border-left: 6px solid #c49b0b; }
+.dash-card.blue   { border-left: 6px solid #1976d2; }
+.dash-card.purple { border-left: 6px solid #7b1fa2; }
 
-.dash-card:hover {
-    opacity: 0.9;
-}
-
-/* LOGOUT CARD (explicit) */
-.logout-card {
-    background: #dc3545;
-    color: #fff;
-    padding: 10px;
-    border-radius: 8px;
-}
-
-/* RESPONSIVE DESIGN */
+/* =========================
+   RESPONSIVE DESIGN
+   ========================= */
 @media (max-width: 768px) {
     .dashboard-header {
         flex-direction: column;
@@ -275,15 +354,21 @@
 
     .user-panel {
         text-align: center;
+        margin-top: 20px;
     }
 
     .dashboard-logo {
-        width: 60px;
-        height: 60px;
+        width: 65px;
+        height: 65px;
     }
 
     .dashboard-welcome h1 {
         font-size: 1.6rem;
+    }
+
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+        gap: 18px;
     }
 }
 /* =========================
@@ -379,57 +464,6 @@ button, input[type="submit"] {
 /* Flash messages */
 
 
-/* =========================
-   LOGIN PAGE
-   ========================= */
-
-
-.login-header {
-    text-align: center;
-    margin-bottom: 20px;
-}
-.login-logo {
-    width: 80px;
-    height: auto;
-    margin-bottom: 10px;
-}
-.login-title {
-    font-size: 1.5rem;
-    margin-bottom: 15px;
-}
-.form-group {
-    margin-bottom: 15px;
-}
-.form-group label {
-    display: block;
-    font-weight: bold;
-    margin-bottom: 5px;
-}
-.form-group input,
-.login-form select {
-    width: 100%;
-    padding: 8px 10px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-}
-.login-btn {
-    width: 100%;
-    padding: 10px;
-    background: #28a745;
-    color: #fff;
-    font-weight: bold;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-.login-btn:hover {
-    background: #218838;
-}
-.login-error {
-    color: red;
-    text-align: center;
-    margin-bottom: 10px;
-}
 
 /* =========================
    DASHBOARD
