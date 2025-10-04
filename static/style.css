@@ -87,60 +87,204 @@
 }
 
 /* =========================
-   DASHBOARD
+   MODERN DASHBOARD (Deep Green Theme)
    ========================= */
-.dashboard-wrapper {
+.dashboard-container {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #023020, #064420, #0b6b34);
+    color: #fff;
+    font-family: 'Poppins', sans-serif;
     padding: 20px;
 }
 
+/* HEADER SECTION */
 .dashboard-header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    background: #007bff;
-    color: #fff;
-    padding: 15px;
-    border-radius: 5px;
-    margin-bottom: 20px;
-}
-
-.dashboard-logo {
-    width: 60px;
-    height: auto;
-    margin-right: 10px;
-}
-
-.header-text h1, .header-text h2, .header-text p {
-    margin: 2px 0;
-}
-
-.dashboard-cards {
-    display: flex;
+    background: rgba(255, 255, 255, 0.08);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 18px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
     flex-wrap: wrap;
+}
+
+.logo-section {
+    display: flex;
+    align-items: center;
     gap: 15px;
 }
 
-.dashboard-card {
-    flex: 1 1 calc(33% - 10px);
-    background: #fff;
-    text-align: center;
-    padding: 20px;
+.dashboard-logo {
+    width: 70px;
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.company-info {
+    line-height: 1.4;
+}
+
+.company-name {
+    font-size: 1.6rem;
+    color: #fdfdfd;
+    font-weight: 700;
+}
+
+.company-motto {
+    font-size: 1rem;
+    color: goldenrod;
+    font-weight: 600;
+}
+
+.company-address {
+    font-size: 0.9rem;
+    color: #d0d0d0;
+}
+
+.user-panel {
+    text-align: right;
+    min-width: 250px;
+}
+
+.greeting {
+    font-size: 1rem;
+    margin-bottom: 5px;
+    color: #fff;
+}
+
+.today-date {
+    font-size: 0.9rem;
+    color: #ccc;
+    margin-bottom: 10px;
+}
+
+.header-links {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.nav-btn {
+    background: #0b6b34;
+    color: #fff;
+    padding: 8px 14px;
     border-radius: 10px;
     text-decoration: none;
-    color: #333;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    transition: transform 0.2s, box-shadow 0.2s;
+    font-weight: 600;
+    transition: all 0.3s ease;
 }
 
-.dashboard-card:hover {
+.nav-btn:hover {
+    background: #0e8a4d;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(14, 138, 77, 0.4);
+}
+
+.logout-btn {
+    background: #c0392b;
+}
+
+.logout-btn:hover {
+    background: #e74c3c;
+}
+
+/* WELCOME SECTION */
+.dashboard-welcome {
+    text-align: center;
+    margin: 40px 0 20px 0;
+}
+
+.dashboard-welcome h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #fff;
+}
+
+.dashboard-welcome h1 span {
+    color: goldenrod;
+}
+
+.dashboard-welcome p {
+    color: #dcdcdc;
+    font-size: 1rem;
+    margin-top: 10px;
+}
+
+/* DASHBOARD CARDS GRID */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+    margin-top: 30px;
+}
+
+.dash-card {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+    color: #023020;
+    padding: 25px;
+    border-radius: 15px;
+    text-decoration: none;
+    font-size: 1.1rem;
+    font-weight: 600;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.25);
+    transition: all 0.3s ease;
+}
+
+.dash-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.35);
 }
 
+/* CARD COLOR VARIANTS */
+.dash-card.green { background: #0b6b34; color: #fff; }
+.dash-card.teal { background: #107050; color: #fff; }
+.dash-card.gold { background: #b8860b; color: #fff; }
+.dash-card.blue { background: #2471a3; color: #fff; }
+.dash-card.purple { background: #6c3483; color: #fff; }
+.dash-card.grey { background: #566573; color: #fff; }
+.dash-card.red { background: #c0392b; color: #fff; }
+
+.dash-card:hover {
+    opacity: 0.9;
+}
+
+/* RESPONSIVE DESIGN */
+@media (max-width: 768px) {
+    .dashboard-header {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .user-panel {
+        text-align: center;
+    }
+
+    .dashboard-logo {
+        width: 60px;
+    }
+
+    .dashboard-welcome h1 {
+        font-size: 1.6rem;
+    }
+}
 .logout-card {
     background: #dc3545;
     color: #fff;
 }
+```)  
+
+👉 **Replace that entire section** with the new modern one:  
+```css
+/* =========================
+   MODERN DASHBOARD (Deep Green Theme)
+   ========================= */
+... (the full updated CSS you pasted)
 
 /* =========================
    TABLES

@@ -1,50 +1,45 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="dashboard-wrapper">
-
-    <!-- Header -->
+<div class="dashboard-container">
+    
+    <!-- Top Header -->
     <header class="dashboard-header">
-        <!-- Left: Logo + Company Info -->
-        <div style="display: flex; align-items: center; gap: 1rem;">
+        <div class="logo-section">
             <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="dashboard-logo">
-            <div class="header-text">
+            <div class="company-info">
                 <h1 class="company-name">OKOYA FOOD COMPANY LIMITED</h1>
-                <h2 class="company-motto">POVERTY ERADICTION, REDUCE INEQUALITY AND LEAVE NO ONE BEHIND</h2>
-                <p class="company-address">KM 7 Idi APA community, along Ilesha Ibaruba express way, Shaki, Oyo State, Nigeria</p>
-                <p class="greeting">👋 Hello, Admin! Welcome back.</p>
-                <p class="today-date">📅 Today: <span id="todayDate"></span></p>
+                <h2 class="company-motto">POVERTY ERADICATION • REDUCE INEQUALITY • LEAVE NO ONE BEHIND</h2>
+                <p class="company-address">KM 7 Idi APA Community, Along Ilesha Ibaruba Expressway, Saki, Oyo State, Nigeria</p>
             </div>
         </div>
 
-        <!-- Right: Dashboard / Logout Links -->
-        <div class="header-links">
-            <a href="{{ url_for('dashboard') }}">🏠 Dashboard</a>
-            {% if session.get('admin') %}
-                <a href="{{ url_for('logout') }}">🚪 Logout</a>
-            {% endif %}
+        <div class="user-panel">
+            <p class="greeting">👋 Hello, Admin!</p>
+            <p class="today-date">📅 Today: <span id="todayDate"></span></p>
+            <div class="header-links">
+                <a href="{{ url_for('dashboard') }}" class="nav-btn">🏠 Dashboard</a>
+                {% if session.get('admin') %}
+                    <a href="{{ url_for('logout') }}" class="nav-btn logout-btn">🚪 Logout</a>
+                {% endif %}
+            </div>
         </div>
     </header>
 
-    <!-- Theme Controls -->
-    <section class="theme-controls">
-        <button onclick="setTheme('light')">☀️ Light</button>
-        <button onclick="setTheme('dark')">🌙 Dark</button>
-        <button onclick="setTheme('blue')">🔵 Blue</button>
-        <button onclick="setTheme('red')">🔴 Red</button>
+    <!-- Welcome Section -->
+    <section class="dashboard-welcome">
+        <h1>Welcome to <span>Okoya Food Co.</span> Staff Management</h1>
+        <p>Manage workers, attendance, and salaries effortlessly.</p>
     </section>
 
-    <!-- Dashboard Welcome -->
-    <h1 class="dashboard-welcome">Welcome to Okoya Food Co., Staff Management</h1>
-
     <!-- Dashboard Cards -->
-    <section class="dashboard-cards">
-        <a href="{{ url_for('register_worker') }}" class="dashboard-card">📋 Register Worker</a>
-        <a href="{{ url_for('attendance') }}" class="dashboard-card">🕒 Mark Attendance</a>
-        <a href="{{ url_for('salary') }}" class="dashboard-card">💰 Record Salary</a>
-        <a href="{{ url_for('attendance_history') }}" class="dashboard-card">📅 Attendance History</a>
-        <a href="{{ url_for('salary_history') }}" class="dashboard-card">🧾 Salary History</a>
-        <a href="{{ url_for('workers_name') }}" class="dashboard-card">👥 View Workers</a>
-        <a href="{{ url_for('logout') }}" class="dashboard-card logout-card">🚪 Logout</a>
+    <section class="dashboard-grid">
+        <a href="{{ url_for('register_worker') }}" class="dash-card green">📋 Register Worker</a>
+        <a href="{{ url_for('attendance') }}" class="dash-card teal">🕒 Mark Attendance</a>
+        <a href="{{ url_for('salary') }}" class="dash-card gold">💰 Record Salary</a>
+        <a href="{{ url_for('attendance_history') }}" class="dash-card blue">📅 Attendance History</a>
+        <a href="{{ url_for('salary_history') }}" class="dash-card purple">🧾 Salary History</a>
+        <a href="{{ url_for('workers_name') }}" class="dash-card grey">👥 View Workers</a>
+        <a href="{{ url_for('logout') }}" class="dash-card red">🚪 Logout</a>
     </section>
 </div>
 
