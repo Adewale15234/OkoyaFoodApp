@@ -74,6 +74,29 @@ class Worker(db.Model):
         cascade="all, delete-orphan"
     )
 
+# --- Client Order Model ---
+class Order(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    name = db.Column(db.String(200))
+    email = db.Column(db.String(200))
+    date_needed = db.Column(db.String(50))
+    bank_name = db.Column(db.String(200))
+    items = db.Column(db.String(200))
+    description = db.Column(db.Text)
+    tonnage = db.Column(db.Float, nullable=True)
+    number_of_bags = db.Column(db.Integer, nullable=True)
+    kilograms = db.Column(db.Float, nullable=True)
+    unit_price = db.Column(db.Float, nullable=True)
+    total_amount = db.Column(db.Float, nullable=True)
+    driver_name = db.Column(db.String(200))
+    vehicle_plate_number = db.Column(db.String(100))
+    phone_number = db.Column(db.String(100))
+    account_number = db.Column(db.String(200))
+    account_bank_name = db.Column(db.String(200))
+
+    def __repr__(self):
+        return f"<Order {self.id} - {self.name} - {self.items}>"
 
 class Attendance(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -164,6 +187,42 @@ def workers_name():
     workers = Worker.query.all()
     return render_template('workers_name.html', workers=workers)
 
+   @app.route('/client_form', methods=['GET', 'POST'])
+def client_form():
+    # Sample product list, can later pull from DB
+    products = ["CASHEW NUT", "MAIZE", "SOYA BEANS", "RICE"]
+
+    if request.method == 'POST':
+        try:
+            data = request.form
+            order = Order(
+                name=data.get('name', '').strip(),
+                email=data.get('email', '').strip(),
+                date_needed=data.get('date', '').strip(),
+                bank_name=data.get('bank_name', '').strip(),
+                items=data.get('items', '').strip(),
+                description=data.get('description', '').strip(),
+                tonnage=float(data.get('tonnage') or 0) or None,
+                number_of_bags=int(data.get('number_of_bags') or 0) or None,
+                kilograms=float(data.get('kilograms') or 0) or None,
+                unit_price=float(data.get('unit_price') or 0) or None,
+                total_amount=float(data.get('total_amount') or 0) or None,
+                driver_name=data.get('driver_name', '').strip(),
+                vehicle_plate_number=data.get('vehicle_plate_number', '').strip(),
+                phone_number=data.get('phone_number', '').strip(),
+                account_number=data.get('account_number', '').strip(),
+                account_bank_name=data.get('account_bank_name', '').strip()
+            )
+            db.session.add(order)
+            db.session.commit()
+            flash("Client order submitted successfully!", "success")
+            return redirect(url_for('client_form'))
+        except Exception as e:
+            db.session.rollback()
+            flash("Error submitting order. Please check your input.", "error")
+    
+    return render_template('client_form.html', products=products)
+    
 @app.route('/edit_worker/<int:worker_id>', methods=['GET', 'POST'])
 def edit_worker(worker_id):
     if 'admin' not in session:
