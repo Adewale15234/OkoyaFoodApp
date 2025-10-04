@@ -6,7 +6,7 @@
     <div class="company-header">
       <img src="{{ url_for('static', filename='android-chrome-512x512 (1).png') }}" alt="OKOYA Logo" class="company-logo">
       <div class="company-text">
-        <h1 class="company-name">OKOYA FOOD COMPANY LIMITED</h1>
+        <h1 class="company-name">OKOYA FOOD Co,. COMPANY LIMITED</h1>
         <h2 class="company-motto">POVERTY ERADICATION, REDUCE INEQUALITY AND LEAVE NO ONE BEHIND</h2>
         <p class="company-address">
           KM 7 idi APA community, along Ilesha Ibaruba express way, Shaki, Oyo State, Nigeria
@@ -14,7 +14,8 @@
       </div>
     </div>
 
-    <form action="{{ url_for('submit_order') }}" method="post" class="order-form two-column-form">
+    <!-- Form starts here, action points to the correct route -->
+    <form action="{{ url_for('client_form') }}" method="post" class="order-form two-column-form">
       <div class="form-column left-column">
         <div class="form-row">
           <label for="name">NAME</label>
@@ -68,7 +69,7 @@
           <input id="total_amount" name="total_amount" type="number" step="0.01" min="0">
         </div>
         <div class="form-row">
-          <label for="driver_name">DRIVER' NAME</label>
+          <label for="driver_name">DRIVER'S NAME</label>
           <input id="driver_name" name="driver_name">
         </div>
         <div class="form-row">
@@ -87,14 +88,13 @@
           <label for="account_bank_name">ACCOUNT BANK NAME</label>
           <input id="account_bank_name" name="account_bank_name">
         </div>
+
+        <!-- Submit button must be inside the form -->
+        <div class="submit-center">
+          <button type="submit" class="btn-primary">Submit Order</button>
+        </div>
       </div>
     </form>
-
-    <!-- Submit Button centered in the page -->
-    <div class="submit-center">
-      <button type="submit" class="btn-primary">Submit Order</button>
-    </div>
-  
 
     <!-- Footer -->
     <div class="footer">

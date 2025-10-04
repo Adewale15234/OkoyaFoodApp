@@ -180,10 +180,8 @@ def workers_name():
         return redirect(url_for('login'))
     workers = Worker.query.all()
     return render_template('workers_name.html', workers=workers)
-
 @app.route('/client_form', methods=['GET', 'POST'])
 def client_form():
-    # Sample product list, can later pull from DB
     products = ["CASHEW NUT", "MAIZE", "SOYA BEANS", "RICE"]
 
     if request.method == 'POST':
