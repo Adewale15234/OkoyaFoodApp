@@ -78,28 +78,6 @@ class Worker(db.Model):
 class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    name = db.Column(db.String(200))
-    email = db.Column(db.String(200))
-    date_needed = db.Column(db.String(50))
-    bank_name = db.Column(db.String(200))
-    items = db.Column(db.String(200))
-    description = db.Column(db.Text)
-    tonnage = db.Column(db.Float, nullable=True)
-    number_of_bags = db.Column(db.Integer, nullable=True)
-    kilograms = db.Column(db.Float, nullable=True)
-    unit_price = db.Column(db.Float, nullable=True)
-    total_amount = db.Column(db.Float, nullable=True)
-    driver_name = db.Column(db.String(200))
-    vehicle_plate_number = db.Column(db.String(100))
-    phone_number = db.Column(db.String(100))
-    account_number = db.Column(db.String(200))
-    account_bank_name = db.Column(db.String(200))
-
-    def __repr__(self):
-        return f"<Order {self.id} - {self.name} - {self.items}>"
-
-class Order(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(150))
     email = db.Column(db.String(150))
     items = db.Column(db.String(50))
@@ -113,8 +91,10 @@ class Order(db.Model):
     vehicle_plate_number = db.Column(db.String(50))
     bank_name = db.Column(db.String(100))
     account_number = db.Column(db.String(50))
+    account_bank_name = db.Column(db.String(200))
     description = db.Column(db.String(255))
-    status = db.Column(db.String(20), default="Pending")  # <-- New field
+    phone_number = db.Column(db.String(100))
+    status = db.Column(db.String(20), default="Pending")
 
 class Attendance(db.Model):
     id = db.Column(db.Integer, primary_key=True)

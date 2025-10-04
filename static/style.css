@@ -1237,4 +1237,5 @@ h1, h2, h3, p {
 }
 
 .btn-primary:hover {
-    backgr
+    background: linear-gradient(135deg, #09a74f, #11cc64);
+}
