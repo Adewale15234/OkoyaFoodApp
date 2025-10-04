@@ -87,12 +87,12 @@
 }
 
 /* =========================
-   MODERN DASHBOARD (Refined Green Theme)
+   MODERN DASHBOARD (Emerald Green Theme)
    ========================= */
 .dashboard-container {
     min-height: 100vh;
-    background: linear-gradient(135deg, #1b5e20, #2e7d32, #4caf50);
-    color: #fff;
+    background: linear-gradient(135deg, #003d1f, #046c34, #0a8f43);
+    color: #ffffff;
     font-family: 'Poppins', sans-serif;
     padding: 20px;
 }
@@ -102,11 +102,11 @@
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    background: rgba(255, 255, 255, 0.07);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 18px 22px;
-    border-radius: 18px;
-    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.25);
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 22px 26px;
+    border-radius: 20px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
     flex-wrap: wrap;
 }
 
@@ -114,31 +114,31 @@
 .logo-section {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 18px;
 }
 
 .dashboard-logo {
-    width: 60px;              /* ✅ Balanced logo size */
-    height: 60px;
+    width: 70px;              /* increased height */
+    height: 70px;
     object-fit: cover;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-    border: 2px solid rgba(255,255,255,0.2);
+    border-radius: 14px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    border: 2px solid rgba(255,255,255,0.25);
 }
 
 .company-info {
-    line-height: 1.4;
+    line-height: 1.5;
 }
 
 .company-name {
-    font-size: 1.5rem;
-    color: #fdfdfd;
+    font-size: 1.7rem;
+    color: #00ff6a;          /* bright green accent */
     font-weight: 700;
 }
 
 .company-motto {
     font-size: 1rem;
-    color: #ffda6a;
+    color: #ffe082;
     font-weight: 600;
 }
 
@@ -172,9 +172,9 @@
 }
 
 .nav-btn {
-    background: #2e7d32;
+    background: #056a2d;
     color: #fff;
-    padding: 8px 14px;
+    padding: 9px 15px;
     border-radius: 10px;
     text-decoration: none;
     font-weight: 600;
@@ -182,17 +182,17 @@
 }
 
 .nav-btn:hover {
-    background: #43a047;
+    background: #09a34a;
     transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(67, 160, 71, 0.4);
+    box-shadow: 0 4px 12px rgba(9, 163, 74, 0.5);
 }
 
 .logout-btn {
-    background: #c0392b;
+    background: #b71c1c;
 }
 
 .logout-btn:hover {
-    background: #e74c3c;
+    background: #e53935;
 }
 
 /* WELCOME SECTION */
@@ -204,11 +204,11 @@
 .dashboard-welcome h1 {
     font-size: 2rem;
     font-weight: 700;
-    color: #fff;
+    color: #ffffff;
 }
 
 .dashboard-welcome h1 span {
-    color: #ffda6a;
+    color: #00ff6a; /* matches brand green */
 }
 
 .dashboard-welcome p {
@@ -230,7 +230,7 @@
     align-items: center;
     justify-content: center;
     background: #ffffff;
-    color: #1b5e20;
+    color: #046c34;
     padding: 25px;
     border-radius: 15px;
     text-decoration: none;
@@ -246,13 +246,13 @@
 }
 
 /* CARD COLOR VARIANTS */
-.dash-card.green { background: #43a047; color: #fff; }
+.dash-card.green { background: #0a8f43; color: #fff; }
 .dash-card.teal { background: #00796b; color: #fff; }
 .dash-card.gold { background: #b8860b; color: #fff; }
-.dash-card.blue { background: #1e88e5; color: #fff; }
+.dash-card.blue { background: #1976d2; color: #fff; }
 .dash-card.purple { background: #6a1b9a; color: #fff; }
-.dash-card.grey { background: #546e7a; color: #fff; }
-.dash-card.red { background: #e53935; color: #fff; }
+.dash-card.grey { background: #455a64; color: #fff; }
+.dash-card.red { background: #d32f2f; color: #fff; }
 
 .dash-card:hover {
     opacity: 0.9;
@@ -270,8 +270,8 @@
     }
 
     .dashboard-logo {
-        width: 55px;
-        height: 55px;
+        width: 60px;
+        height: 60px;
     }
 
     .dashboard-welcome h1 {
@@ -781,31 +781,6 @@ button, input[type="submit"] {
         width: 100px;
     }
 }
-/* =========================
-   REGISTER WORKER PAGE
-   ========================= */
-```).  
-
----
-
-### 🧠 In short:
-✔️ Remove → old "Register Worker Print Styles" section  
-✔️ Paste → new "REGISTER WORKER PAGE" section (the big one you just sent)  
-✔️ Save the file → `static/style.css`  
-✔️ Reload your **Register Worker** page in the browser  
-
----
-
-You’ll see:
-- Cleaner white form layout  
-- Properly sized **company logo** and **passport**  
-- Aligned header text (company name, motto, address)  
-- Looks official both **on screen and in print (A4)**  
-
----
-
-Would you like me to show how to make the **Print button** (if you have one) print just the registration form cleanly — hiding menus and background?
-
 /* =========================
    GLOBAL STYLES
    ========================= */
