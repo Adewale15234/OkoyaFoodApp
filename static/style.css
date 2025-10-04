@@ -87,11 +87,11 @@
 }
 
 /* =========================
-   MODERN DASHBOARD (Deep Green Theme)
+   MODERN DASHBOARD (Refined Green Theme)
    ========================= */
 .dashboard-container {
     min-height: 100vh;
-    background: linear-gradient(135deg, #023020, #064420, #0b6b34);
+    background: linear-gradient(135deg, #1b5e20, #2e7d32, #4caf50);
     color: #fff;
     font-family: 'Poppins', sans-serif;
     padding: 20px;
@@ -102,14 +102,15 @@
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    background: rgba(255, 255, 255, 0.08);
-    border: 2px solid rgba(255, 255, 255, 0.1);
-    padding: 20px;
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 18px 22px;
     border-radius: 18px;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.25);
     flex-wrap: wrap;
 }
 
+/* LOGO AREA */
 .logo-section {
     display: flex;
     align-items: center;
@@ -117,10 +118,12 @@
 }
 
 .dashboard-logo {
-    width: 70px;
-    height: auto;
+    width: 60px;              /* ✅ Balanced logo size */
+    height: 60px;
+    object-fit: cover;
     border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    border: 2px solid rgba(255,255,255,0.2);
 }
 
 .company-info {
@@ -128,14 +131,14 @@
 }
 
 .company-name {
-    font-size: 1.6rem;
+    font-size: 1.5rem;
     color: #fdfdfd;
     font-weight: 700;
 }
 
 .company-motto {
     font-size: 1rem;
-    color: goldenrod;
+    color: #ffda6a;
     font-weight: 600;
 }
 
@@ -144,9 +147,10 @@
     color: #d0d0d0;
 }
 
+/* USER PANEL */
 .user-panel {
     text-align: right;
-    min-width: 250px;
+    min-width: 240px;
 }
 
 .greeting {
@@ -157,7 +161,7 @@
 
 .today-date {
     font-size: 0.9rem;
-    color: #ccc;
+    color: #cfd8dc;
     margin-bottom: 10px;
 }
 
@@ -168,7 +172,7 @@
 }
 
 .nav-btn {
-    background: #0b6b34;
+    background: #2e7d32;
     color: #fff;
     padding: 8px 14px;
     border-radius: 10px;
@@ -178,9 +182,9 @@
 }
 
 .nav-btn:hover {
-    background: #0e8a4d;
+    background: #43a047;
     transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(14, 138, 77, 0.4);
+    box-shadow: 0 4px 10px rgba(67, 160, 71, 0.4);
 }
 
 .logout-btn {
@@ -204,11 +208,11 @@
 }
 
 .dashboard-welcome h1 span {
-    color: goldenrod;
+    color: #ffda6a;
 }
 
 .dashboard-welcome p {
-    color: #dcdcdc;
+    color: #e0e0e0;
     font-size: 1rem;
     margin-top: 10px;
 }
@@ -226,7 +230,7 @@
     align-items: center;
     justify-content: center;
     background: #ffffff;
-    color: #023020;
+    color: #1b5e20;
     padding: 25px;
     border-radius: 15px;
     text-decoration: none;
@@ -242,13 +246,13 @@
 }
 
 /* CARD COLOR VARIANTS */
-.dash-card.green { background: #0b6b34; color: #fff; }
-.dash-card.teal { background: #107050; color: #fff; }
+.dash-card.green { background: #43a047; color: #fff; }
+.dash-card.teal { background: #00796b; color: #fff; }
 .dash-card.gold { background: #b8860b; color: #fff; }
-.dash-card.blue { background: #2471a3; color: #fff; }
-.dash-card.purple { background: #6c3483; color: #fff; }
-.dash-card.grey { background: #566573; color: #fff; }
-.dash-card.red { background: #c0392b; color: #fff; }
+.dash-card.blue { background: #1e88e5; color: #fff; }
+.dash-card.purple { background: #6a1b9a; color: #fff; }
+.dash-card.grey { background: #546e7a; color: #fff; }
+.dash-card.red { background: #e53935; color: #fff; }
 
 .dash-card:hover {
     opacity: 0.9;
@@ -266,26 +270,22 @@
     }
 
     .dashboard-logo {
-        width: 60px;
+        width: 55px;
+        height: 55px;
     }
 
     .dashboard-welcome h1 {
         font-size: 1.6rem;
     }
 }
-.logout-card {
-    background: #dc3545;
-    color: #fff;
-}
-```)  
+} .logout-card { background: #dc3545; color: #fff; }
+)  
 
-👉 **Replace that entire section** with the new modern one:  
-```css
-/* =========================
-   MODERN DASHBOARD (Deep Green Theme)
+👉 **Replace that entire section** with the new modern one:
+css 
+/* ========================= 
+    MODERN DASHBOARD (Deep Green Theme)
    ========================= */
-... (the full updated CSS you pasted)
-
 /* =========================
    TABLES
    ========================= */
