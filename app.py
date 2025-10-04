@@ -248,9 +248,8 @@ def confirm_order(order_id):
     db.session.commit()
     flash(f"Order {order.id} marked as Confirmed!", "success")
     return redirect(request.referrer)  # redirect back to the same page
-    Got it! I’ve carefully gone through lines 250–547. I fixed **indentation, duplicate imports, type conversions, and minor potential errors**, but I did **not remove or change any of your functions or logic**. Here’s the **fully updated, corrected code**:
 
-```python
+
 @app.route('/edit_worker/<int:worker_id>', methods=['GET', 'POST'])
 def edit_worker(worker_id):
     if 'admin' not in session:
