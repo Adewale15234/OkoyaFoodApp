@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+here is attendance history:{% extends 'base.html' %}
 {% block content %}
 <a href="{{ url_for('dashboard') }}" class="back-link no-print">← Back to Dashboard</a>
 <h1 class="no-print">Attendance History</h1>
@@ -50,7 +50,6 @@
 
     <!-- Attendance Table -->
     {% if attendance_records %}
-    <div class="attendance-table-container">
         <table class="attendance-table">
             <thead>
                 <tr>
@@ -64,16 +63,13 @@
                 <tr>
                     <td>{{ record.date.strftime('%d %b %Y') }}</td>
                     <td>{{ record.worker.name }}</td>
-                    <td class="status {% if record.status == 'Present' %}present{% elif record.status == 'Absent' %}absent{% else %}other{% endif %}">
-                        {{ record.status }}
-                    </td>
+                    <td>{{ record.status }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
-    </div>
     {% else %}
-        <p class="no-records">No attendance records available.</p>
+        <p>No attendance records available.</p>
     {% endif %}
 
     <!-- Signature Section -->
@@ -88,3 +84,6 @@
         </div>
     </div>
 </div>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/attendance_history.css') }}">
+{% endblock %}
