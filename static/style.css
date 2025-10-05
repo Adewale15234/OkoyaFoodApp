@@ -1077,14 +1077,23 @@ h1, h2, h3, p {
 /* =========================
    SECRETARY DASHBOARD (Emerald Theme)
    ========================= */
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    font-family: 'Poppins', sans-serif;
+}
+
 .dashboard-wrapper {
-    min-height: 100vh;
+    width: 100vw;
+    height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
     background: linear-gradient(145deg, #013d22, #046a34, #08a84c);
-    font-family: 'Poppins', sans-serif;
-    padding: 30px;
+    padding: 0; /* remove extra padding */
+    box-sizing: border-box;
 }
 
 .dashboard-card {
@@ -1093,7 +1102,8 @@ h1, h2, h3, p {
     border: 1px solid rgba(255, 255, 255, 0.25);
     border-radius: 20px;
     padding: 40px 35px;
-    width: 420px;
+    width: 90%;
+    max-width: 500px; /* responsive max width */
     text-align: center;
     color: #fff;
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
