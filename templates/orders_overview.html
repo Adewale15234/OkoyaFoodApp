@@ -1,236 +1,72 @@
 {% extends 'base.html' %}
 {% block content %}
-<a href="{{ url_for('dashboard') }}" class="back-link">← Back to Dashboard</a>
-<div class="dashboard-wrapper">
-    <h1 class="dashboard-title">Orders Overview</h1>
-
-    <!-- SOYA BEANS ORDERS -->
-    {% if soya_orders %}
-    <div class="order-card">
-        <h2>Soya Beans Orders</h2>
-        <table class="orders-table">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Bags</th>
-                    <th>Kgs</th>
-                    <th>Unit Price</th>
-                    <th>Total Amount</th>
-                    <th>Date Needed</th>
-                    <th>Driver</th>
-                    <th>Vehicle</th>
-                    <th>Bank</th>
-                    <th>Account</th>
-                    <th>Description</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for order in soya_orders %}
-                <tr>
-                    <td>{{ order.id }}</td>
-                    <td>{{ order.name }}</td>
-                    <td>{{ order.email }}</td>
-                    <td>{{ order.number_of_bags or '-' }}</td>
-                    <td>{{ order.kilograms or '-' }}</td>
-                    <td>{{ order.unit_price or '-' }}</td>
-                    <td>{{ order.total_amount or '-' }}</td>
-                    <td>{{ order.date_needed }}</td>
-                    <td>{{ order.driver_name or '-' }}</td>
-                    <td>{{ order.vehicle_plate_number or '-' }}</td>
-                    <td>{{ order.bank_name or '-' }}</td>
-                    <td>{{ order.account_number or '-' }}</td>
-                    <td>{{ order.description or '-' }}</td>
-                    <td>{{ order.status }}</td>
-                    <td>
-                        {% if order.status != 'Confirmed' %}
-                        <form action="{{ url_for('confirm_order', order_id=order.id) }}" method="POST">
-                            <button type="submit" class="confirm-btn">Confirm</button>
-                        </form>
-                        {% else %}
-                        <button class="confirm-btn confirmed" disabled>Confirmed</button>
-                        {% endif %}
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+<div class="orders-overview-container">
+    <div class="overview-header">
+        <h1>📦 Orders Overview</h1>
+        <p>All client orders categorized by product type.</p>
+        <a href="{{ url_for('dashboard') }}" class="back-btn">← Back to Dashboard</a>
     </div>
-    {% endif %}
 
-    <!-- CASHEW NUT ORDERS -->
-    {% if cashew_orders %}
+    {% macro order_card(order) %}
     <div class="order-card">
-        <h2>Cashew Nut Orders</h2>
-        <table class="orders-table">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Bags</th>
-                    <th>Kgs</th>
-                    <th>Unit Price</th>
-                    <th>Total Amount</th>
-                    <th>Date Needed</th>
-                    <th>Driver</th>
-                    <th>Vehicle</th>
-                    <th>Bank</th>
-                    <th>Account</th>
-                    <th>Description</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for order in cashew_orders %}
-                <tr>
-                    <td>{{ order.id }}</td>
-                    <td>{{ order.name }}</td>
-                    <td>{{ order.email }}</td>
-                    <td>{{ order.number_of_bags or '-' }}</td>
-                    <td>{{ order.kilograms or '-' }}</td>
-                    <td>{{ order.unit_price or '-' }}</td>
-                    <td>{{ order.total_amount or '-' }}</td>
-                    <td>{{ order.date_needed }}</td>
-                    <td>{{ order.driver_name or '-' }}</td>
-                    <td>{{ order.vehicle_plate_number or '-' }}</td>
-                    <td>{{ order.bank_name or '-' }}</td>
-                    <td>{{ order.account_number or '-' }}</td>
-                    <td>{{ order.description or '-' }}</td>
-                    <td>{{ order.status }}</td>
-                    <td>
-                        {% if order.status != 'Confirmed' %}
-                        <form action="{{ url_for('confirm_order', order_id=order.id) }}" method="POST">
-                            <button type="submit" class="confirm-btn">Confirm</button>
-                        </form>
-                        {% else %}
-                        <button class="confirm-btn confirmed" disabled>Confirmed</button>
-                        {% endif %}
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-    {% endif %}
+        <div class="order-header">
+            <h2>{{ order.items }}</h2>
+            <span class="status {{ order.status|lower }}">{{ order.status }}</span>
+        </div>
 
-    <!-- MAIZE ORDERS -->
-    {% if maize_orders %}
-    <div class="order-card">
-        <h2>Maize Orders</h2>
-        <table class="orders-table">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Bags</th>
-                    <th>Kgs</th>
-                    <th>Unit Price</th>
-                    <th>Total Amount</th>
-                    <th>Date Needed</th>
-                    <th>Driver</th>
-                    <th>Vehicle</th>
-                    <th>Bank</th>
-                    <th>Account</th>
-                    <th>Description</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for order in maize_orders %}
-                <tr>
-                    <td>{{ order.id }}</td>
-                    <td>{{ order.name }}</td>
-                    <td>{{ order.email }}</td>
-                    <td>{{ order.number_of_bags or '-' }}</td>
-                    <td>{{ order.kilograms or '-' }}</td>
-                    <td>{{ order.unit_price or '-' }}</td>
-                    <td>{{ order.total_amount or '-' }}</td>
-                    <td>{{ order.date_needed }}</td>
-                    <td>{{ order.driver_name or '-' }}</td>
-                    <td>{{ order.vehicle_plate_number or '-' }}</td>
-                    <td>{{ order.bank_name or '-' }}</td>
-                    <td>{{ order.account_number or '-' }}</td>
-                    <td>{{ order.description or '-' }}</td>
-                    <td>{{ order.status }}</td>
-                    <td>
-                        {% if order.status != 'Confirmed' %}
-                        <form action="{{ url_for('confirm_order', order_id=order.id) }}" method="POST">
-                            <button type="submit" class="confirm-btn">Confirm</button>
-                        </form>
-                        {% else %}
-                        <button class="confirm-btn confirmed" disabled>Confirmed</button>
-                        {% endif %}
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-    {% endif %}
+        <div class="order-info">
+            <p><strong>Client:</strong> {{ order.name }}</p>
+            <p><strong>Email:</strong> {{ order.email }}</p>
+            <p><strong>Phone:</strong> {{ order.phone_number }}</p>
+            <p><strong>Date Needed:</strong> {{ order.date_needed }}</p>
+            <p><strong>Description:</strong> {{ order.description }}</p>
+        </div>
 
-    <!-- RICE ORDERS -->
-    {% if rice_orders %}
-    <div class="order-card">
-        <h2>Rice Orders</h2>
-        <table class="orders-table">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Bags</th>
-                    <th>Kgs</th>
-                    <th>Unit Price</th>
-                    <th>Total Amount</th>
-                    <th>Date Needed</th>
-                    <th>Driver</th>
-                    <th>Vehicle</th>
-                    <th>Bank</th>
-                    <th>Account</th>
-                    <th>Description</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for order in rice_orders %}
-                <tr>
-                    <td>{{ order.id }}</td>
-                    <td>{{ order.name }}</td>
-                    <td>{{ order.email }}</td>
-                    <td>{{ order.number_of_bags or '-' }}</td>
-                    <td>{{ order.kilograms or '-' }}</td>
-                    <td>{{ order.unit_price or '-' }}</td>
-                    <td>{{ order.total_amount or '-' }}</td>
-                    <td>{{ order.date_needed }}</td>
-                    <td>{{ order.driver_name or '-' }}</td>
-                    <td>{{ order.vehicle_plate_number or '-' }}</td>
-                    <td>{{ order.bank_name or '-' }}</td>
-                    <td>{{ order.account_number or '-' }}</td>
-                    <td>{{ order.description or '-' }}</td>
-                    <td>{{ order.status }}</td>
-                    <td>
-                        {% if order.status != 'Confirmed' %}
-                        <form action="{{ url_for('confirm_order', order_id=order.id) }}" method="POST">
-                            <button type="submit" class="confirm-btn">Confirm</button>
-                        </form>
-                        {% else %}
-                        <button class="confirm-btn confirmed" disabled>Confirmed</button>
-                        {% endif %}
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-    {% endif %}
+        <div class="order-details">
+            <p><strong>Quantity:</strong> {{ order.number_of_bags or 0 }} bags ({{ order.kilograms or 0 }} kg)</p>
+            <p><strong>Unit Price:</strong> ₦{{ "%.2f"|format(order.unit_price or 0) }}</p>
+            <p><strong>Total:</strong> ₦{{ "%.2f"|format(order.total_amount or 0) }}</p>
+        </div>
 
+        <div class="order-logistics">
+            <p><strong>Driver:</strong> {{ order.driver_name or "—" }}</p>
+            <p><strong>Vehicle Plate:</strong> {{ order.vehicle_plate_number or "—" }}</p>
+        </div>
+
+        <div class="order-bank">
+            <p><strong>Bank Name:</strong> {{ order.bank_name or "—" }}</p>
+            <p><strong>Account No:</strong> {{ order.account_number or "—" }}</p>
+            <p><strong>Account Name:</strong> {{ order.account_bank_name or "—" }}</p>
+        </div>
+
+        {% if order.status != "Confirmed" %}
+        <form method="POST" action="{{ url_for('confirm_order', order_id=order.id) }}" onsubmit="return confirm('Confirm this order?')">
+            <button type="submit" class="confirm-btn">✅ Confirm Order</button>
+        </form>
+        {% endif %}
+    </div>
+    {% endmacro %}
+
+    {% set categories = {
+        "Soya Beans Orders": soya_orders,
+        "Cashew Nut Orders": cashew_orders,
+        "Maize Orders": maize_orders,
+        "Rice Orders": rice_orders
+    } %}
+
+    {% for category, orders in categories.items() %}
+    <section class="order-category">
+        <h2 class="category-title">{{ category }}</h2>
+        {% if orders %}
+            <div class="orders-grid">
+                {% for order in orders %}
+                    {{ order_card(order) }}
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="empty-msg">No orders available.</p>
+        {% endif %}
+    </section>
+    {% endfor %}
 </div>
 {% endblock %}
