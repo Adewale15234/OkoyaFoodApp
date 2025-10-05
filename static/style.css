@@ -382,72 +382,190 @@ body {
 }
 
 /* =========================
-   CLIENT / ORDER FORM
+   CLIENT / ORDER FORM (A4 PORTRAIT THEME)
    ========================= */
-.order-card {
-    background: #f7fff7;
-    padding: 35px;
-    border-radius: 18px;
-    max-width: 1000px;
-    margin: 30px auto;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.25);
-    color: #013d22;
+
+/* Page background */
+body {
+  background: linear-gradient(135deg, #cce7ff, #99ccff);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+  padding: 0;
 }
+
+/* A4 Portrait card */
+.a4-portrait {
+  width: 210mm;
+  height: 297mm;
+  background: #fff;
+  padding: 40px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  box-shadow: 0 0 20px rgba(0,0,0,0.1);
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+/* Header section */
+.company-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.company-logo {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+}
+
+.company-text {
+  text-align: center;
+}
+
+.company-name {
+  color: #28a745;
+  font-weight: 800;
+  font-size: 32px;
+  margin-bottom: 10px;
+}
+.company-motto {
+  color: #daa520;
+  font-weight: 600;
+  font-size: 20px;
+  margin-bottom: 8px;
+}
+.company-address {
+  background: #000;
+  color: #fff;
+  display: inline-block;
+  padding: 6px 12px;
+  font-size: 16px;
+  font-weight: 400;
+  border-radius: 6px;
+}
+
+/* Two-column form layout */
 .two-column-form {
-    display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+  width: 100%;
 }
-.form-column {
-    flex: 1;
-    min-width: 280px;
+
+/* Form columns */
+.two-column-form .form-column {
+  flex: 1;
+  min-width: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
 }
-.form-row {
-    margin-bottom: 12px;
+
+/* Form rows */
+.order-form .form-row {
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
 }
-.form-row label {
-    font-weight: bold;
-    display: block;
-    margin-bottom: 5px;
-    color: #045e32;
+
+/* Reduce space in description */
+.description-row label {
+  margin-bottom: 2px;
 }
-.form-row input,
-.form-row select,
-.form-row textarea {
-    width: 100%;
-    padding: 8px 12px;
-    border-radius: 8px;
-    border: 1px solid #a0cfa0;
-    font-size: 0.95rem;
-    background: #ffffff;
-    color: #013d22;
-    transition: all 0.3s ease;
+.description-row textarea {
+  margin-top: 0;
+  padding-top: 4px;
 }
-.form-row input:focus,
-.form-row select:focus,
-.form-row textarea:focus {
-    border-color: #078f4a;
-    box-shadow: 0 0 8px rgba(7,143,74,0.5);
-    outline: none;
+
+/* Labels */
+.order-form label {
+  font-weight: 700;
+  margin-bottom: 4px;
+  color: #333;
 }
+
+/* Inputs */
+.order-form input,
+.order-form select,
+.order-form textarea {
+  border: none;
+  border-bottom: 3px solid #28a745;
+  border-radius: 0;
+  background: transparent;
+  padding: 6px 4px;
+  font-size: 15px;
+  font-weight: 600;
+  width: 100%;
+  transition: all 0.2s ease;
+}
+.order-form input:focus,
+.order-form select:focus,
+.order-form textarea:focus {
+  border-bottom-color: #007bff;
+  outline: none;
+  box-shadow: none;
+  background: transparent;
+}
+
+/* Submit button centered in A4 Portrait */
 .submit-center {
-    text-align: center;
-    margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-grow: 1;
+  width: 100%;
+  margin-top: 25px;
 }
+
+/* Submit Button */
 .btn-primary {
-    padding: 12px 25px;
-    background: linear-gradient(135deg, #067d3c, #09a74f);
-    color: #fff;
-    font-weight: 700;
-    border-radius: 10px;
-    border: none;
-    cursor: pointer;
-    transition: all 0.3s ease;
+  background: #007bff;
+  color: #fff;
+  padding: 12px 25px;
+  font-size: 16px;
+  font-weight: 700;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.2s;
 }
 .btn-primary:hover {
-    background: linear-gradient(135deg, #09a74f, #11cc64);
-    box-shadow: 0 6px 15px rgba(10, 166, 77, 0.4);
+  background: #0056b3;
+  transform: scale(1.05);
 }
+
+/* Footer */
+.footer {
+  text-align: center;
+  font-size: 14px;
+  font-weight: 500;
+  margin-top: 20px;
+  align-self: center;
+}
+
+/* Print settings for A4 Portrait */
+@media print {
+  body {
+    background: none;
+    display: block;
+  }
+  .a4-portrait {
+    box-shadow: none;
+    margin: 0;
+  }
+}
+
 /* =========================
    STYLISH ORDERS TABLE
    ========================= */
