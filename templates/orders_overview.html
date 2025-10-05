@@ -60,15 +60,25 @@
     </div>
     {% endif %}
 
-    <!-- Repeat similar blocks for Cashew, Maize, Rice -->
+    <!-- CASHEW ORDERS -->
     {% if cashew_orders %}
-        {% include 'partials/orders_table.html' with orders=cashew_orders title='Cashew Nut Orders' %}
+        {% set orders = cashew_orders %}
+        {% set title = 'Cashew Nut Orders' %}
+        {% include 'partials/orders_table.html' %}
     {% endif %}
+
+    <!-- MAIZE ORDERS -->
     {% if maize_orders %}
-        {% include 'partials/orders_table.html' with orders=maize_orders title='Maize Orders' %}
+        {% set orders = maize_orders %}
+        {% set title = 'Maize Orders' %}
+        {% include 'partials/orders_table.html' %}
     {% endif %}
+
+    <!-- RICE ORDERS -->
     {% if rice_orders %}
-        {% include 'partials/orders_table.html' with orders=rice_orders title='Rice Orders' %}
+        {% set orders = rice_orders %}
+        {% set title = 'Rice Orders' %}
+        {% include 'partials/orders_table.html' %}
     {% endif %}
 
 </div>
