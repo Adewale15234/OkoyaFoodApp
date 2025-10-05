@@ -1386,211 +1386,264 @@ h1, h2, h3, p {
 }
 
 /* =========================
-   CHOOSE LOGIN PAGE (Emerald Corporate Theme)
+   CHOOSE LOGIN PAGE (Emerald Luxury Theme)
    ========================= */
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #022d1b, #045e32, #0b6b34);
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Wrapper */
 .choose-wrapper {
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    background: radial-gradient(circle at top left, #045e32, #013d22, #001a10);
-    color: #fff;
-    font-family: 'Poppins', sans-serif;
-    overflow: hidden;
+    padding: 20px;
 }
 
+/* Card */
 .choose-card {
-    background: rgba(255, 255, 255, 0.97);
-    padding: 50px 40px;
-    border-radius: 20px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
+    position: relative;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 25px;
+    padding: 60px 50px;
+    width: 100%;
+    max-width: 550px;
     text-align: center;
-    max-width: 520px;
-    width: 90%;
-    backdrop-filter: blur(8px);
-    animation: fadeIn 1s ease;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    backdrop-filter: blur(15px);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    animation: floatIn 1.2s ease forwards;
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
 }
 
 .choose-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.35);
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 25px 70px rgba(0,0,0,0.7);
 }
 
 /* Company Branding */
 .company-header {
-    margin-bottom: 25px;
+    margin-bottom: 30px;
 }
 
 .company-logo {
-    width: 90px;
-    height: 90px;
+    width: 100px;
+    height: 100px;
     border-radius: 50%;
-    margin-bottom: 12px;
-    border: 3px solid #0b6b34;
-    box-shadow: 0 0 20px rgba(11, 107, 52, 0.4);
+    margin-bottom: 15px;
+    border: 4px solid #13ce63;
+    box-shadow: 0 0 25px rgba(19, 206, 99, 0.6);
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.company-logo:hover {
+    transform: rotate(-5deg) scale(1.05);
+    box-shadow: 0 0 35px rgba(19, 206, 99, 0.8);
 }
 
 .company-name {
-    font-size: 1.6rem;
-    font-weight: 700;
-    color: #064420;
+    font-size: 2rem;
+    font-weight: 800;
+    color: #0b6b34;
     margin-bottom: 5px;
-    letter-spacing: 0.5px;
+    letter-spacing: 1px;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
 
 .company-motto {
-    font-size: 0.95rem;
-    color: #047c3a;
+    font-size: 1rem;
+    color: #0fd473;
     font-weight: 600;
-    margin-bottom: 6px;
+    margin-bottom: 8px;
 }
 
 .company-address {
     font-size: 0.85rem;
-    color: #444;
-    line-height: 1.4;
-    margin-bottom: 25px;
+    color: #ccc;
+    line-height: 1.5;
+    margin-bottom: 30px;
 }
 
 /* Welcome Section */
 .choose-title {
-    font-size: 1.5rem;
-    color: #064420;
+    font-size: 1.8rem;
     font-weight: 700;
-    margin-bottom: 10px;
+    color: #fff;
+    margin-bottom: 12px;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.4);
 }
 
 .choose-subtitle {
-    font-size: 1.05rem;
-    color: #333;
-    margin-bottom: 28px;
+    font-size: 1.1rem;
+    color: #e0e0e0;
+    margin-bottom: 35px;
+    letter-spacing: 0.5px;
 }
 
 /* Buttons */
 .login-options {
     display: flex;
     flex-direction: column;
-    gap: 18px;
+    gap: 20px;
 }
 
 .choose-btn {
-    padding: 14px;
-    border-radius: 10px;
-    font-weight: 600;
-    font-size: 1rem;
-    letter-spacing: 0.5px;
+    padding: 16px 0;
+    border-radius: 15px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    letter-spacing: 1px;
     border: none;
     cursor: pointer;
     text-decoration: none;
-    text-align: center;
     color: #fff;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    transition: all 0.4s ease;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255,255,255,0.2);
 }
 
+/* Admin Button */
 .admin-btn {
-    background: linear-gradient(135deg, #064420, #0b6b34);
+    background: linear-gradient(135deg, #0b6b34, #13ce63);
 }
 
 .admin-btn:hover {
-    background: linear-gradient(135deg, #0b6b34, #10a65c);
-    box-shadow: 0 6px 20px rgba(11, 107, 52, 0.3);
-    transform: translateY(-3px);
+    background: linear-gradient(135deg, #13ce63, #0bff84);
+    box-shadow: 0 10px 25px rgba(19, 206, 99, 0.6);
+    transform: translateY(-5px) scale(1.02);
 }
 
+/* Secretary Button */
 .secretary-btn {
     background: linear-gradient(135deg, #047c3a, #08a94b);
 }
 
 .secretary-btn:hover {
-    background: linear-gradient(135deg, #08a94b, #13ce63);
-    box-shadow: 0 6px 20px rgba(19, 206, 99, 0.35);
-    transform: translateY(-3px);
+    background: linear-gradient(135deg, #08a94b, #1aff7a);
+    box-shadow: 0 10px 25px rgba(19, 206, 99, 0.7);
+    transform: translateY(-5px) scale(1.02);
 }
 
-/* Animation */
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+/* Animations */
+@keyframes floatIn {
+    0% { opacity: 0; transform: translateY(40px) scale(0.95); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 /* =========================
    LOGIN PAGE (Admin & Secretary)
    ========================= */
+/* =========================
+   LOGIN PAGE (Emerald Luxury Theme)
+   ========================= */
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #022d1b, #045e32, #0b6b34);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+/* Wrapper */
 .login-wrapper {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
-    background: radial-gradient(circle at top left, #045e32, #013d22, #001a10);
-    font-family: 'Poppins', sans-serif;
-    overflow: hidden;
+    width: 100%;
+    padding: 20px;
 }
 
+/* Card */
 .login-card {
-    background: #ffffff;
-    padding: 45px 35px;
-    border-radius: 20px;
-    width: 420px;
-    max-width: 90%;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(18px);
+    border-radius: 25px;
+    padding: 60px 50px;
+    width: 100%;
+    max-width: 480px;
     margin: 40px auto;
-    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.25);
-    transition: all 0.3s ease;
+    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.6);
     text-align: center;
-    animation: fadeIn 0.8s ease;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+    animation: floatIn 1.2s ease forwards;
 }
 
 .login-card:hover {
-    transform: translateY(-5px);
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 35px 90px rgba(0, 0, 0, 0.7);
 }
 
 /* Header Section */
 .login-header {
-    margin-bottom: 25px;
+    margin-bottom: 30px;
 }
 
 .login-logo {
-    width: 95px;
-    height: 95px;
+    width: 100px;
+    height: 100px;
     border-radius: 50%;
-    border: 3px solid #0b6b34;
-    box-shadow: 0 0 20px rgba(11, 107, 52, 0.3);
-    margin-bottom: 10px;
+    border: 4px solid #13ce63;
+    box-shadow: 0 0 30px rgba(19, 206, 99, 0.6);
+    margin-bottom: 15px;
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.login-logo:hover {
+    transform: rotate(-5deg) scale(1.05);
+    box-shadow: 0 0 45px rgba(19, 206, 99, 0.8);
 }
 
 .company-name {
-    font-size: 1.5rem;
-    color: #064420;
-    font-weight: 700;
+    font-size: 2rem;
+    font-weight: 800;
+    color: #0b6b34;
     margin-bottom: 5px;
+    letter-spacing: 1px;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
 
 .company-motto {
-    color: #047c3a;
+    color: #0fd473;
     font-weight: 600;
-    font-size: 0.9rem;
-    margin-bottom: 5px;
+    font-size: 1rem;
+    margin-bottom: 8px;
 }
 
 .company-address {
-    font-size: 0.85rem;
-    color: #555;
-    margin-bottom: 15px;
+    font-size: 0.9rem;
+    color: #ccc;
+    margin-bottom: 25px;
 }
 
 /* Login Title */
 .login-title {
-    text-align: center;
-    font-size: 1.4rem;
-    color: #023020;
-    font-weight: 600;
-    margin-bottom: 20px;
+    font-size: 1.7rem;
+    color: #fff;
+    font-weight: 700;
+    margin-bottom: 30px;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.4);
 }
 
 /* Form Section */
 .login-form .form-group {
-    margin-bottom: 18px;
+    margin-bottom: 20px;
     text-align: left;
 }
 
@@ -1598,77 +1651,85 @@ h1, h2, h3, p {
     font-weight: 600;
     display: block;
     margin-bottom: 6px;
-    color: #064420;
+    color: #0fd473;
 }
 
 .login-form input {
     width: 100%;
-    padding: 11px 13px;
-    border-radius: 10px;
-    border: 1px solid #ccc;
+    padding: 14px 15px;
+    border-radius: 15px;
+    border: 1px solid rgba(255,255,255,0.3);
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
     outline: none;
-    transition: all 0.3s ease;
-    font-size: 0.95rem;
+    font-size: 1rem;
+    transition: all 0.4s ease;
+}
+
+.login-form input::placeholder {
+    color: rgba(255,255,255,0.6);
 }
 
 .login-form input:focus {
-    border-color: #086636;
-    box-shadow: 0 0 8px rgba(8, 102, 54, 0.35);
+    border-color: #13ce63;
+    box-shadow: 0 0 12px rgba(19, 206, 99, 0.6);
+    background: rgba(255,255,255,0.15);
 }
 
 /* Button */
 .login-btn {
     width: 100%;
-    padding: 13px;
-    background: linear-gradient(135deg, #064420, #0b6b34);
+    padding: 16px 0;
+    background: linear-gradient(135deg, #0b6b34, #13ce63);
     color: #fff;
     font-weight: 700;
-    border-radius: 10px;
+    border-radius: 15px;
     border: none;
     cursor: pointer;
-    transition: all 0.3s ease;
-    letter-spacing: 0.5px;
+    transition: all 0.4s ease;
+    letter-spacing: 1px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.4);
 }
 
 .login-btn:hover {
-    background: linear-gradient(135deg, #0b6b34, #10a65c);
-    box-shadow: 0 5px 15px rgba(8, 102, 54, 0.3);
-    transform: translateY(-2px);
+    background: linear-gradient(135deg, #13ce63, #1aff7a);
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 12px 30px rgba(19,206,99,0.7);
 }
 
 /* Error Message */
 .login-error {
-    color: #d63333;
-    background: rgba(255, 235, 235, 0.8);
-    border-radius: 6px;
-    padding: 8px;
-    margin-bottom: 10px;
-    font-weight: bold;
-    font-size: 0.95rem;
+    color: #ff4c4c;
+    background: rgba(255, 77, 77, 0.2);
+    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 15px;
+    font-weight: 600;
+    font-size: 1rem;
 }
 
 /* Links */
 .login-wrapper a {
     display: inline-block;
     margin-top: 15px;
-    color: #0b6b34;
+    color: #0fd473;
     font-weight: 600;
-    transition: all 0.3s ease;
     text-decoration: none;
+    transition: all 0.3s ease;
 }
 
 .login-wrapper a:hover {
     text-decoration: underline;
 }
 
-/* Animation */
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+/* Animations */
+@keyframes floatIn {
+    0% { opacity: 0; transform: translateY(40px) scale(0.95); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 /* =========================
-   SECRETARY DASHBOARD (Emerald Theme)
+   SECRETARY DASHBOARD (Emerald Luxury Theme)
    ========================= */
 html, body {
     margin: 0;
@@ -1676,82 +1737,101 @@ html, body {
     width: 100%;
     height: 100%;
     font-family: 'Poppins', sans-serif;
+    background: linear-gradient(145deg, #012c1b, #045e32, #0b6b34);
+    overflow-x: hidden;
 }
 
+/* Wrapper */
 .dashboard-wrapper {
     width: 100vw;
     height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    background: linear-gradient(145deg, #013d22, #046a34, #08a84c);
-    padding: 0; /* remove extra padding */
+    padding: 0;
     box-sizing: border-box;
 }
 
+/* Card */
 .dashboard-card {
-    background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(12px);
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.25);
-    border-radius: 20px;
-    padding: 40px 35px;
+    border-radius: 25px;
+    padding: 50px 40px;
     width: 90%;
-    max-width: 500px; /* responsive max width */
+    max-width: 520px;
     text-align: center;
     color: #fff;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-    animation: fadeIn 0.6s ease-in-out;
+    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.5);
+    animation: floatIn 0.8s ease forwards;
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
 }
 
+.dashboard-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 35px 90px rgba(0, 0, 0, 0.7);
+}
+
+/* Title & Subtitle */
 .dashboard-title {
-    font-size: 2rem;
-    font-weight: 700;
+    font-size: 2.2rem;
+    font-weight: 800;
     color: #aef5c4;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.3);
 }
 
 .dashboard-subtitle {
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     color: #e0f2e9;
-    margin-bottom: 25px;
+    margin-bottom: 30px;
+    letter-spacing: 0.5px;
 }
 
+/* Links & Buttons */
 .dashboard-links {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 18px;
 }
 
 .dashboard-btn {
-    padding: 14px;
-    border-radius: 10px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
+    padding: 16px 0;
+    border-radius: 15px;
+    font-weight: 700;
+    letter-spacing: 1px;
     border: none;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.4s ease;
     color: #fff;
     background: linear-gradient(135deg, #09a74f, #0dc95d);
     text-decoration: none;
+    box-shadow: 0 6px 20px rgba(10, 166, 77, 0.4);
+    backdrop-filter: blur(5px);
 }
 
 .dashboard-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(10, 166, 77, 0.4);
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 12px 30px rgba(10, 166, 77, 0.6);
 }
 
+/* Logout Button */
 .logout-btn {
     background: linear-gradient(135deg, #b71c1c, #e53935);
+    box-shadow: 0 6px 20px rgba(229, 57, 53, 0.5);
 }
 
 .logout-btn:hover {
     background: linear-gradient(135deg, #e53935, #f66464);
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 12px 30px rgba(246, 100, 100, 0.7);
 }
 
-/* Fade-in animation */
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(15px); }
-    to { opacity: 1; transform: translateY(0); }
+/* Fade-in Animation */
+@keyframes floatIn {
+    0% { opacity: 0; transform: translateY(30px) scale(0.95); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 /* =========================
@@ -1779,6 +1859,7 @@ html, body {
         font-size: 1.6rem;
     }
 }
+
 /* =========================
    ORDERS OVERVIEW PAGE
    ========================= */
@@ -1905,20 +1986,29 @@ html, body {
 }
 
 /* =========================
-   ORDER FORM PAGE
+   ORDER FORM PAGE (Emerald Luxury Theme)
    ========================= */
+
 .order-card {
-    background: #fff;
-    padding: 35px;
-    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(15px);
+    border-radius: 20px;
     max-width: 1000px;
     margin: 30px auto;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+    padding: 40px;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.5);
+    border: 1px solid rgba(255,255,255,0.2);
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.order-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 35px 80px rgba(0,0,0,0.7);
 }
 
 .two-column-form {
     display: flex;
-    gap: 20px;
+    gap: 25px;
     flex-wrap: wrap;
 }
 
@@ -1928,42 +2018,70 @@ html, body {
 }
 
 .form-row {
-    margin-bottom: 12px;
+    margin-bottom: 15px;
 }
 
 .form-row label {
-    font-weight: bold;
+    font-weight: 700;
     display: block;
-    margin-bottom: 5px;
-    color: #064420;
+    margin-bottom: 6px;
+    color: #0fd473;
 }
 
 .form-row input,
 .form-row select,
 .form-row textarea {
     width: 100%;
-    padding: 8px 10px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.3);
+    background: rgba(255,255,255,0.08);
+    color: #fff;
     font-size: 0.95rem;
+    transition: all 0.4s ease;
+}
+
+.form-row input::placeholder,
+.form-row textarea::placeholder {
+    color: rgba(255,255,255,0.6);
+}
+
+.form-row input:focus,
+.form-row select:focus,
+.form-row textarea:focus {
+    border-color: #13ce63;
+    box-shadow: 0 0 12px rgba(19, 206, 99, 0.6);
+    background: rgba(255,255,255,0.15);
+    outline: none;
 }
 
 .submit-center {
     text-align: center;
-    margin-top: 20px;
+    margin-top: 25px;
 }
 
 .btn-primary {
-    padding: 12px 25px;
-    background: #064420;
+    padding: 14px 30px;
+    background: linear-gradient(135deg, #0b6b34, #13ce63);
     color: #fff;
     font-weight: 700;
-    border-radius: 10px;
+    border-radius: 15px;
     border: none;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.4s ease;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.4);
 }
 
 .btn-primary:hover {
-    background: linear-gradient(135deg, #09a74f, #11cc64);
+    background: linear-gradient(135deg, #13ce63, #1aff7a);
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 12px 30px rgba(19,206,99,0.7);
+}
+
+/* Responsive */
+@media (max-width: 500px) {
+    .two-column-form {
+        flex-direction: column;
+        gap: 15px;
+    }
 }
