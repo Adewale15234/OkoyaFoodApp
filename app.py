@@ -520,8 +520,8 @@ def login():
         username = request.form.get('username')
         password = request.form.get('password')
 
-        USERNAME = 'admin'
-        PASSWORD = 'Alayinde001'
+        # ✅ Use environment variables or fallback defaults
+        global USERNAME, PASSWORD
 
         if username == USERNAME and password == PASSWORD:
             session['admin'] = username
@@ -600,8 +600,13 @@ def handle_exception(e):
 # ✅ Ensure all tables exist (This runs BOTH locally and on Render)
 with app.app_context():
     db.create_all()
-    print("✅ All tables ensured in the database")
+    try:
+        upgrade()
+        print("✅ Database schema upgraded successfully.")
+    except Exception as e:
+        print("⚠️ Migration upgrade skipped or failed:", e)
 
+print("🚀 Okoya Co,. Food Staff Manager app is starting...")
 
 # For local development
 if __name__ == '__main__':
