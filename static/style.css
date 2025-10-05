@@ -136,19 +136,19 @@ body {
     }
 }
 
-/* =========================
-   EMERALD DASHBOARD THEME (Full Screen - Enhanced Colors)
-   ========================= */
+/* ======================================================
+   EMERALD DASHBOARD THEME (A4 Ready - Refined Color Glow)
+   ====================================================== */
 
 /* GLOBAL BODY */
 body {
     font-family: 'Poppins', sans-serif;
     margin: 0;
     padding: 0;
-    height: 100vh;
+    min-height: 100vh;
     width: 100vw;
     overflow-x: hidden;
-    background: linear-gradient(135deg, #012a18, #026b38, #0ba24d);
+    background: linear-gradient(135deg, #01311d, #02733b, #0bbf5d);
     color: #f5f7f6;
 }
 
@@ -158,13 +158,14 @@ body {
 .dashboard-container {
     min-height: 100vh;
     width: 100%;
-    background: linear-gradient(135deg, #013d22, #046b34, #08a84c);
+    background: linear-gradient(135deg, #014b28, #058a48, #0bd665);
     color: #f5f7f6;
-    padding: 30px;
+    padding: 35px;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     box-sizing: border-box;
+    border-radius: 0;
 }
 
 /* =========================
@@ -174,11 +175,11 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.18);
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
     padding: 25px 40px;
-    border-radius: 22px;
-    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+    border-radius: 20px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
     backdrop-filter: blur(8px);
     flex-wrap: wrap;
 }
@@ -191,12 +192,12 @@ body {
 }
 
 .dashboard-logo {
-    width: 100px;
-    height: 100px;
+    width: 95px;
+    height: 95px;
     object-fit: cover;
-    border-radius: 20px;
-    border: 3px solid rgba(255, 255, 255, 0.35);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    border-radius: 18px;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
     background: rgba(255, 255, 255, 0.1);
 }
 
@@ -206,23 +207,28 @@ body {
 
 .company-name {
     font-size: 2.2rem;
-    color: #aef5c4;
-    font-weight: 700;
-    text-shadow: 0 0 8px rgba(174, 245, 196, 0.5);
+    color: #c8ffe0;
+    font-weight: 800;
+    text-shadow: 0 0 8px rgba(200, 255, 224, 0.6);
 }
 
 .company-motto {
-    font-size: 1rem;
-    color: #e3fbe9;
+    font-size: 1.05rem;
+    color: #fff8dc;
     font-weight: 500;
 }
 
 .company-address {
     font-size: 0.9rem;
-    color: #cce4d3;
+    color: #e0f2e9;
+    background: rgba(255, 255, 255, 0.12);
+    padding: 4px 10px;
+    border-radius: 8px;
 }
 
-/* USER PANEL */
+/* =========================
+   USER PANEL
+   ========================= */
 .user-panel {
     text-align: right;
     min-width: 240px;
@@ -230,13 +236,13 @@ body {
 
 .greeting {
     font-size: 1rem;
-    color: #e0f7e9;
+    color: #e3ffe9;
     margin-bottom: 5px;
 }
 
 .today-date {
     font-size: 0.9rem;
-    color: #cfe7d6;
+    color: #cff7d7;
     margin-bottom: 10px;
 }
 
@@ -247,29 +253,29 @@ body {
 }
 
 .nav-btn {
-    background: linear-gradient(135deg, #067d3c, #0dc95d);
+    background: linear-gradient(135deg, #07a54d, #1eea7c);
     color: #fff;
-    padding: 12px 22px;
+    padding: 12px 24px;
     border-radius: 10px;
     font-weight: 600;
     border: none;
     transition: all 0.3s ease;
     text-decoration: none;
-    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.25);
 }
 
 .nav-btn:hover {
-    background: linear-gradient(135deg, #0bb652, #13e56e);
+    background: linear-gradient(135deg, #0bd764, #33ff91);
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(10, 166, 77, 0.45);
+    box-shadow: 0 8px 20px rgba(10, 166, 77, 0.45);
 }
 
 .logout-btn {
-    background: linear-gradient(135deg, #b71c1c, #e53935);
+    background: linear-gradient(135deg, #cc0000, #ff4444);
 }
 
 .logout-btn:hover {
-    background: linear-gradient(135deg, #e53935, #f66464);
+    background: linear-gradient(135deg, #ff4444, #ff7777);
 }
 
 /* =========================
@@ -285,21 +291,22 @@ body {
     font-weight: 700;
     color: #ffffff;
     letter-spacing: 1px;
+    text-shadow: 0 0 12px rgba(255, 255, 255, 0.3);
 }
 
 .dashboard-welcome h1 span {
     color: #aef5c4;
-    text-shadow: 0 0 12px rgba(174, 245, 196, 0.5);
+    text-shadow: 0 0 14px rgba(174, 245, 196, 0.6);
 }
 
 .dashboard-welcome p {
-    color: #dfe8e2;
+    color: #eaf7ef;
     font-size: 1.15rem;
     margin-top: 10px;
 }
 
 /* =========================
-   DASHBOARD CARDS GRID
+   DASHBOARD GRID / CARDS
    ========================= */
 .dashboard-grid {
     flex: 1;
@@ -315,12 +322,12 @@ body {
     justify-content: center;
     background: #ffffff;
     color: #024d27;
-    padding: 40px 25px;
+    padding: 45px 28px;
     border-radius: 18px;
-    font-size: 1.15rem;
+    font-size: 1.2rem;
     font-weight: 600;
     text-decoration: none;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.25);
     position: relative;
     overflow: hidden;
     transition: all 0.3s ease;
@@ -333,7 +340,7 @@ body {
     left: -100%;
     width: 100%;
     height: 100%;
-    background: rgba(10, 166, 77, 0.1);
+    background: rgba(10, 166, 77, 0.12);
     transition: all 0.4s ease;
 }
 
@@ -346,11 +353,44 @@ body {
     box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
 }
 
-.dash-card.green  { border-left: 6px solid #0aa64d; }
-.dash-card.teal   { border-left: 6px solid #009688; }
-.dash-card.gold   { border-left: 6px solid #c49b0b; }
-.dash-card.blue   { border-left: 6px solid #1976d2; }
-.dash-card.purple { border-left: 6px solid #7b1fa2; }
+/* Card Colors - Elegant Pastel Touch */
+.dash-card.green  { border-left: 6px solid #12cc6b; }
+.dash-card.teal   { border-left: 6px solid #00b3b3; }
+.dash-card.gold   { border-left: 6px solid #e0b000; }
+.dash-card.blue   { border-left: 6px solid #2196f3; }
+.dash-card.purple { border-left: 6px solid #b24dff; }
+
+/* =========================
+   PRINT (A4 Friendly)
+   ========================= */
+@media print {
+    body {
+        background: #ffffff;
+        color: #000;
+        margin: 0;
+        padding: 0;
+    }
+
+    .dashboard-container {
+        width: 210mm;
+        min-height: 297mm;
+        background: #fff;
+        color: #000;
+        box-shadow: none;
+        padding: 20mm;
+    }
+
+    .dashboard-header,
+    .dash-card {
+        box-shadow: none;
+        border: 1px solid #ddd;
+        background: #fff;
+    }
+
+    .nav-btn, .logout-btn {
+        display: none;
+    }
+}
 
 /* =========================
    RESPONSIVE DESIGN
@@ -367,12 +407,12 @@ body {
     }
 
     .dashboard-logo {
-        width: 85px;
-        height: 85px;
+        width: 80px;
+        height: 80px;
     }
 
     .dashboard-welcome h1 {
-        font-size: 1.8rem;
+        font-size: 1.9rem;
     }
 
     .dashboard-grid {
