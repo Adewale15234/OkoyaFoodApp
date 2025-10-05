@@ -50,6 +50,7 @@
 
     <!-- Attendance Table -->
     {% if attendance_records %}
+    <div class="attendance-table-container">
         <table class="attendance-table">
             <thead>
                 <tr>
@@ -63,13 +64,16 @@
                 <tr>
                     <td>{{ record.date.strftime('%d %b %Y') }}</td>
                     <td>{{ record.worker.name }}</td>
-                    <td>{{ record.status }}</td>
+                    <td class="status {% if record.status == 'Present' %}present{% elif record.status == 'Absent' %}absent{% else %}other{% endif %}">
+                        {{ record.status }}
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
+    </div>
     {% else %}
-        <p>No attendance records available.</p>
+        <p class="no-records">No attendance records available.</p>
     {% endif %}
 
     <!-- Signature Section -->
@@ -84,6 +88,3 @@
         </div>
     </div>
 </div>
-
-<link rel="stylesheet" href="{{ url_for('static', filename='css/attendance_history.css') }}">
-{% endblock %}
