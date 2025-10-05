@@ -875,31 +875,33 @@ button, input[type="submit"] {
         text-align: center;
     }
 
-    /* REGISTER WORKER PAGE PRINT */
-    .register-container {
-        box-shadow: none;
-        border: 1px solid #000;
-        width: 100%;
-        margin: 0;
-        padding: 15px;
-    }
-    .official-header-row {
-        flex-wrap: nowrap;
-        gap: 0;
-    }
-    .company-logo img,
-    .passport-preview img {
-        border: 1px solid #000;
-    }
-    @page {
-        size: A4 portrait;
-        margin: 15mm;
-    }
-}
 
 /* =========================
    REGISTER WORKER PAGE
    ========================= */
+
+/* Back to Dashboard Button */
+.back-dashboard {
+    margin: 20px;
+}
+
+.back-dashboard a {
+    text-decoration: none;
+    color: #fff;
+    background-color: #045e32;  /* deep green */
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: bold;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    transition: all 0.3s ease;
+}
+
+.back-dashboard a:hover {
+    background-color: #078f4a;
+    transform: translateY(-2px);
+}
+
+/* Main Container */
 .register-container {
     max-width: 900px;
     margin: 30px auto;
@@ -909,7 +911,10 @@ button, input[type="submit"] {
     font-family: Arial, sans-serif;
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     border-radius: 8px;
+    page-break-inside: avoid;
 }
+
+/* Header Row with Logo, Text, Passport */
 .official-header-row {
     display: flex;
     justify-content: space-between;
@@ -919,6 +924,8 @@ button, input[type="submit"] {
     flex-wrap: wrap;
     gap: 10px;
 }
+
+/* Company Logo */
 .company-logo img {
     height: 120px;
     width: 120px;
@@ -926,6 +933,8 @@ button, input[type="submit"] {
     border-radius: 10px;
     border: 1px solid #ccc;
 }
+
+/* Passport Preview */
 .passport-preview img {
     height: 120px;
     width: 100px;
@@ -934,46 +943,59 @@ button, input[type="submit"] {
     border-radius: 8px;
     background: #f9f9f9;
 }
+
+/* Center Header */
 .official-header {
     flex: 1;
     padding: 0 20px;
 }
+
+/* Company Text */
 .company-name {
     color: green;
     font-weight: 700;
     font-size: 1.8rem;
     margin: 5px 0;
 }
+
 .company-motto {
     color: goldenrod;
     font-weight: bold;
     margin: 5px 0;
 }
+
 .company-address {
     color: black;
     font-weight: bold;
     font-size: 0.95rem;
 }
+
+/* Form Titles */
 .form-title {
     color: #064420;
     margin-top: 8px;
     font-weight: bold;
 }
+
 .form-note {
     font-style: italic;
     color: #444;
     font-size: 0.9rem;
 }
+
+/* Grid Form Layout */
 .form-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 10px 20px;
 }
+
 .form-grid label {
     display: block;
     font-weight: bold;
     margin-bottom: 5px;
 }
+
 .form-grid input {
     width: 100%;
     padding: 8px 10px;
@@ -981,15 +1003,20 @@ button, input[type="submit"] {
     border-radius: 5px;
     font-size: 0.95rem;
 }
+
+/* Passport Upload Box */
 .passport-box {
     margin: 20px 0;
 }
+
+/* Submit Buttons */
 .form-submit {
     margin-top: 20px;
     display: flex;
     gap: 15px;
     justify-content: center;
 }
+
 .form-submit input[type="submit"],
 .form-submit button {
     padding: 10px 18px;
@@ -1000,17 +1027,21 @@ button, input[type="submit"] {
     font-weight: 600;
     transition: all 0.3s ease;
 }
+
 .form-submit input[type="submit"] {
     background: #28a745;
     color: #fff;
 }
+
 .form-submit input[type="submit"]:hover {
     background: #218838;
 }
+
 .form-submit button {
     background: #007bff;
     color: #fff;
 }
+
 .form-submit button:hover {
     background: #0056b3;
 }
@@ -1022,14 +1053,50 @@ button, input[type="submit"] {
     .form-grid {
         grid-template-columns: 1fr;
     }
+
     .official-header-row {
         flex-direction: column;
         text-align: center;
     }
+
     .company-logo img,
     .passport-preview img {
         height: 100px;
         width: 100px;
+    }
+}
+
+/* =========================
+   PRINT (A4 Friendly)
+   ========================= */
+@media print {
+    body {
+        margin: 0;
+        padding: 0;
+        font-size: 12pt;
+    }
+
+    .register-container {
+        max-width: 100%;
+        border: none;
+        box-shadow: none;
+        page-break-after: always;
+    }
+
+    .back-dashboard,
+    .passport-box,
+    .form-submit {
+        display: none; /* hide non-print elements */
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px 15px;
+    }
+
+    .official-header-row {
+        flex-direction: row;
+        justify-content: space-between;
     }
 }
 
