@@ -234,9 +234,10 @@ body {
 
 .company-name {
     font-size: 2.2rem;
-    color: #c8ffe0;
+    color: #00ff99; /* Bright, fresh green */
     font-weight: 800;
-    text-shadow: 0 0 8px rgba(200, 255, 224, 0.6);
+    text-shadow: 0 2px 8px rgba(0, 255, 153, 0.5), 0 0 12px rgba(0, 255, 153, 0.3);
+    letter-spacing: 1px;
 }
 
 .company-motto {
@@ -316,36 +317,32 @@ body {
 }
 
 .dashboard-welcome h1 {
-    font-size: 2.8rem; /* slightly bigger for impact */
+    font-size: 2.8rem; /* big for impact */
     font-weight: 800;
-    background: linear-gradient(90deg, #a8ff78, #78ffd6, #00c9ff);
+    background: linear-gradient(90deg, #00ff99, #00d4ff, #78ffd6);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent; /* gradient text effect */
     letter-spacing: 1.2px;
-    text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.25); /* soft shadow for depth */
+    text-shadow: 2px 2px 12px rgba(0, 0, 0, 0.2); /* subtle shadow for depth */
     margin: 0;
     transition: all 0.3s ease;
 }
 
 .dashboard-welcome h1 span {
-    background: linear-gradient(90deg, #faff72, #78ffd6, #00eaff);
+    background: linear-gradient(90deg, #faff72, #00ff99, #00d4ff);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    text-shadow: 0 0 14px rgba(174, 245, 196, 0.7);
+    text-shadow: 0 0 16px rgba(0, 255, 153, 0.5);
 }
 
 .dashboard-welcome h1:hover {
-    transform: translateY(-4px) scale(1.02);
-    text-shadow: 2px 4px 18px rgba(0, 0, 0, 0.35);
+    transform: translateY(-4px) scale(1.03);
+    text-shadow: 2px 4px 20px rgba(0, 0, 0, 0.3);
 }
 
 .dashboard-welcome p {
-    color: #eaf7ef;
-    font-size: 1.2rem;
-    margin-top: 12px;
-    font-weight: 500;
-    text-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
-}
+    color: #e0ffeb; /* soft and readable */
+    font
 
 /* Optional subtle fade-in animation */
 @keyframes fadeIn {
@@ -724,74 +721,122 @@ body {
 }
 
 /* =========================
-   TABLES
+   TABLES & CONTAINERS
    ========================= */
 table {
     width: 100%;
     border-collapse: collapse;
-    margin-bottom: 20px;
-    background: #fff;
-}
-th, td {
-    border: 1px solid #ccc;
-    padding: 10px;
-    text-align: center;
-}
-th {
-    background: #007bff;
-    color: #fff;
-}
-.attendance-table-container, .workers-table-container {
-    overflow-x: auto;
+    margin-bottom: 25px;
+    background: #fefefe;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    font-family: 'Poppins', sans-serif;
 }
 
-/* BUTTONS */
-button, input[type="submit"] {
-    padding: 6px 12px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
+th, td {
+    padding: 12px 15px;
+    text-align: center;
 }
+
+th {
+    background: linear-gradient(135deg, #007bff, #00c6ff);
+    color: #fff;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+td {
+    color: #333;
+    font-size: 0.95rem;
+    transition: background 0.3s ease;
+}
+
+tr:nth-child(even) td {
+    background: #f8f9fa;
+}
+
+tr:hover td {
+    background: #e1f5fe;
+}
+
+/* SCROLLABLE CONTAINERS */
+.attendance-table-container, .workers-table-container {
+    overflow-x: auto;
+    border-radius: 12px;
+    box-shadow: inset 0 0 8px rgba(0,0,0,0.05);
+}
+
+/* =========================
+   BUTTONS
+   ========================= */
+button, input[type="submit"], .edit-button, .delete-button {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
 .submit-button {
     background: #28a745;
     color: #fff;
+    padding: 8px 18px;
 }
 .submit-button:hover {
     background: #218838;
 }
+
 .edit-button {
     background: #ffc107;
     color: #333;
-    padding: 5px 10px;
+    padding: 6px 14px;
     text-decoration: none;
 }
 .edit-button:hover {
     background: #e0a800;
 }
+
 .delete-button {
     background: #dc3545;
     color: #fff;
-    padding: 5px 10px;
+    padding: 6px 14px;
 }
 .delete-button:hover {
     background: #c82333;
 }
 
-/* BACK LINK */
+/* =========================
+   BACK LINK
+   ========================= */
 .back-link {
     display: inline-block;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
+    padding: 6px 15px;
     text-decoration: none;
-    color: #007bff;
-}
-.back-link:hover {
-    text-decoration: underline;
+    background: #007bff;
+    color: #fff;
+    border-radius: 6px;
+    font-weight: 500;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
 }
 
-/* DETAILS ROW */
-.details-row td {
-    background: #f1f1f1;
+.back-link:hover {
+    background: #0056b3;
+    text-decoration: none;
 }
+
+/* =========================
+   DETAILS ROW
+   ========================= */
+.details-row td {
+    background: #f1f5f9;
+    font-weight: 500;
+    color: #333;
+}
+
 /* =========================
    DASHBOARD
    ========================= */
