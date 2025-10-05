@@ -590,7 +590,6 @@ def favicon():
         mimetype='image/vnd.microsoft.icon'
     )
 
-
 # Optional: Global error handler for debugging 500s on Render
 @app.errorhandler(Exception)
 def handle_exception(e):
@@ -598,8 +597,15 @@ def handle_exception(e):
     return f"<pre>{traceback.format_exc()}</pre>", 500
 
 
+# ✅ Ensure all tables exist (This runs BOTH locally and on Render)
+with app.app_context():
+    db.create_all()
+    print("✅ All tables ensured in the database")
+
+
 # For local development
 if __name__ == '__main__':
     app.debug = True
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
+
