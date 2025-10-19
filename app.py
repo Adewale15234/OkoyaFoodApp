@@ -537,15 +537,15 @@ def login():
             error = 'Invalid username or password.'
 
     return render_template('login.html', error=error)
-
-
+    
 # --- Admin Dashboard ---
 @app.route('/admin_dashboard')
 def admin_dashboard():
     if session.get('role') != 'admin':
         flash("Unauthorized access! Please login as admin.", "error")
         return redirect(url_for('login'))
-    return render_template('admin_dashboard.html')
+    return render_template('dashboard.html')
+
 
 
 # --- Secretary Dashboard ---

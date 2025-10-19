@@ -7,31 +7,44 @@
         /* General page setup */
         body {
             font-family: 'Poppins', Arial, sans-serif;
-            margin: 20px;
+            margin: 40px auto;
+            max-width: 1200px; /* ✅ Fit neatly on laptop screens */
             color: #111;
             background: #fff;
         }
 
         h2 {
             text-align: center;
-            margin-bottom: 15px;
+            margin-bottom: 25px;
             color: #03492c;
             text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* ✅ Back to Dashboard Link */
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            text-decoration: none;
+            color: #03492c;
+            font-weight: bold;
+            font-size: 15px;
         }
 
         /* Table styling */
         table {
             width: 100%;
             border-collapse: collapse;
-            table-layout: fixed; /* ✅ Forces all columns to fit evenly */
+            table-layout: auto; /* ✅ Allows columns to size naturally */
             margin-top: 10px;
+            font-size: 15px;
         }
 
         th, td {
             border: 1px solid #555;
-            padding: 8px;
+            padding: 10px 12px;
             text-align: center;
-            word-wrap: break-word; /* ✅ Prevents overflow text */
+            word-wrap: break-word;
         }
 
         th {
@@ -41,7 +54,7 @@
         }
 
         tr:nth-child(even) {
-            background-color: #f2f2f2;
+            background-color: #f7f7f7;
         }
 
         tr:hover {
@@ -50,6 +63,9 @@
 
         /* Print-friendly settings */
         @media print {
+            .back-link {
+                display: none;
+            }
             body {
                 margin: 0;
                 font-size: 12px;
@@ -66,7 +82,16 @@
     </style>
 </head>
 <body>
+
+    <!-- ✅ Smart Back Link (admin or secretary) -->
+    {% if session.get('secretary_logged_in') %}
+        <a href="{{ url_for('secretary_dashboard') }}" class="back-link">← Back to Secretary Dashboard</a>
+    {% else %}
+        <a href="{{ url_for('dashboard') }}" class="back-link">← Back to Admin Dashboard</a>
+    {% endif %}
+
     <h2>Attendance Records</h2>
+
     <table>
         <thead>
             <tr>
@@ -87,5 +112,6 @@
             {% endfor %}
         </tbody>
     </table>
+
 </body>
 </html>
