@@ -1,24 +1,21 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="orders-overview-container">
-    <!-- Header + Filters (Right Aligned) -->
+    <!-- Header + Filters (Sticky) -->
     <div class="overview-header-wrapper">
-        <div class="overview-header">
+        <div class="overview-header sticky-header">
             <h1>📦 Orders Overview</h1>
             <p>All client orders categorized by product type.</p>
 
-            <!-- Smart Back to Dashboard -->
             {% if session['username'] == 'admin' %}
                 <a href="{{ url_for('admin_dashboard') }}" class="back-btn">← Back to Admin Dashboard</a>
-            {% elif session['username'] == 'secretary' %}
-                <a href="{{ url_for('secretary_dashboard') }}" class="back-btn">← Back to Secretary Dashboard</a>
             {% else %}
-                <a href="{{ url_for('admin_dashboard') }}" class="back-btn">← Back to Dashboard</a>
+                <a href="{{ url_for('client_form') }}" class="back-btn">← Add New Order</a>
             {% endif %}
         </div>
 
         <!-- Filter Buttons -->
-        <div class="filter-buttons">
+        <div class="filter-buttons sticky-filter">
             <button class="filter-btn active" data-category="all">All</button>
             <button class="filter-btn" data-category="soya">Soya Beans</button>
             <button class="filter-btn" data-category="cashew">Cashew Nut</button>
@@ -55,11 +52,9 @@
             <p><strong>Account Name:</strong> {{ order.account_bank_name or "—" }}</p>
         </div>
 
-        {% if order.status != "Confirmed" %}
-        <form method="POST" action="{{ url_for('confirm_order', order_id=order.id) }}" onsubmit="return confirm('Confirm this order?')">
-            <button type="submit" class="confirm-btn">✅ Confirm Order</button>
+        <form method="POST" action="{{ url_for('delete_order', order_id=order.id) }}" onsubmit="return confirm('Delete this order?');">
+            <button type="submit" class="confirm-btn" style="background:#dc3545;">🗑 Delete Order</button>
         </form>
-        {% endif %}
     </div>
     {% endmacro %}
 
@@ -91,11 +86,7 @@
 
             const cat = btn.dataset.category;
             orderCards.forEach(card => {
-                if(cat === 'all' || card.dataset.category === cat) {
-                    card.style.display = 'block';
-                } else {
-                    card.style.display = 'none';
-                }
+                card.style.display = (cat === 'all' || card.dataset.category === cat) ? 'block' : 'none';
             });
         });
     });
@@ -110,12 +101,27 @@
     font-family: 'Poppins', sans-serif;
 }
 
-/* Header wrapper to align right */
-.overview-header-wrapper {
+/* Sticky header */
+.sticky-header {
+    position: sticky;
+    top: 0;
+    background: #fff;
+    z-index: 100;
+    padding: 15px 0;
+    border-bottom: 2px solid #eee;
+}
+
+/* Sticky filter buttons */
+.sticky-filter {
+    position: sticky;
+    top: 80px;
+    z-index: 90;
+    background: #f7fff7;
+    padding: 10px 0;
     display: flex;
-    justify-content: flex-end;
     flex-wrap: wrap;
-    gap: 20px;
+    gap: 10px;
+    border-bottom: 2px solid #eee;
 }
 
 /* Header */
@@ -126,7 +132,7 @@
 .overview-header h1 {
     font-size: 2rem;
     margin-bottom: 6px;
-    color: #000; /* Orders Overview title in black */
+    color: #000;
 }
 .overview-header p {
     font-size: 1rem;
@@ -153,7 +159,6 @@
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
-    margin-top: 10px;
 }
 .filter-btn {
     padding: 8px 16px;
@@ -210,12 +215,11 @@
     font-size: 0.9rem;
 }
 
-/* Confirm Button */
+/* Confirm/Delete Button */
 .confirm-btn {
     margin-top: 10px;
     width: 100%;
     padding: 8px 0;
-    background: linear-gradient(135deg, #09a74f, #0dc95d);
     border: none;
     border-radius: 8px;
     color: #fff;
@@ -224,7 +228,7 @@
     transition: all 0.3s;
 }
 .confirm-btn:hover {
-    background: linear-gradient(135deg, #0dc95d, #11e06a);
+    filter: brightness(1.1);
 }
 
 /* Empty message */

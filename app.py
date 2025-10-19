@@ -99,7 +99,7 @@ class Worker(db.Model):
 
 # --- Client Order Model ---
 class Order(db.Model):
-    __tablename__ = 'orders'  # ✅ Use plural or a safe name instead of 'order'
+    __tablename__ = 'orders'
     
     id = db.Column(db.Integer, primary_key=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -107,7 +107,6 @@ class Order(db.Model):
     email = db.Column(db.String(150))
     items = db.Column(db.String(50))
     number_of_bags = db.Column(db.Integer, nullable=True)
-    kilograms = db.Column(db.Float, nullable=True)
     unit_price = db.Column(db.Float, nullable=True)
     total_amount = db.Column(db.Float, nullable=True)
     date_needed = db.Column(db.String(50))
@@ -202,69 +201,81 @@ def workers_name():
     workers = Worker.query.all()
     return render_template('workers_name.html', workers=workers)
 
+# Client Form
 @app.route('/client_form', methods=['GET', 'POST'])
 def client_form():
-    products = ["CASHEW NUT", "MAIZE", "SOYA BEANS", "RICE"]
-
+    products = ["Soya Beans", "Cashew Nut", "Maize", "Rice"]
     if request.method == 'POST':
-        try:
-            data = request.form
-            number_of_bags = int(data.get('number_of_bags')) if data.get('number_of_bags') else 0
-            unit_price = float(data.get('unit_price')) if data.get('unit_price') else 0
-            total_amount = number_of_bags * unit_price  # total = number of bags × price per 1kg
+        name = request.form.get('name')
+        email = request.form.get('email')
+        items = request.form.get('items')
+        number_of_bags = int(request.form.get('number_of_bags') or 0)
+        unit_price = float(request.form.get('unit_price') or 0)
+        total_amount = number_of_bags * unit_price
+        date_needed = request.form.get('date')
+        driver_name = request.form.get('driver_name')
+        vehicle_plate_number = request.form.get('vehicle_plate_number')
+        bank_name = request.form.get('bank_name')
+        account_number = request.form.get('account_number')
+        account_bank_name = request.form.get('account_bank_name')
+        description = request.form.get('description')
+        phone_number = request.form.get('phone_number')
 
-            order = Order(
-                name=data.get('name', '').strip(),
-                email=data.get('email', '').strip(),
-                date_needed=data.get('date', '').strip(),
-                bank_name=data.get('bank_name', '').strip(),
-                items=data.get('items', '').strip(),
-                description=data.get('description', '').strip(),
-                number_of_bags=number_of_bags,
-                kilograms=None,  # optional, since now we just track number of bags
-                unit_price=unit_price,
-                total_amount=total_amount,
-                driver_name=data.get('driver_name', '').strip(),
-                vehicle_plate_number=data.get('vehicle_plate_number', '').strip(),
-                phone_number=data.get('phone_number', '').strip(),
-                account_number=data.get('account_number', '').strip(),
-                account_bank_name=data.get('account_bank_name', '').strip(),
-                status="Pending"  # set default status
-            )
-            db.session.add(order)
-            db.session.commit()
-            flash(f"Client order submitted successfully! Total Amount: {total_amount:.2f}", "success")
-            return redirect(url_for('client_form'))
-        except Exception as e:
-            db.session.rollback()
-            flash(f"Error submitting order. Please check your input. ({str(e)})", "error")
+        order = Order(
+            name=name,
+            email=email,
+            items=items,
+            number_of_bags=number_of_bags,
+            unit_price=unit_price,
+            total_amount=total_amount,
+            date_needed=date_needed,
+            driver_name=driver_name,
+            vehicle_plate_number=vehicle_plate_number,
+            bank_name=bank_name,
+            account_number=account_number,
+            account_bank_name=account_bank_name,
+            description=description,
+            phone_number=phone_number
+        )
+        db.session.add(order)
+        db.session.commit()
+        return redirect(url_for('orders_overview'))
 
     return render_template('client_form.html', products=products)
 
+# Orders Overview
 @app.route('/orders_overview')
-@login_required(role='admin')
 def orders_overview():
-    # Fetch orders grouped by product type
-    soya_orders = Order.query.filter(Order.items == "SOYA BEANS").all()
-    cashew_orders = Order.query.filter(Order.items == "CASHEW NUT").all()
-    maize_orders = Order.query.filter(Order.items == "MAIZE").all()
-    rice_orders = Order.query.filter(Order.items == "RICE").all()
-
+    all_orders = Order.query.order_by(Order.created_at.desc()).all()
+    soya_orders = [o for o in all_orders if o.items.lower() == 'soya beans']
+    cashew_orders = [o for o in all_orders if o.items.lower() == 'cashew nut']
+    maize_orders = [o for o in all_orders if o.items.lower() == 'maize']
+    rice_orders = [o for o in all_orders if o.items.lower() == 'rice']
     return render_template('orders_overview.html',
                            soya_orders=soya_orders,
                            cashew_orders=cashew_orders,
                            maize_orders=maize_orders,
                            rice_orders=rice_orders)
 
+# Delete order
+@app.route('/delete_order/<int:order_id>', methods=['POST'])
+def delete_order(order_id):
+    order = Order.query.get_or_404(order_id)
+    db.session.delete(order)
+    db.session.commit()
+    return redirect(url_for('orders_overview'))
 
+# Confirm order
 @app.route('/confirm_order/<int:order_id>', methods=['POST'])
-@login_required(role='admin')
 def confirm_order(order_id):
     order = Order.query.get_or_404(order_id)
     order.status = "Confirmed"
     db.session.commit()
-    flash(f"Order {order.id} marked as Confirmed!", "success")
-    return redirect(request.referrer)
+    return redirect(url_for('orders_overview'))
+
+if __name__ == "__main__":
+    app.run(debug=True)
+
 
 
 @app.route('/edit_worker/<int:worker_id>', methods=['GET', 'POST'])

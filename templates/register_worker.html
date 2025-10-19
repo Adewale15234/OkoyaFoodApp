@@ -80,13 +80,20 @@
     margin: 5px 0;
 }
 
+/* Updated company-address styling: centered black box */
 .company-address {
-    color: black;
+    color: white;                  /* White text */
+    background-color: black;       /* Black box */
     font-weight: bold;
     font-size: 0.9rem;
-    margin: 5px 0;
+    margin: 10px auto;
+    padding: 5px 10px;
+    border-radius: 5px;
+    text-align: center;            /* Center text */
+    display: inline-block;         /* Fit the text only */
 }
 
+/* Form titles */
 .form-title {
     color: goldenrod;
     font-weight: bold;
@@ -133,6 +140,13 @@
     padding: 4px 5px;
     background: transparent;
     outline: none;
+    color: black;          /* Input text color black */
+    font-weight: 500;
+}
+
+/* If you want some inputs green */
+.form-grid input.green-input {
+    color: green;          /* Optional green text */
 }
 
 /* Submit Button */
@@ -206,7 +220,9 @@
         <div class="official-header">
             <h1 class="company-name">OKOYA FOOD COMPANY LIMITED</h1>
             <h3 class="company-motto">POVERTY ERADICTION, REDUCE INEQUALITY AND LEAVE NO ONE BEHIND</h3>
-            <p class="company-address">KM 7 Idi APA community, along Ilesha Ibaruba express way, Shaki, Oyo State, Nigeria</p>
+            <p class="company-address">
+                KM 7 Idi APA community, along Ilesha Ibaruba express way, Shaki, Oyo State, Nigeria
+            </p>
             <h3 class="form-title">WORKER REGISTRATION FORM</h3>
             <p class="form-note">(PLEASE WRITE OR TYPE IN BLOCK LETTERS)</p>
         </div>
@@ -225,8 +241,8 @@
     <!-- Worker Registration Form -->
     <form method="POST" enctype="multipart/form-data" class="register-form">
         <div class="form-grid">
-            <div><label>Name:</label><input type="text" name="name" required></div>
-            <div><label>Phone:</label><input type="text" name="phone_number" required></div>
+            <div><label>Name:</label><input type="text" name="name" class="green-input" required></div>
+            <div><label>Phone:</label><input type="text" name="phone_number" class="green-input" required></div>
             <div><label>Date of Birth:</label><input type="date" name="date_of_birth" required></div>
             <div><label>Gender:</label><input type="text" name="gender" required></div>
             <div><label>Email:</label><input type="email" name="email" required></div>

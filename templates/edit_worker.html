@@ -1,13 +1,20 @@
 {% extends 'base.html' %}
+
 {% block content %}
-<h1>Edit Worker Details</h1>
-<a href="{{ url_for('workers_name') }}" class="back-link">← Back to Registered Workers</a>
+<!-- Sticky Header -->
+<div class="sticky-header">
+    <h1>Edit Worker Details</h1>
+    <a href="{{ url_for('workers_name') }}" class="back-link">← Back to Registered Workers</a>
+</div>
+
+<!-- Form Container -->
+<div class="register-container">
 
 <form method="POST" class="register-form">
 
     <div class="form-grid">
-        <div><label>Name:</label><input type="text" name="name" value="{{ worker.name }}" required></div>
-        <div><label>Phone:</label><input type="text" name="phone_number" value="{{ worker.phone_number }}" required></div>
+        <div><label>Name:</label><input type="text" name="name" value="{{ worker.name }}" class="green-input" required></div>
+        <div><label>Phone:</label><input type="text" name="phone_number" value="{{ worker.phone_number }}" class="green-input" required></div>
         <div><label>Date of Birth:</label><input type="date" name="date_of_birth" value="{{ worker.date_of_birth.strftime('%Y-%m-%d') }}" required></div>
         <div><label>Gender:</label><input type="text" name="gender" value="{{ worker.gender }}" required></div>
         <div><label>Email:</label><input type="email" name="email" value="{{ worker.email }}" required></div>
@@ -31,4 +38,101 @@
         <input type="submit" value="Update Worker">
     </div>
 </form>
+</div>
+
+<!-- Custom CSS for Sticky Header and Inputs -->
+<style>
+/* Sticky header */
+.sticky-header {
+    position: sticky;
+    top: 0;
+    background: #004080;
+    color: #fff;
+    padding: 15px 20px;
+    z-index: 999;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+.sticky-header h1 {
+    margin: 0;
+    font-size: 1.8rem;
+}
+
+.sticky-header .back-link {
+    color: #fff;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.sticky-header .back-link:hover {
+    text-decoration: underline;
+}
+
+/* Form container */
+.register-container {
+    margin-top: 20px;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 20px;
+    border: 1px solid #000;
+    background: #fff;
+    font-family: Arial, sans-serif;
+}
+
+/* Form grid */
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px 40px;
+    margin-bottom: 20px;
+}
+
+.form-grid label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 3px;
+    color: black;
+}
+
+.form-grid input {
+    border: none;
+    border-bottom: 1px solid #000;
+    width: 100%;
+    padding: 4px 5px;
+    background: transparent;
+    outline: none;
+    color: black; /* user input text */
+    font-weight: 500;
+}
+
+.form-grid input.green-input {
+    color: green; /* optional green for selected fields */
+}
+
+/* Submit button */
+.form-submit {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.form-submit input {
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    background: #004080;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.form-submit input:hover {
+    background: #0066cc;
+}
+</style>
 {% endblock %}

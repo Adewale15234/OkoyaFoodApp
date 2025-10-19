@@ -1,16 +1,9 @@
 {% extends 'base.html' %}
 {% block content %}
 <section class="hero">
-  <!-- Centralized Back to Dashboard -->
-  <div style="text-align: center; margin-bottom: 20px;">
-    <a href="{{ url_for('admin_dashboard') }}" class="back-link">← Back to Dashboard</a>
-  </div>
-
-  <!-- A4 Portrait Card -->
-  <div class="a4-portrait">
-    <!-- Header Section -->
+  <div class="card a4-portrait">
+    <!-- Header -->
     <div class="company-header">
-      <img src="{{ url_for('static', filename='android-chrome-512x512.png') }}" alt="Okoya Food Logo" class="company-logo">
       <div class="company-text">
         <h1 class="company-name">OKOYA FOOD COMPANY LIMITED</h1>
         <h2 class="company-motto">POVERTY ERADICATION, REDUCE INEQUALITY AND LEAVE NO ONE BEHIND</h2>
@@ -20,158 +13,271 @@
       </div>
     </div>
 
-    <!-- Passport Upload -->
-    <div class="passport-box no-print" style="text-align: center; margin-bottom: 20px;">
-      <label for="passport">Upload Passport Photograph</label><br>
-      <input type="file" id="passport" name="passport" accept="image/*"><br>
-      <img id="passportPreview" alt="Passport Photo" style="margin-top: 10px; height: 120px; width: 100px; object-fit: cover; border: 1px solid #000;">
-    </div>
-
-    <!-- Worker Registration Form -->
-    <form method="POST" enctype="multipart/form-data" class="register-form" id="workerForm">
-      <div class="form-grid">
-        <div><label>Name:</label><input type="text" name="name" required></div>
-        <div><label>Phone:</label><input type="text" name="phone_number" required></div>
-        <div><label>Date of Birth:</label><input type="date" name="date_of_birth" required></div>
-        <div><label>Gender:</label><input type="text" name="gender" required></div>
-        <div><label>Email:</label><input type="email" name="email" required></div>
-        <div><label>Qualifications:</label><input type="text" name="qualifications" required></div>
-        <div><label>Position:</label><input type="text" name="position" required></div>
-        <div><label>Amount of Salary:</label><input type="number" name="amount_of_salary" required></div>
-        <div><label>Date of Employment:</label><input type="date" name="date_of_employment" required></div>
-        <div><label>Guarantor:</label><input type="text" name="guarantor" required></div>
-        <div><label>National ID:</label><input type="text" name="national_id" required></div>
-        <div><label>Nationality:</label><input type="text" name="nationality" required></div>
-        <div><label>Ethnic Group:</label><input type="text" name="ethnic_group" required></div>
-        <div><label>Disability:</label><input type="text" name="disability"></div>
-        <div><label>Home Address:</label><input type="text" name="home_address" required></div>
-        <div><label>Place of Residence:</label><input type="text" name="place_of_residence" required></div>
-        <div><label>Bank Account Name:</label><input type="text" name="bank_account_name" required></div>
-        <div><label>Bank Name:</label><input type="text" name="bank_name" required></div>
-        <div><label>Bank Account:</label><input type="number" name="bank_account" required></div>
+    <!-- Order Form -->
+    <form action="{{ url_for('client_form') }}" method="post" class="order-form two-column-form">
+      <div class="form-column left-column">
+        <div class="form-row">
+          <label for="name">NAME</label>
+          <input id="name" name="name" required>
+        </div>
+        <div class="form-row">
+          <label for="email">EMAIL</label>
+          <input id="email" name="email" type="email">
+        </div>
+        <div class="form-row">
+          <label for="date">DATE (needed)</label>
+          <input id="date" name="date" type="date">
+        </div>
+        <div class="form-row">
+          <label for="bank_name">BANK NAME (payer)</label>
+          <input id="bank_name" name="bank_name">
+        </div>
+        <div class="form-row">
+          <label for="items">ITEMS</label>
+          <select id="items" name="items" required>
+            {% for p in products %}
+              <option value="{{ p }}">{{ p }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-row description-row">
+          <label for="description">DESCRIPTION</label>
+          <textarea id="description" name="description" rows="2"></textarea>
+        </div>
+        <div class="form-row">
+          <label for="number_of_bags">NUMBER OF BAGS</label>
+          <input id="number_of_bags" name="number_of_bags" type="number" min="0" step="1" onchange="recalcTotal()">
+        </div>
       </div>
 
-      <!-- Submit Button -->
-      <div class="form-submit no-print" style="text-align: center; margin-top: 20px;">
-        <input type="submit" value="Register Worker">
+      <div class="form-column right-column">
+        <div class="form-row">
+          <label for="unit_price">UNIT PRICE (per kg)</label>
+          <input id="unit_price" name="unit_price" type="number" step="0.01" min="0" onchange="recalcTotal()">
+        </div>
+        <div class="form-row">
+          <label for="total_amount">TOTAL AMOUNT</label>
+          <input id="total_amount" name="total_amount" type="number" step="0.01" min="0" readonly>
+        </div>
+        <div class="form-row">
+          <label for="driver_name">DRIVER' NAME</label>
+          <input id="driver_name" name="driver_name">
+        </div>
+        <div class="form-row">
+          <label for="vehicle_plate_number">VEHICLE PLATE NUMBER</label>
+          <input id="vehicle_plate_number" name="vehicle_plate_number">
+        </div>
+        <div class="form-row">
+          <label for="phone_number">PHONE NUMBER</label>
+          <input id="phone_number" name="phone_number">
+        </div>
+        <div class="form-row">
+          <label for="account_number">ACCOUNT NUMBER</label>
+          <input id="account_number" name="account_number">
+        </div>
+        <div class="form-row">
+          <label for="account_bank_name">ACCOUNT BANK NAME</label>
+          <input id="account_bank_name" name="account_bank_name">
+        </div>
+      </div>
+
+      <!-- Submit -->
+      <div class="submit-center">
+        <button type="submit" class="btn-primary">Submit Order</button>
       </div>
     </form>
 
-    <!-- Footer -->
-    <div class="footer" style="text-align: center; margin-top: 30px; font-weight: bold; color: #004080;">
-      © OKOYA FOOD COMPANY
-    </div>
+    <div class="footer">© OKOYA FOOD COMPANY</div>
   </div>
 </section>
 
-<!-- JS for Passport Preview & Auto Print -->
 <script>
-  // Passport Preview
-  document.getElementById('passport').addEventListener('change', function(event) {
-    const preview = document.getElementById('passportPreview');
-    const file = event.target.files[0];
-    if (file) {
-      preview.src = URL.createObjectURL(file);
-    }
-  });
-
-  // Auto Print after Submit
-  document.getElementById('workerForm').addEventListener('submit', function(event) {
-    setTimeout(function() {
-      window.print();
-    }, 100);
-  });
+function recalcTotal() {
+    const numberOfBags = parseFloat(document.getElementById('number_of_bags').value) || 0;
+    const unitPrice = parseFloat(document.getElementById('unit_price').value) || 0;
+    document.getElementById('total_amount').value = (numberOfBags * unitPrice).toFixed(2);
+}
 </script>
 
 <style>
-/* Center page and A4 card */
+/* Page background */
 body {
+  background: linear-gradient(135deg, #cce7ff, #99ccff);
+  min-height: 100vh;
   display: flex;
   justify-content: center;
-  align-items: flex-start;
-  padding-top: 30px;
-  background: #f0f8ff;
+  align-items: center;
   margin: 0;
-  font-family: Arial, sans-serif;
+  padding: 0;
 }
 
-/* A4 Portrait Card */
+/* A4 Portrait card */
 .a4-portrait {
   width: 210mm;
-  min-height: 297mm;
+  height: 297mm;
   background: #fff;
-  padding: 30px 40px;
+  padding: 40px;
   box-sizing: border-box;
-  box-shadow: 0 0 20px rgba(0,0,0,0.1);
-  border: 3px solid #28a745;
-  border-radius: 12px;
   display: flex;
   flex-direction: column;
+  justify-content: flex-start;
   align-items: center;
+  box-shadow: 0 0 20px rgba(0,0,0,0.1);
+  overflow: hidden;
 }
 
-/* Header */
+/* Header section */
 .company-header {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 20px;
-  flex-wrap: wrap;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
   text-align: center;
 }
+
 .company-logo {
   width: 90px;
   height: 90px;
   object-fit: contain;
 }
-.company-name { color: #28a745; font-weight: 800; font-size: 28px; margin-bottom: 4px; }
-.company-motto { color: #daa520; font-weight: 600; font-size: 18px; margin-bottom: 4px; }
-.company-address { background: #000; color: #fff; padding: 4px 10px; border-radius: 4px; font-size: 14px; }
 
-/* Form Grid */
-.form-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 15px 40px;
+.company-text {
+  text-align: center;
+}
+
+.company-name {
+  color: #28a745;
+  font-weight: 800;
+  font-size: 32px;
+  margin-bottom: 10px;
+}
+.company-motto {
+  color: #daa520;
+  font-weight: 600;
+  font-size: 20px;
+  margin-bottom: 8px;
+}
+.company-address {
+  background: #000;
+  color: #fff;
+  display: inline-block;
+  padding: 6px 12px;
+  font-size: 16px;
+  font-weight: 400;
+  border-radius: 6px;
+}
+
+/* Two-column form layout */
+.two-column-form {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
   width: 100%;
 }
-.form-grid label { font-weight: bold; margin-bottom: 2px; color: #000; } /* Labels black */
-.form-grid input, .form-grid select, .form-grid textarea {
-  width: 100%;
+
+/* Form columns */
+.two-column-form .form-column {
+  flex: 1;
+  min-width: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+/* Form rows */
+.order-form .form-row {
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Reduce space in description */
+.description-row label {
+  margin-bottom: 2px;
+}
+.description-row textarea {
+  margin-top: 0;
+  padding-top: 4px;
+}
+
+/* Labels */
+.order-form label {
+  font-weight: 700;
+  margin-bottom: 4px;
+  color: #333;
+}
+
+/* Inputs */
+.order-form input,
+.order-form select,
+.order-form textarea {
   border: none;
-  border-bottom: 2px solid #28a745;
-  padding: 5px 4px;
-  font-size: 14px;
+  border-bottom: 3px solid #28a745;
+  border-radius: 0;
   background: transparent;
-  color: #000; /* Input text black */
+  padding: 6px 4px;
+  font-size: 15px;
+  font-weight: 600;
+  width: 100%;
+  transition: all 0.2s ease;
 }
-.form-grid input:focus, .form-grid select:focus, .form-grid textarea:focus {
-  outline: none;
+.order-form input:focus,
+.order-form select:focus,
+.order-form textarea:focus {
   border-bottom-color: #007bff;
+  outline: none;
+  box-shadow: none;
+  background: transparent;
+}
+
+/* Submit button centered in A4 Portrait */
+.submit-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-grow: 1;
+  width: 100%;
+  margin-top: 25px;
 }
 
 /* Submit Button */
-.form-submit input {
-  padding: 10px 20px;
-  font-weight: bold;
-  background: #004080;
+.btn-primary {
+  background: #007bff;
   color: #fff;
+  padding: 12px 25px;
+  font-size: 16px;
+  font-weight: 700;
   border: none;
   border-radius: 6px;
   cursor: pointer;
-  margin: 5px;
+  transition: transform 0.2s, background 0.2s;
 }
-.form-submit input:hover { background: #0066cc; }
+.btn-primary:hover {
+  background: #0056b3;
+  transform: scale(1.05);
+}
 
 /* Footer */
-.footer { margin-top: auto; }
+.footer {
+  text-align: center;
+  font-size: 14px;
+  font-weight: 500;
+  margin-top: 20px;
+  align-self: center;
+}
 
-/* Print */
+/* Print settings for A4 Portrait */
 @media print {
-  body { background: none; display: block; }
-  .a4-portrait { box-shadow: none; margin: 0; padding: 15mm; border: none; }
-  .back-link, .form-submit { display: none; }
+  body {
+    background: none;
+    display: block;
+  }
+  .a4-portrait {
+    box-shadow: none;
+    margin: 0;
+  }
 }
 </style>
 {% endblock %}
