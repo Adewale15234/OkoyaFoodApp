@@ -10,80 +10,96 @@
         <a href="#" onclick="window.print()">🖨️ Print This Page</a>
     </nav>
 </div>
+{% extends 'base.html' %}
+{% block content %}
 
-<!-- Page Title -->
-<h1 class="page-title no-print">Attendance History</h1>
-
-<!-- Filter Section -->
-<div class="filter-section no-print">
-    <form method="get" action="{{ url_for('attendance_history') }}">
-        <label for="month_filter">Filter by Month:</label>
-        <select name="month" id="month_filter" onchange="this.form.submit()">
-            <option value="">-- All Months --</option>
-            {% for month in available_months %}
-                <option value="{{ month }}" {% if month == selected_month %}selected{% endif %}>
-                    {{ month }}
-                </option>
-            {% endfor %}
-        </select>
-    </form>
-    <p class="selected-month">
-        Showing results for: <strong>{{ selected_month if selected_month else 'All Months' }}</strong>
-    </p>
+<!-- Page Header with Back Button & Navigation -->
+<div class="attendance-header sticky-header">
+    <a href="{{ url_for('admin_dashboard') }}" class="back-link no-print">← Back to Dashboard</a>
+    <nav class="top-nav no-print">
+        <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+        <a href="{{ url_for('logout') }}">Logout</a>
+        <a href="#" onclick="window.print()">🖨️ Print This Page</a>
+    </nav>
 </div>
 
-<!-- Printable Section -->
-<div class="print-area">
-    <!-- Print Header -->
-    <div class="print-header">
-        <img src="{{ url_for('static', filename='android-chrome-512x512.png') }}" alt="Company Logo" class="print-logo">
-        <div class="print-header-text">
-            <h1 class="company-name">Okoya Food Co., Staff Manager</h1>
-            <p class="company-motto">"Quality Service, Trusted Management"</p>
-            <p class="company-address">Saki, Oyo State, Nigeria</p>
-        </div>
-    </div>
-    <hr>
+<!-- Page Wrapper to Ensure Content Starts Below Header -->
+<div class="attendance-page-wrapper">
 
-    <!-- Report Info -->
-    <h2 class="report-title">Attendance Report</h2>
-    <p class="report-date">Printed on: {{ now.strftime('%d %B %Y, %I:%M %p') }}</p>
+    <!-- Page Title -->
+    <h1 class="page-title no-print">Attendance History</h1>
 
-    <!-- Attendance Table -->
-    {% if attendance_records %}
-    <div class="table-container">
-        <table class="attendance-table">
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Worker</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for record in attendance_records|sort(attribute='date', reverse=true) %}
-                <tr>
-                    <td>{{ record.date.strftime('%d %b %Y') }}</td>
-                    <td>{{ record.worker.name }}</td>
-                    <td>{{ record.status }}</td>
-                </tr>
+    <!-- Filter Section -->
+    <div class="filter-section no-print">
+        <form method="get" action="{{ url_for('attendance_history') }}">
+            <label for="month_filter">Filter by Month:</label>
+            <select name="month" id="month_filter" onchange="this.form.submit()">
+                <option value="">-- All Months --</option>
+                {% for month in available_months %}
+                    <option value="{{ month }}" {% if month == selected_month %}selected{% endif %}>
+                        {{ month }}
+                    </option>
                 {% endfor %}
-            </tbody>
-        </table>
+            </select>
+        </form>
+        <p class="selected-month">
+            Showing results for: <strong>{{ selected_month if selected_month else 'All Months' }}</strong>
+        </p>
     </div>
-    {% else %}
-        <p class="no-records">No attendance records available.</p>
-    {% endif %}
 
-    <!-- Signature Section -->
-    <div class="signature-section">
-        <div>
-            __________________________ <br>
-            Manager’s Signature
+    <!-- Printable Section -->
+    <div class="print-area">
+        <!-- Print Header -->
+        <div class="print-header">
+            <img src="{{ url_for('static', filename='android-chrome-512x512.png') }}" alt="Company Logo" class="print-logo">
+            <div class="print-header-text">
+                <h1 class="company-name">Okoya Food Co., Staff Manager</h1>
+                <p class="company-motto">"Quality Service, Trusted Management"</p>
+                <p class="company-address">Saki, Oyo State, Nigeria</p>
+            </div>
         </div>
-        <div>
-            __________________________ <br>
-            HR/Secretary Signature
+        <hr>
+
+        <!-- Report Info -->
+        <h2 class="report-title">Attendance Report</h2>
+        <p class="report-date">Printed on: {{ now.strftime('%d %B %Y, %I:%M %p') }}</p>
+
+        <!-- Attendance Table -->
+        {% if attendance_records %}
+        <div class="table-container">
+            <table class="attendance-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Worker</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in attendance_records|sort(attribute='date', reverse=true) %}
+                    <tr>
+                        <td>{{ record.date.strftime('%d %b %Y') }}</td>
+                        <td>{{ record.worker.name }}</td>
+                        <td>{{ record.status }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+            <p class="no-records">No attendance records available.</p>
+        {% endif %}
+
+        <!-- Signature Section -->
+        <div class="signature-section">
+            <div>
+                __________________________ <br>
+                Manager’s Signature
+            </div>
+            <div>
+                __________________________ <br>
+                HR/Secretary Signature
+            </div>
         </div>
     </div>
 </div>
@@ -96,9 +112,10 @@ body {
     background: #f5f7fa;
     margin: 0;
     padding: 0;
+    overflow-x: hidden;
 }
 
-/* ===== Sticky Header & Nav ===== */
+/* ===== Sticky Header ===== */
 .sticky-header {
     position: sticky;
     top: 0;
@@ -111,6 +128,13 @@ body {
     border-bottom: 2px solid #28a745;
     flex-wrap: wrap;
     box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+
+/* Prevent content from hiding under header */
+.attendance-page-wrapper {
+    margin-top: 100px; /* ensures content starts below header */
+    padding: 0 10px;
+    box-sizing: border-box;
 }
 
 /* Header Navigation Links */
@@ -132,15 +156,15 @@ body {
 }
 .back-link:hover { color: #28a745; }
 
-/* Page Title */
+/* ===== Page Title ===== */
 .page-title {
     text-align: center;
-    margin: 25px 0 15px;
+    margin: 20px 0 15px;
     color: #03492c;
     font-size: 2rem;
 }
 
-/* Filter Section */
+/* ===== Filter Section ===== */
 .filter-section {
     display: flex;
     justify-content: center;
@@ -164,7 +188,7 @@ body {
     font-weight: bold;
 }
 
-/* Printable Area */
+/* ===== Printable Area ===== */
 .print-area {
     background: #fff;
     margin: 0 auto 30px;
@@ -173,9 +197,11 @@ body {
     max-width: 1200px;
     box-shadow: 0 6px 20px rgba(0,0,0,0.1);
     border-radius: 12px;
+    overflow-y: auto;
+    max-height: 100vh;
 }
 
-/* Print Header */
+/* ===== Print Header ===== */
 .print-header {
     display: flex;
     align-items: center;
@@ -203,7 +229,7 @@ body {
     font-size: 14px;
 }
 
-/* Report Title */
+/* ===== Report Title ===== */
 .report-title {
     text-align: center;
     margin: 20px 0 10px;
@@ -217,7 +243,7 @@ body {
     color: #555;
 }
 
-/* Table Styling */
+/* ===== Table Styling ===== */
 .table-container {
     overflow-x: auto;
 }
@@ -230,7 +256,7 @@ body {
     padding: 12px 15px;
     border: 1px solid #ccc;
     text-align: center;
-    color: #000; /* Ensure text is readable */
+    color: #000;
 }
 .attendance-table th {
     background: linear-gradient(135deg, #28a745, #0dc95d);
@@ -240,7 +266,7 @@ body {
 .attendance-table tr:nth-child(even) { background: #f5f7fa; }
 .attendance-table tr:hover { background: #dff9fb; }
 
-/* Signature Section */
+/* ===== Signature Section ===== */
 .signature-section {
     display: flex;
     justify-content: space-between;
@@ -250,15 +276,32 @@ body {
 }
 .signature-section div { text-align: center; }
 
-/* Print Adjustments */
+/* ===== Orientation Fix (Landscape Mode) ===== */
+@media screen and (orientation: landscape) {
+    .print-area {
+        transform: scale(0.95);
+        margin-bottom: 30px;
+        overflow-y: auto;
+        max-height: 100vh;
+    }
+}
+
+/* ===== Print Adjustments ===== */
 @media print {
     body { background: #fff; }
     .no-print { display: none !important; }
     .sticky-header, .filter-section { display: none !important; }
-    .print-area { box-shadow: none; width: 100%; margin: 0; padding: 15mm; }
+    .attendance-page-wrapper { margin-top: 0; }
+    .print-area {
+        box-shadow: none;
+        width: 100%;
+        margin: 0;
+        padding: 15mm;
+        overflow: visible;
+    }
 }
 
-/* Responsive */
+/* ===== Responsive (Phones/Tablets) ===== */
 @media (max-width: 768px) {
     .attendance-header { flex-direction: column; align-items: flex-start; }
     .attendance-header .top-nav a { margin-left: 0; margin-right: 10px; }
@@ -267,4 +310,5 @@ body {
     .print-logo { height: 80px; width: 80px; }
 }
 </style>
+
 {% endblock %}
