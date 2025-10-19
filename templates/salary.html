@@ -21,15 +21,15 @@
             {% for worker in salary_data %}
                 <tr>
                     <form method="post">
-                        <td>{{ worker.name }}</td>
-                        <td>{{ worker.total_days_present }}</td>
+                        <td><input type="text" value="{{ worker.name }}" readonly class="readonly-input"></td>
+                        <td><input type="number" value="{{ worker.total_days_present }}" readonly class="readonly-input"></td>
                         <td>
-                            <input type="number" name="calculated_salary" value="{{ worker.calculated_salary }}" readonly>
+                            <input type="number" name="calculated_salary" value="{{ worker.calculated_salary }}" readonly class="readonly-input">
                             <input type="hidden" name="worker_id" value="{{ worker.id }}">
                         </td>
-                        <td><input type="text" name="bank_name" value="{{ worker.bank_name }}" readonly></td>
-                        <td><input type="text" name="bank_account_name" value="{{ worker.bank_account_name }}" readonly></td>
-                        <td><input type="text" name="bank_name" value="{{ worker.bank_name }}" readonly></td>
+                        <td><input type="text" name="bank_account_name" value="{{ worker.bank_account_name }}" readonly class="readonly-input"></td>
+                        <td><input type="text" name="bank_name" value="{{ worker.bank_name }}" readonly class="readonly-input"></td>
+                        <td><input type="text" name="account_number" value="{{ worker.bank_account_number }}" readonly class="readonly-input"></td>
                         <td><input type="submit" value="Save Salary" class="save-btn"></td>
                     </form>
                 </tr>
@@ -111,7 +111,8 @@
 
 /* Input fields */
 .salary-table input[type="text"],
-.salary-table input[type="number"] {
+.salary-table input[type="number"],
+.salary-table .readonly-input {
     width: 100%;
     padding: 6px 8px;
     border: 1px solid #ccc;
@@ -119,6 +120,7 @@
     font-weight: 500;
     text-align: center;
     background: #f0f8ff;
+    color: #000; /* Black text for all autofilled/read-only fields */
 }
 
 /* Submit button */

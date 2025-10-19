@@ -103,13 +103,13 @@
     margin: 20px auto;
     padding: 10px 20px;
     font-family: 'Poppins', sans-serif;
-    position: relative; /* important for sticky children */
+    position: relative;
 }
 
 /* Sticky Header */
 .sticky-header {
     position: sticky;
-    top: 0;
+    top: 10px; /* small offset to prevent clipping */
     background: #fff;
     z-index: 1000;
     padding: 15px 0;
@@ -117,10 +117,22 @@
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
+/* Back button */
+.back-btn {
+    display: inline-block;
+    margin-top: 8px;
+    text-decoration: none;
+    color: #28a745;
+    font-weight: 600;
+}
+.back-btn:hover {
+    color: #046a3a;
+}
+
 /* Side Filter Container */
 .side-filter-container {
     position: sticky;
-    top: 90px; /* below main sticky header */
+    top: 120px; /* below main sticky header */
     z-index: 900;
     background: #f7fff7;
     padding: 10px 15px;
