@@ -2,7 +2,7 @@
 
 {% block content %}
 <!-- Page Header with Back Button & Navigation -->
-<div class="attendance-header">
+<div class="attendance-header sticky-header">
     <a href="{{ url_for('admin_dashboard') }}" class="back-link no-print">← Back to Dashboard</a>
     <nav class="top-nav no-print">
         <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
@@ -98,8 +98,11 @@ body {
     padding: 0;
 }
 
-/* ===== Header & Nav ===== */
-.attendance-header {
+/* ===== Sticky Header & Nav ===== */
+.sticky-header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
     background: #ffffff;
     padding: 15px 20px;
     display: flex;
@@ -107,8 +110,10 @@ body {
     align-items: center;
     border-bottom: 2px solid #28a745;
     flex-wrap: wrap;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
 }
 
+/* Header Navigation Links */
 .attendance-header .top-nav a {
     margin-left: 15px;
     text-decoration: none;
@@ -225,6 +230,7 @@ body {
     padding: 12px 15px;
     border: 1px solid #ccc;
     text-align: center;
+    color: #000; /* Ensure text is readable */
 }
 .attendance-table th {
     background: linear-gradient(135deg, #28a745, #0dc95d);
@@ -248,7 +254,7 @@ body {
 @media print {
     body { background: #fff; }
     .no-print { display: none !important; }
-    .attendance-header, .filter-section { display: none !important; }
+    .sticky-header, .filter-section { display: none !important; }
     .print-area { box-shadow: none; width: 100%; margin: 0; padding: 15mm; }
 }
 
