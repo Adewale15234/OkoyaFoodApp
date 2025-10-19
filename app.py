@@ -537,7 +537,7 @@ def login():
             error = 'Invalid username or password.'
 
     return render_template('login.html', error=error)
-    
+
 # --- Admin Dashboard ---
 @app.route('/admin_dashboard')
 def admin_dashboard():
@@ -545,8 +545,6 @@ def admin_dashboard():
         flash("Unauthorized access! Please login as admin.", "error")
         return redirect(url_for('login'))
     return render_template('dashboard.html')
-
-
 
 # --- Secretary Dashboard ---
 @app.route('/secretary_dashboard')
@@ -556,27 +554,20 @@ def secretary_dashboard():
         return redirect(url_for('login'))
     return render_template('secretary_dashboard.html')
 
-
-    # --- Admin Dashboard ---
+# --- Main Dashboard (alias for admin) ---
 @app.route('/dashboard')
 def dashboard():
-    if 'admin' not in session:
-        flash("Please login as Admin to continue.", "danger")
+    if session.get('role') != 'admin':
+        flash("Unauthorized access! Please login as admin.", "error")
         return redirect(url_for('login'))
-    # ... your existing dashboard logic ...
     return render_template('dashboard.html')
 
-@app.route('/logout_admin')
-def logout_admin():
-    session.clear()
-    return redirect(url_for('admin_login'))
-
+# --- Logout (works for both admin & secretary) ---
 @app.route('/logout')
 def logout():
     session.clear()
     flash("You have been logged out successfully.", "info")
     return redirect(url_for('login'))
-
 
 # Route to serve favicon.ico from static folder
 @app.route('/favicon.ico')

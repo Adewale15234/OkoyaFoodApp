@@ -1,86 +1,266 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Okoya Worker Registration</title>
-    <!-- Link to external CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Okoya Worker Registration</title>
+<!-- Link to external CSS -->
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<style>
+/* =========================
+   Register Worker Page
+   ========================= */
+
+/* General Container */
+.register-container {
+    max-width: 900px;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #000;
+    background: #fff;
+    font-family: Arial, sans-serif;
+}
+
+/* Back to Dashboard */
+.back-dashboard {
+    margin: 10px 0;
+}
+
+.back-dashboard a {
+    text-decoration: none;
+    color: #004080;
+    font-weight: bold;
+}
+
+.back-dashboard a:hover {
+    text-decoration: underline;
+}
+
+/* Official Header Row (Logo + Text + Passport) */
+.official-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.company-logo img {
+    height: 120px;
+    width: 120px;
+    object-fit: contain;
+    border-radius: 10px;
+}
+
+.passport-preview img {
+    height: 120px;
+    width: 100px;
+    object-fit: cover;
+    border: 1px solid #000;
+}
+
+.official-header {
+    flex: 1 1 60%;
+    padding: 0 15px;
+    text-align: center;
+}
+
+/* Header Text Styling */
+.company-name {
+    color: green;
+    font-size: 1.8rem;
+    font-weight: bold;
+    margin: 0;
+}
+
+.company-motto {
+    color: goldenrod;
+    font-weight: bold;
+    font-size: 1rem;
+    margin: 5px 0;
+}
+
+.company-address {
+    color: black;
+    font-weight: bold;
+    font-size: 0.9rem;
+    margin: 5px 0;
+}
+
+.form-title {
+    color: goldenrod;
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin: 10px 0 3px;
+}
+
+.form-note {
+    color: black;
+    font-weight: bold;
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+}
+
+/* Passport Upload Box */
+.passport-box label {
+    font-weight: bold;
+}
+
+/* Form Layout */
+.register-form {
+    width: 100%;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px 40px;
+    margin-bottom: 20px;
+}
+
+.form-grid label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 3px;
+}
+
+.form-grid input {
+    border: none;
+    border-bottom: 1px solid #000;
+    width: 100%;
+    padding: 4px 5px;
+    background: transparent;
+    outline: none;
+}
+
+/* Submit Button */
+.form-submit {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.form-submit input,
+.form-submit button {
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    background: #004080;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    margin: 5px;
+}
+
+.form-submit input:hover,
+.form-submit button:hover {
+    background: #0066cc;
+}
+
+/* Print Styles for A4 */
+@media print {
+    body {
+        margin: 0;
+        background: #fff;
+    }
+    .no-print {
+        display: none !important;
+    }
+    .register-container {
+        margin: 0;
+        padding: 10mm;
+        width: 190mm;
+        max-width: 190mm;
+        border: none;
+    }
+    .official-header-row {
+        flex-wrap: nowrap;
+    }
+    .form-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 12px 20px;
+    }
+    .form-submit {
+        display: none;
+    }
+}
+</style>
 </head>
 <body class="form-page">
-    <!-- Back to Dashboard Button -->
-<div class="back-dashboard">
+
+<!-- Back to Dashboard Button -->
+<div class="back-dashboard no-print">
     <a href="{{ url_for('dashboard') }}">&#8592; Back to Dashboard</a>
 </div>
-    <div class="register-container print-area">
 
-        <!-- Official Header Row with Logo (Left), Text (Center), Passport (Right) -->
-        <div class="official-header-row">
-            <div class="company-logo">
-                <img src="{{ url_for('static', filename='android-chrome-512x512.png') }}" alt="Company Logo" id="company-logo">
-            </div>
+<div class="register-container print-area">
 
-            <div class="official-header">
-                <h1 class="company-name">OKOYA FOOD COMPANY LIMITED</h1>
-                <h3 class="company-motto">POVERTY ERADICTION, REDUCE INEQUALITY AND LEAVE NO ONE BEHIND</h3>
-                <p class="company-address">KM 7 Idi APA community, along Ilesha Ibaruba express way, Shaki, Oyo State, Nigeria</p>
-                <h3 class="form-title">WORKER REGISTRATION FORM</h3>
-                <p class="form-note">(PLEASE WRITE OR TYPE IN BLOCK LETTERS)</p>
-            </div>
-
-            <div class="passport-preview">
-                <img id="passportPreview" alt="Passport Photo">
-            </div>
+    <!-- Official Header Row with Logo, Text, Passport -->
+    <div class="official-header-row">
+        <div class="company-logo">
+            <img src="{{ url_for('static', filename='android-chrome-512x512.png') }}" alt="Company Logo" id="company-logo">
         </div>
 
-        <!-- Passport Upload (hidden when printing) -->
-        <div class="passport-box no-print">
-            <label for="passport">Upload Passport Photograph</label><br><br>
-            <input type="file" id="passport" name="passport" accept="image/*"><br><br>
+        <div class="official-header">
+            <h1 class="company-name">OKOYA FOOD COMPANY LIMITED</h1>
+            <h3 class="company-motto">POVERTY ERADICTION, REDUCE INEQUALITY AND LEAVE NO ONE BEHIND</h3>
+            <p class="company-address">KM 7 Idi APA community, along Ilesha Ibaruba express way, Shaki, Oyo State, Nigeria</p>
+            <h3 class="form-title">WORKER REGISTRATION FORM</h3>
+            <p class="form-note">(PLEASE WRITE OR TYPE IN BLOCK LETTERS)</p>
         </div>
 
-        <!-- Worker Registration Form -->
-        <form method="POST" enctype="multipart/form-data" class="register-form">
-
-            <div class="form-grid">
-                <div><label>Name:</label><input type="text" name="name" required></div>
-                <div><label>Phone:</label><input type="text" name="phone_number" required></div>
-                <div><label>Date of Birth:</label><input type="date" name="date_of_birth" required></div>
-                <div><label>Gender:</label><input type="text" name="gender" required></div>
-                <div><label>Email:</label><input type="email" name="email" required></div>
-                <div><label>Qualifications:</label><input type="text" name="qualifications" required></div>
-                <div><label>Position:</label><input type="text" name="position" required></div>
-                <div><label>Amount of Salary:</label><input type="number" name="amount_of_salary" required></div>
-                <div><label>Date of Employment:</label><input type="date" name="date_of_employment" required></div>
-                <div><label>Guarantor:</label><input type="text" name="guarantor" required></div>
-                <div><label>National ID:</label><input type="text" name="national_id" required></div>
-                <div><label>Nationality:</label><input type="text" name="nationality" required></div>
-                <div><label>Ethnic Group:</label><input type="text" name="ethnic_group" required></div>
-                <div><label>Disability:</label><input type="text" name="disability"></div>
-                <div><label>Home Address:</label><input type="text" name="home_address" required></div>
-                <div><label>Place of Residence:</label><input type="text" name="place_of_residence" required></div>
-                <div><label>Bank Account Name:</label><input type="text" name="bank_account_name" required></div>
-                <div><label>Bank Name:</label><input type="text" name="bank_name" required></div>
-                <div><label>Bank Account:</label><input type="number" name="bank_account" required></div>
-            </div>
-
-            <!-- Submit and Print Buttons -->
-            <div class="form-submit no-print">
-                <input type="submit" value="Register Worker">
-                <button type="button" onclick="window.print()">Print Form</button>
-            </div>
-        </form>
+        <div class="passport-preview">
+            <img id="passportPreview" alt="Passport Photo">
+        </div>
     </div>
 
-    <!-- JS for Passport Preview -->
-    <script>
-        document.getElementById('passport').addEventListener('change', function(event) {
-            const preview = document.getElementById('passportPreview');
-            const file = event.target.files[0];
-            if (file) {
-                preview.src = URL.createObjectURL(file);
-            }
-        });
-    </script>
+    <!-- Passport Upload (hidden when printing) -->
+    <div class="passport-box no-print">
+        <label for="passport">Upload Passport Photograph</label><br><br>
+        <input type="file" id="passport" name="passport" accept="image/*"><br><br>
+    </div>
+
+    <!-- Worker Registration Form -->
+    <form method="POST" enctype="multipart/form-data" class="register-form">
+        <div class="form-grid">
+            <div><label>Name:</label><input type="text" name="name" required></div>
+            <div><label>Phone:</label><input type="text" name="phone_number" required></div>
+            <div><label>Date of Birth:</label><input type="date" name="date_of_birth" required></div>
+            <div><label>Gender:</label><input type="text" name="gender" required></div>
+            <div><label>Email:</label><input type="email" name="email" required></div>
+            <div><label>Qualifications:</label><input type="text" name="qualifications" required></div>
+            <div><label>Position:</label><input type="text" name="position" required></div>
+            <div><label>Amount of Salary:</label><input type="number" name="amount_of_salary" required></div>
+            <div><label>Date of Employment:</label><input type="date" name="date_of_employment" required></div>
+            <div><label>Guarantor:</label><input type="text" name="guarantor" required></div>
+            <div><label>National ID:</label><input type="text" name="national_id" required></div>
+            <div><label>Nationality:</label><input type="text" name="nationality" required></div>
+            <div><label>Ethnic Group:</label><input type="text" name="ethnic_group" required></div>
+            <div><label>Disability:</label><input type="text" name="disability"></div>
+            <div><label>Home Address:</label><input type="text" name="home_address" required></div>
+            <div><label>Place of Residence:</label><input type="text" name="place_of_residence" required></div>
+            <div><label>Bank Account Name:</label><input type="text" name="bank_account_name" required></div>
+            <div><label>Bank Name:</label><input type="text" name="bank_name" required></div>
+            <div><label>Bank Account:</label><input type="number" name="bank_account" required></div>
+        </div>
+
+        <!-- Submit and Print Buttons -->
+        <div class="form-submit no-print">
+            <input type="submit" value="Register Worker">
+            <button type="button" onclick="window.print()">Print Form</button>
+        </div>
+    </form>
+</div>
+
+<!-- JS for Passport Preview -->
+<script>
+document.getElementById('passport').addEventListener('change', function(event) {
+    const preview = document.getElementById('passportPreview');
+    const file = event.target.files[0];
+    if (file) {
+        preview.src = URL.createObjectURL(file);
+    }
+});
+</script>
 </body>
 </html>

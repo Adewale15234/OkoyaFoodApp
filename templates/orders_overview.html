@@ -5,35 +5,31 @@
         <h1>📦 Orders Overview</h1>
         <p>All client orders categorized by product type.</p>
 
-        <!-- ✅ Smart Back to Dashboard Button -->
+        <!-- Filter Buttons -->
+        <div class="filter-buttons">
+            <button class="filter-btn active" data-category="all">All</button>
+            <button class="filter-btn" data-category="soya">Soya Beans</button>
+            <button class="filter-btn" data-category="cashew">Cashew Nut</button>
+            <button class="filter-btn" data-category="maize">Maize</button>
+            <button class="filter-btn" data-category="rice">Rice</button>
+        </div>
+
+        <!-- Smart Back to Dashboard -->
         {% if session['username'] == 'admin' %}
-            <a href="{{ url_for('admin_dashboard') }}" 
-               class="back-btn"
-               style="display:inline-block; background:#03492c; color:#fff; padding:10px 18px; border-radius:6px; text-decoration:none; font-weight:500; transition:0.3s;">
-               ← Back to Admin Dashboard
-            </a>
+            <a href="{{ url_for('admin_dashboard') }}" class="back-btn">← Back to Admin Dashboard</a>
         {% elif session['username'] == 'secretary' %}
-            <a href="{{ url_for('secretary_dashboard') }}" 
-               class="back-btn"
-               style="display:inline-block; background:#03492c; color:#fff; padding:10px 18px; border-radius:6px; text-decoration:none; font-weight:500; transition:0.3s;">
-               ← Back to Secretary Dashboard
-            </a>
+            <a href="{{ url_for('secretary_dashboard') }}" class="back-btn">← Back to Secretary Dashboard</a>
         {% else %}
-            <a href="{{ url_for('dashboard') }}" 
-               class="back-btn"
-               style="display:inline-block; background:#03492c; color:#fff; padding:10px 18px; border-radius:6px; text-decoration:none; font-weight:500; transition:0.3s;">
-               ← Back to Dashboard
-            </a>
+            <a href="{{ url_for('dashboard') }}" class="back-btn">← Back to Dashboard</a>
         {% endif %}
     </div>
 
     {% macro order_card(order) %}
-    <div class="order-card">
+    <div class="order-card" data-category="{{ order.items|lower|replace(' ', '') }}">
         <div class="order-header">
             <h2>{{ order.items }}</h2>
             <span class="status {{ order.status|lower }}">{{ order.status }}</span>
         </div>
-
         <div class="order-info">
             <p><strong>Client:</strong> {{ order.name }}</p>
             <p><strong>Email:</strong> {{ order.email }}</p>
@@ -41,18 +37,15 @@
             <p><strong>Date Needed:</strong> {{ order.date_needed }}</p>
             <p><strong>Description:</strong> {{ order.description }}</p>
         </div>
-
         <div class="order-details">
-            <p><strong>Quantity:</strong> {{ order.number_of_bags or 0 }} bags ({{ order.kilograms or 0 }} kg)</p>
+            <p><strong>Quantity:</strong> {{ order.number_of_bags or 0 }} bags</p>
             <p><strong>Unit Price:</strong> ₦{{ "%.2f"|format(order.unit_price or 0) }}</p>
             <p><strong>Total:</strong> ₦{{ "%.2f"|format(order.total_amount or 0) }}</p>
         </div>
-
         <div class="order-logistics">
             <p><strong>Driver:</strong> {{ order.driver_name or "—" }}</p>
             <p><strong>Vehicle Plate:</strong> {{ order.vehicle_plate_number or "—" }}</p>
         </div>
-
         <div class="order-bank">
             <p><strong>Bank Name:</strong> {{ order.bank_name or "—" }}</p>
             <p><strong>Account No:</strong> {{ order.account_number or "—" }}</p>
@@ -68,25 +61,170 @@
     {% endmacro %}
 
     {% set categories = {
-        "Soya Beans Orders": soya_orders,
-        "Cashew Nut Orders": cashew_orders,
-        "Maize Orders": maize_orders,
-        "Rice Orders": rice_orders
+        "soya": soya_orders,
+        "cashew": cashew_orders,
+        "maize": maize_orders,
+        "rice": rice_orders
     } %}
 
-    {% for category, orders in categories.items() %}
-    <section class="order-category">
-        <h2 class="category-title">{{ category }}</h2>
-        {% if orders %}
-            <div class="orders-grid">
-                {% for order in orders %}
-                    {{ order_card(order) }}
-                {% endfor %}
-            </div>
-        {% else %}
-            <p class="empty-msg">No orders available.</p>
-        {% endif %}
-    </section>
-    {% endfor %}
+    <div class="orders-grid">
+        {% for cat, orders in categories.items() %}
+            {% for order in orders %}
+                {{ order_card(order) }}
+            {% endfor %}
+        {% endfor %}
+    </div>
 </div>
+
+<script>
+    // Filtering logic
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const orderCards = document.querySelectorAll('.order-card');
+
+    filterButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            filterButtons.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            const cat = btn.dataset.category;
+            orderCards.forEach(card => {
+                if(cat === 'all' || card.dataset.category === cat) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+    });
+</script>
+
+<style>
+/* Container */
+.orders-overview-container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 10px 20px;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Header */
+.overview-header h1 {
+    font-size: 2rem;
+    margin-bottom: 6px;
+}
+.overview-header p {
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 15px;
+}
+
+/* Back button */
+.back-btn {
+    display:inline-block;
+    background:#03492c;
+    color:#fff;
+    padding:10px 18px;
+    border-radius:6px;
+    text-decoration:none;
+    font-weight:500;
+    margin-bottom: 15px;
+    transition: 0.3s;
+}
+.back-btn:hover {
+    background: #046a3a;
+}
+
+/* Filter Buttons */
+.filter-buttons {
+    margin-bottom: 20px;
+}
+.filter-btn {
+    padding: 8px 16px;
+    margin-right: 10px;
+    border: none;
+    border-radius: 6px;
+    background: #09a74f;
+    color: #fff;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+.filter-btn.active, .filter-btn:hover {
+    background: #0dc95d;
+    transform: scale(1.05);
+}
+
+/* Orders Grid */
+.orders-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+/* Order Card */
+.order-card {
+    background: #f7fff7;
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+    padding: 18px 20px;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.order-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 22px rgba(0,0,0,0.25);
+}
+
+/* Order Header */
+.order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+.order-header h2 {
+    font-size: 1.25rem;
+    color: #03492c;
+}
+.status {
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 6px;
+    color: #fff;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+}
+.status.confirmed { background: #28a745; }
+.status.pending { background: #f0ad4e; }
+.status.cancelled { background: #dc3545; }
+
+/* Info Sections */
+.order-info p, .order-details p, .order-logistics p, .order-bank p {
+    margin: 4px 0;
+    font-size: 0.9rem;
+}
+
+/* Confirm Button */
+.confirm-btn {
+    margin-top: 10px;
+    width: 100%;
+    padding: 8px 0;
+    background: linear-gradient(135deg, #09a74f, #0dc95d);
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+.confirm-btn:hover {
+    background: linear-gradient(135deg, #0dc95d, #11e06a);
+}
+
+/* Empty message */
+.empty-msg {
+    text-align: center;
+    color: #777;
+    font-style: italic;
+}
+</style>
 {% endblock %}

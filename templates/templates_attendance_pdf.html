@@ -2,26 +2,28 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Attendance Records PDF</title>
+    <title>Attendance Records</title>
     <style>
-        /* General page setup */
+        /* =========================
+           BODY & GENERAL LAYOUT
+           ========================= */
         body {
             font-family: 'Poppins', Arial, sans-serif;
-            margin: 40px auto;
-            max-width: 1200px; /* ✅ Fit neatly on laptop screens */
+            background: #f0f4f7;
+            margin: 0;
+            padding: 20px;
             color: #111;
-            background: #fff;
         }
 
         h2 {
             text-align: center;
-            margin-bottom: 25px;
             color: #03492c;
             text-transform: uppercase;
             letter-spacing: 1px;
+            margin-bottom: 25px;
+            font-size: 2rem;
         }
 
-        /* ✅ Back to Dashboard Link */
         .back-link {
             display: inline-block;
             margin-bottom: 20px;
@@ -29,61 +31,135 @@
             color: #03492c;
             font-weight: bold;
             font-size: 15px;
+            transition: 0.3s;
+        }
+        .back-link:hover {
+            color: #0b7d52;
         }
 
-        /* Table styling */
+        /* =========================
+           TABLE CONTAINER
+           ========================= */
+        .attendance-table-container {
+            overflow-x: auto;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            background: #fff;
+            padding: 20px;
+            margin: auto;
+            max-width: 1200px;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
-            table-layout: auto; /* ✅ Allows columns to size naturally */
-            margin-top: 10px;
+            table-layout: auto;
             font-size: 15px;
+            min-width: 700px;
         }
 
         th, td {
-            border: 1px solid #555;
-            padding: 10px 12px;
+            padding: 12px 15px;
             text-align: center;
             word-wrap: break-word;
+            transition: all 0.3s ease;
         }
 
         th {
-            background-color: #03492c;
+            background: linear-gradient(135deg, #00b894, #00cec9);
             color: #fff;
+            font-weight: 700;
+            font-size: 0.95rem;
+            letter-spacing: 0.5px;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+
+        td {
+            background: #f9f9f9;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        tr:hover td {
+            background: #d0f0eb;
+            transform: scale(1.01);
+            box-shadow: inset 0 0 8px rgba(0,0,0,0.05);
+        }
+
+        tr:nth-child(even) td {
+            background: #eef7f4;
+        }
+
+        /* =========================
+           STATUS BADGES
+           ========================= */
+        .status-present {
+            background: #28a745;
+            color: #fff;
+            padding: 4px 8px;
+            border-radius: 6px;
             font-weight: 600;
+            font-size: 0.85rem;
+        }
+        .status-absent {
+            background: #dc3545;
+            color: #fff;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.85rem;
         }
 
-        tr:nth-child(even) {
-            background-color: #f7f7f7;
-        }
-
-        tr:hover {
-            background-color: #e6ffe6;
-        }
-
-        /* Print-friendly settings */
+        /* =========================
+           PRINT STYLES
+           ========================= */
         @media print {
-            .back-link {
-                display: none;
-            }
             body {
+                background: #fff;
                 margin: 0;
                 font-size: 12px;
             }
+            .back-link {
+                display: none;
+            }
+            .attendance-table-container {
+                box-shadow: none;
+                border: none;
+                margin: 0;
+                padding: 0;
+            }
             table {
                 border: 1px solid #000;
-                page-break-inside: auto;
             }
-            tr {
-                page-break-inside: avoid;
-                page-break-after: auto;
+            th, td {
+                border: 1px solid #000;
+                padding: 6px;
+                font-size: 11px;
+            }
+        }
+
+        /* =========================
+           RESPONSIVE DESIGN
+           ========================= */
+        @media (max-width: 768px) {
+            table {
+                font-size: 0.85rem;
+                min-width: 100%;
+            }
+            th, td {
+                padding: 8px 10px;
+            }
+            h2 {
+                font-size: 1.5rem;
+            }
+            .back-link {
+                font-size: 14px;
             }
         }
     </style>
 </head>
 <body>
-
-    <!-- ✅ Smart Back Link (admin or secretary) -->
     {% if session.get('secretary_logged_in') %}
         <a href="{{ url_for('secretary_dashboard') }}" class="back-link">← Back to Secretary Dashboard</a>
     {% else %}
@@ -92,26 +168,33 @@
 
     <h2>Attendance Records</h2>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Staff ID</th>
-                <th>Name</th>
-                <th>Date</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for record in attendance_records %}
-            <tr>
-                <td>{{ record.worker.staff_id }}</td>
-                <td>{{ record.worker.name }}</td>
-                <td>{{ record.date.strftime('%Y-%m-%d') }}</td>
-                <td>{{ record.status }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-
+    <div class="attendance-table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Staff ID</th>
+                    <th>Name</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in attendance_records %}
+                <tr>
+                    <td>{{ record.worker.staff_id }}</td>
+                    <td>{{ record.worker.name }}</td>
+                    <td>{{ record.date.strftime('%Y-%m-%d') }}</td>
+                    <td>
+                        {% if record.status.lower() == 'present' %}
+                            <span class="status-present">{{ record.status }}</span>
+                        {% else %}
+                            <span class="status-absent">{{ record.status }}</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </body>
 </html>
