@@ -3,25 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Login | Okoya Food Co.</title>
+    <title>Login | Okoya Food Co.</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 <div class="login-wrapper">
     <div class="login-card">
+        <!-- Company Header -->
         <div class="login-header">
             <img src="{{ url_for('static', filename='android-chrome-512x512.png') }}" alt="Company Logo" class="login-logo">
-            <h1 class="company-name">OKOYA FOOD Co,. COMPANY LIMITED</h1>
+            <h1 class="company-name">OKOYA FOOD COMPANY LIMITED</h1>
             <h2 class="company-motto">POVERTY ERADICATION • REDUCE INEQUALITY • LEAVE NO ONE BEHIND</h2>
             <p class="company-address">KM 7 Idi APA Community, Along Ilesha Ibaruba Expressway, Saki, Oyo State, Nigeria</p>
         </div>
 
-        <h2 class="login-title">Admin Login</h2>
+        <!-- Page Title -->
+        <h2 class="login-title">Staff Login Portal</h2>
+        <p class="login-subtitle">Enter your username and password to continue</p>
 
         {% if error %}
             <p class="login-error">{{ error }}</p>
         {% endif %}
 
+        <!-- Login Form -->
         <form method="POST" action="{{ url_for('login') }}" class="login-form">
             <div class="form-group">
                 <label for="username">Username</label>
@@ -34,9 +38,8 @@
             <button type="submit" class="login-btn">Login</button>
         </form>
 
-        <div style="text-align:center; margin-top:15px;">
-            <a href="{{ url_for('secretary_login') }}">Secretary Entrance →</a>
-        </div>
+        <!-- Footer -->
+        <p class="login-footer">© 2025 Okoya Food Co. All Rights Reserved.</p>
     </div>
 </div>
 </body>

@@ -15,7 +15,8 @@ logging.basicConfig(level=logging.INFO)
 
 app = Flask(__name__)
 
-# Use environment variable for secret key in production
+# Use environment variable h
+for secret key in production
 app.secret_key = os.environ.get('SECRET_KEY', 'your-secret-key')
 
 # Database setup for Render: use DATABASE_URL if provided, else fallback to local SQLite
@@ -503,55 +504,63 @@ def salary_history():
 
 
 # ===============================
-# LOGIN ROUTES (Admin & Secretary)
+# UNIVERSAL LOGIN + DASHBOARDS
 # ===============================
 
-@app.route('/')
-def choose_login():
-    """Landing page: choose between Admin or Secretary login"""
-    return render_template('choose_login.html')
+from flask import Flask, render_template, request, redirect, url_for, session, flash
+import os
 
+app = Flask(__name__)
+app.secret_key = 'your_secret_key_here'  # change this to a secure random key
 
-# --- Admin login ---
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/', methods=['GET', 'POST'])
 def login():
     error = None
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
 
-        # ✅ Use environment variables or fallback defaults
-        global USERNAME, PASSWORD
+        # --- Admin credentials ---
+        ADMIN_USER = os.environ.get('ADMIN_USER', 'admin')
+        ADMIN_PASS = os.environ.get('ADMIN_PASS', 'Alayinde001')
 
-        if username == USERNAME and password == PASSWORD:
-            session['admin'] = username
-            session.permanent = True
+        # --- Secretary credentials ---
+        SECRETARY_USER = os.environ.get('SECRETARY_USER', 'secretary')
+        SECRETARY_PASS = os.environ.get('SECRETARY_PASS', 'Sec001')
+
+        # --- Check credentials ---
+        if username == ADMIN_USER and password == ADMIN_PASS:
+            session['role'] = 'admin'
             flash("Welcome Admin!", "success")
-            return redirect(url_for('dashboard'))
+            return redirect(url_for('admin_dashboard'))
+
+        elif username == SECRETARY_USER and password == SECRETARY_PASS:
+            session['role'] = 'secretary'
+            flash("Welcome Secretary!", "success")
+            return redirect(url_for('secretary_dashboard'))
+
         else:
             error = 'Invalid username or password.'
 
     return render_template('login.html', error=error)
 
 
-# --- Secretary login ---
-@app.route('/secretary_login', methods=['GET', 'POST'])
-def secretary_login():
-    error = None
-    if request.method == 'POST':
-        password = request.form.get('password')
+# --- Admin Dashboard ---
+@app.route('/admin_dashboard')
+def admin_dashboard():
+    if session.get('role') != 'admin':
+        flash("Unauthorized access! Please login as admin.", "error")
+        return redirect(url_for('login'))
+    return render_template('admin_dashboard.html')
 
-        SECRETARY_PASSWORD = os.environ.get('SECRETARY_PASSWORD', 'secret123')
 
-        if password == SECRETARY_PASSWORD:
-            session['secretary'] = True
-            session.permanent = True
-            flash("Welcome Secretary!", "success")
-            return redirect(url_for('secretary_dashboard'))
-        else:
-            error = "Invalid entrance password."
-
-    return render_template('secretary_login.html', error=error)
+# --- Secretary Dashboard ---
+@app.route('/secretary_dashboard')
+def secretary_dashboard():
+    if session.get('role') != 'secretary':
+        flash("Unauthorized access! Please login as secretary.", "error")
+        return redirect(url_for('login'))
+    return render_template('secretary_dashboard.html')
 
 
     # --- Admin Dashboard ---
