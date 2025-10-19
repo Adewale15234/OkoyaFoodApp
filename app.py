@@ -470,53 +470,50 @@ def attendance_history():
 
 @app.route('/salary_history')
 def salary_history():
+    # Restrict access to admin and secretary only
     if session.get('role') not in ['admin', 'secretary']:
         return redirect(url_for('login'))
 
+    # Base query (join to include worker details)
+    salary_query = Salary.query.join(Worker).order_by(Salary.payment_date.desc())
+
+    # Get month filter from query string (format: 'YYYY-MM')
     selected_month = request.args.get('month')
 
-    query = Salary.query
-
-    # Filter by selected month if provided
+    # Apply month filter if selected
     if selected_month:
-        month_dt = datetime.strptime(selected_month, "%B %Y")
-        query = query.filter(
-            extract('month', Salary.payment_date) == month_dt.month,
-            extract('year', Salary.payment_date) == month_dt.year
-        )
+        from sqlalchemy import extract
+        try:
+            year, month = map(int, selected_month.split('-'))
+            salary_query = salary_query.filter(
+                extract('year', Salary.payment_date) == year,
+                extract('month', Salary.payment_date) == month
+            )
+        except ValueError:
+            # In case month string is malformed, skip filtering
+            pass
 
-    # Order by latest payment
-    salary_records = query.order_by(Salary.payment_date.desc()).all()
+    # Fetch salary records (after filtering)
+    salary_records = salary_query.all()
 
-    # Generate available months dynamically
-    available_months = sorted(
-        list(set(record.payment_date.strftime("%B %Y") for record in Salary.query.all())),
-        reverse=True
-    )
+    # Generate available months dynamically (from fetched records)
+    available_months_set = set()
+    for record in Salary.query.order_by(Salary.payment_date.desc()).all():
+        if record.payment_date:  # Ensure valid date
+            available_months_set.add(record.payment_date.strftime("%Y-%m"))
+    available_months = sorted(list(available_months_set), reverse=True)
 
-    # Attach total_days_present for display
-    for record in salary_records:
-        if selected_month:
-            month_dt = datetime.strptime(selected_month, "%B %Y")
-            record.total_days_present = Attendance.query.filter(
-                Attendance.worker_id == record.worker_id,
-                Attendance.status == "Present",
-                extract('month', Attendance.date) == month_dt.month,
-                extract('year', Attendance.date) == month_dt.year
-            ).count()
-        else:
-            record.total_days_present = Attendance.query.filter_by(
-                worker_id=record.worker_id, status="Present"
-            ).count()
+    # Current date/time (for print view or footer)
+    now = datetime.now()
 
+    # Render the salary history page
     return render_template(
         'salary_history.html',
         salary_records=salary_records,
         available_months=available_months,
         selected_month=selected_month,
-        now=datetime.now()
+        now=now
     )
-
 
 # ===============================
 # UNIVERSAL LOGIN + DASHBOARDS

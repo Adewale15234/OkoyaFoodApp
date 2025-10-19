@@ -108,6 +108,7 @@ body {
   justify-content: center;
   margin: 0;
   padding: 0;
+  overflow: auto;
 }
 
 /* A4 Portrait card */
@@ -120,9 +121,10 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  align-items: stretch; /* fixes header centering */
+  align-items: stretch;
   box-shadow: 0 0 20px rgba(0,0,0,0.1);
-  overflow-y: auto; /* sticky header works */
+  overflow-y: auto;
+  scroll-behavior: smooth;
 }
 
 /* Sticky header */
@@ -232,6 +234,28 @@ body {
   align-self: center;
 }
 
+/* Responsive orientation handling */
+@media screen and (orientation: landscape) {
+  .a4-portrait {
+    width: 100%;
+    min-height: 100vh;
+    padding: 30px;
+    overflow-y: auto;
+  }
+  .sticky-header {
+    position: sticky;
+  }
+}
+
+@media screen and (orientation: portrait) {
+  .a4-portrait {
+    width: 100%;
+    min-height: auto;
+    padding: 20px;
+    overflow-y: auto;
+  }
+}
+
 /* Print settings */
 @media print {
   body {
@@ -246,7 +270,7 @@ body {
     page-break-inside: avoid;
   }
   .sticky-header {
-    position: static; /* sticky not supported in print */
+    position: static;
     box-shadow: none;
   }
 }
