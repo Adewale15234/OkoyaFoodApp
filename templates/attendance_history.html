@@ -1,16 +1,4 @@
 {% extends 'base.html' %}
-
-{% block content %}
-<!-- Page Header with Back Button & Navigation -->
-<div class="attendance-header sticky-header">
-    <a href="{{ url_for('admin_dashboard') }}" class="back-link no-print">← Back to Dashboard</a>
-    <nav class="top-nav no-print">
-        <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
-        <a href="{{ url_for('logout') }}">Logout</a>
-        <a href="#" onclick="window.print()">🖨️ Print This Page</a>
-    </nav>
-</div>
-{% extends 'base.html' %}
 {% block content %}
 
 <!-- Page Header with Back Button & Navigation -->
