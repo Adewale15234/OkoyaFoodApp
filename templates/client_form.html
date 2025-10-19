@@ -234,19 +234,28 @@ body {
   align-self: center;
 }
 
-/* Responsive orientation handling */
+/* ===== Responsive Fixes ===== */
+
+/* Landscape mode */
 @media screen and (orientation: landscape) {
   .a4-portrait {
     width: 100%;
-    min-height: 100vh;
-    padding: 30px;
+    min-height: auto;
+    max-height: 100vh;
+    padding: 25px;
     overflow-y: auto;
+    transform: scale(0.95);
+    transform-origin: top center;
   }
   .sticky-header {
     position: sticky;
   }
+  body {
+    overflow-y: auto;
+  }
 }
 
+/* Portrait mode */
 @media screen and (orientation: portrait) {
   .a4-portrait {
     width: 100%;
