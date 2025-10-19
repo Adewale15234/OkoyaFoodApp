@@ -34,13 +34,13 @@
 <div class="print-area">
     <!-- Print Header -->
     <div class="print-header">
-        <img src="{{ url_for('static', filename='android-chrome-512x512.png') }}" alt="Company Logo" class="print-logo">
+        <img src="{{ url_for('static', filename='android-chrome-512x512.png') }}" alt="Company Logo" class="print-logo left-logo">
         <div class="print-header-text">
             <h1 class="company-name">Okoya Food Co., Staff Manager</h1>
             <p class="company-motto">"Quality Service, Trusted Management"</p>
             <p class="company-address">Saki, Oyo State, Nigeria</p>
         </div>
-        <img src="{{ url_for('static', filename='android-chrome-512x512.png') }}" alt="Favicon" class="print-favicon">
+        <img src="{{ url_for('static', filename='android-chrome-512x512.png') }}" alt="Favicon" class="print-logo right-logo">
     </div>
     <hr>
 
@@ -84,16 +84,101 @@
 
     <!-- Signature Section -->
     <div class="signature-section">
-        <div>
+        <div class="signature-left">
             __________________________ <br>
             Manager’s Signature
         </div>
-        <div>
+        <div class="signature-right">
             __________________________ <br>
             Accountant’s Signature
         </div>
     </div>
 </div>
+
+<!-- Custom CSS for print layout -->
+<style>
+/* PRINT HEADER */
+.print-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.print-header-text {
+    flex: 1;
+    text-align: center;
+    line-height: 1.3;
+}
+
+.print-logo {
+    width: 90px;
+    height: 90px;
+}
+
+.left-logo {
+    align-self: flex-start;
+}
+
+.right-logo {
+    align-self: flex-end;
+}
+
+/* TABLE STYLING */
+.salary-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.salary-table th, .salary-table td {
+    border: 1px solid #333;
+    padding: 8px 10px;
+    text-align: center;
+}
+
+.salary-table th {
+    background-color: #03492c;
+    color: white;
+}
+
+/* SIGNATURE SECTION */
+.signature-section {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 60px;
+    padding: 0 40px;
+    page-break-inside: avoid;
+}
+
+.signature-left, .signature-right {
+    text-align: center;
+    font-weight: 500;
+}
+
+/* PRINT SETTINGS */
+@media print {
+    body {
+        margin: 1.5cm;
+        font-size: 13px;
+    }
+
+    .no-print {
+        display: none !important;
+    }
+
+    .print-area {
+        page-break-after: always;
+    }
+
+    .signature-section {
+        position: relative;
+        bottom: 0;
+        width: 100%;
+    }
+}
+</style>
 
 <link rel="stylesheet" href="{{ url_for('static', filename='css/salary_history.css') }}">
 {% endblock %}
