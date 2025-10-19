@@ -2,38 +2,26 @@
 {% block content %}
 
 <div class="orders-overview-container">
-
     <!-- Main Header + Filters Container -->
     <div class="header-and-filters">
-
         <!-- Sticky Header -->
         <div class="overview-header sticky-header">
             <div class="header-top">
+                <!-- ✅ New Back to Dashboard Button (top-left) -->
+                <a href="{{ url_for('admin_dashboard') }}" class="top-back-btn">← Back to Dashboard</a>
 
-                <!-- Left Side: Back Buttons -->
-                <div class="header-buttons">
-                    <!-- Back to Dashboard -->
-                    <a href="{{ url_for('admin_dashboard') }}" class="top-back-btn">← Back to Dashboard</a>
+                {% if session.get('username') != 'admin' %}
+                    <a href="{{ url_for('client_form') }}" class="back-btn">← Add New Order</a>
+                {% endif %}
 
-                    <!-- Conditional Button -->
-                    {% if session.get('username') == 'admin' %}
-                        <a href="{{ url_for('admin_dashboard') }}" class="back-btn">← Back to Admin Dashboard</a>
-                    {% else %}
-                        <a href="{{ url_for('client_form') }}" class="back-btn">← Add New Order</a>
-                    {% endif %}
-                </div>
-
-                <!-- Right Side: Header Text -->
                 <div class="header-text">
                     <h1>📦 Orders Overview</h1>
                     <p>All client orders categorized by product type.</p>
                 </div>
-
             </div>
         </div>
     </div>
 </div>
-
 
         <!-- Sticky Side Filter -->
         <div class="side-filter-container sticky-filter">

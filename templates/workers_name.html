@@ -4,7 +4,7 @@
 <a href="{{ url_for('admin_dashboard') }}" class="back-link">← Back to Dashboard</a>
 
 <div class="workers-table-container">
-    <table>
+    <table id="workers-table">
         <thead>
             <tr>
                 <th>Code</th>
@@ -150,10 +150,16 @@ function toggleDetails(id) {
 
     if (isHidden) {
         row.style.display = 'table-row';
-        // Smooth scroll to make the opened details fully visible
-        setTimeout(() => {
-            row.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 100);
+
+        // Scroll offset to ensure <thead> remains visible
+        const table = document.getElementById('workers-table');
+        const theadHeight = table.querySelector('thead').offsetHeight;
+        const rowTop = row.getBoundingClientRect().top + window.pageYOffset;
+
+        window.scrollTo({
+            top: rowTop - theadHeight - 20, // 20px extra padding
+            behavior: 'smooth'
+        });
     }
 }
 </script>

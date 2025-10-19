@@ -31,15 +31,9 @@
         </select>
     </form>
 
-    {% if selected_month %}
-        <p class="selected-month">
-            Showing results for: <strong>{{ selected_month }}</strong>
-        </p>
-    {% else %}
-        <p class="selected-month">
-            Showing results for: <strong>All Months</strong>
-        </p>
-    {% endif %}
+    <p class="selected-month">
+        Showing results for: <strong>{{ selected_month or "All Months" }}</strong>
+    </p>
 </div>
 
 <!-- Printable Section -->
@@ -121,12 +115,12 @@ body {
     overflow-x: hidden;
 }
 
-/* Page header */
+/* PAGE HEADER */
 .page-header {
     position: relative;
     background: #004080;
     color: #fff;
-    padding: 20px;
+    padding: 20px 20px 60px 20px; /* extra bottom padding for sticky nav */
     border-radius: 8px;
     margin-bottom: 25px;
     z-index: 1000;
@@ -141,6 +135,7 @@ body {
     color: #fff;
     text-decoration: none;
     margin-bottom: 10px;
+    font-weight: 500;
 }
 .page-header .back-link:hover {
     text-decoration: underline;
@@ -171,7 +166,7 @@ body {
 
 /* Ensure content does not hide under sticky nav */
 .print-area, .filter-section {
-    padding-top: 70px;
+    padding-top: 20px;
 }
 
 /* FILTER SECTION */
@@ -193,6 +188,7 @@ body {
 .selected-month {
     color: green;
     font-weight: 600;
+    margin-top: 5px;
 }
 
 /* PRINT HEADER */
@@ -219,7 +215,7 @@ body {
     color: #03492c;
 }
 .company-address {
-    color: #006b3c; /* Updated color: deep green for better visibility */
+    color: #006b3c;
 }
 
 /* TABLE WRAPPER */
