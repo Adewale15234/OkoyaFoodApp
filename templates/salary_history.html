@@ -61,34 +61,36 @@
 
     <!-- Salary Table -->
     {% if salary_records %}
-        <table class="salary-table">
-            <thead>
-                <tr>
-                    <th>Worker ID</th>
-                    <th>Name</th>
-                    <th>Total Days Present</th>
-                    <th>Amount Paid (₦)</th>
-                    <th>Bank Name</th>
-                    <th>Bank Account Name</th>
-                    <th>Bank Account</th>
-                    <th>Payment Date</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for record in salary_records %}
+        <div class="table-wrapper">
+            <table class="salary-table">
+                <thead>
                     <tr>
-                        <td>{{ record.worker.worker_code }}</td>
-                        <td>{{ record.worker.name }}</td>
-                        <td>{{ record.total_days_present }}</td>
-                        <td>₦{{ "%.2f"|format(record.amount) }}</td>
-                        <td>{{ record.bank_account_name }}</td>
-                        <td>{{ record.bank_name }}</td>
-                        <td>{{ record.bank_account }}</td>
-                        <td>{{ record.payment_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <th>Worker ID</th>
+                        <th>Name</th>
+                        <th>Total Days Present</th>
+                        <th>Amount Paid (₦)</th>
+                        <th>Bank Name</th>
+                        <th>Bank Account Name</th>
+                        <th>Bank Account</th>
+                        <th>Payment Date</th>
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    {% for record in salary_records %}
+                        <tr>
+                            <td>{{ record.worker.worker_code }}</td>
+                            <td>{{ record.worker.name }}</td>
+                            <td>{{ record.total_days_present }}</td>
+                            <td>₦{{ "%.2f"|format(record.amount) }}</td>
+                            <td>{{ record.bank_account_name }}</td>
+                            <td>{{ record.bank_name }}</td>
+                            <td>{{ record.bank_account }}</td>
+                            <td>{{ record.payment_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     {% else %}
         <p>No salary records available.</p>
     {% endif %}
@@ -108,7 +110,16 @@
 
 <!-- Custom CSS -->
 <style>
-/* PAGE HEADER (Fixes Overflow & Layout) */
+/* GENERAL PAGE LAYOUT */
+body {
+    background: #f0f6ff;
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+    overflow-x: hidden;
+}
+
+/* Page header */
 .page-header {
     position: relative;
     background: #004080;
@@ -116,6 +127,7 @@
     padding: 20px;
     border-radius: 8px;
     margin-bottom: 25px;
+    z-index: 1000;
 }
 .page-header h1 {
     margin: 10px 0;
@@ -132,7 +144,7 @@
     text-decoration: underline;
 }
 
-/* STICKY HEADER NAV */
+/* STICKY NAVIGATION */
 .sticky-header {
     position: sticky;
     top: 0;
@@ -142,27 +154,36 @@
     font-weight: bold;
     z-index: 999;
     box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    text-align: center;
 }
 .sticky-header a {
     color: #fff;
     text-decoration: none;
-    margin-right: 15px;
+    margin: 0 10px;
 }
 .sticky-header a:hover {
     text-decoration: underline;
 }
 
-/* Filter Section */
+/* Ensure content does not hide under sticky nav */
+.print-area, .filter-section {
+    padding-top: 70px; /* adjust if your sticky header height changes */
+}
+
+/* FILTER SECTION */
 .filter-section {
     margin: 20px 0;
+    text-align: center;
 }
 .filter-section label {
     font-weight: bold;
     margin-right: 8px;
 }
 .filter-section select {
-    padding: 5px 10px;
+    padding: 6px 12px;
     font-size: 14px;
+    border: 1px solid #aaa;
+    border-radius: 4px;
 }
 
 /* PRINT HEADER */
@@ -183,25 +204,38 @@
     width: 80px;
     height: 80px;
 }
-.left-logo {
-    align-self: flex-start;
+.company-name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #03492c;
 }
-.right-logo {
-    align-self: flex-end;
+.company-address {
+    color: #333;
+}
+
+/* TABLE WRAPPER */
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: auto;
+    max-height: 70vh;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background: #fff;
 }
 
 /* TABLE STYLING */
 .salary-table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 20px;
-    page-break-inside: auto;
+    margin-top: 0;
 }
 .salary-table th,
 .salary-table td {
     border: 1px solid #333;
     padding: 8px 10px;
     text-align: center;
+    font-size: 14px;
 }
 .salary-table th {
     background-color: #03492c;
@@ -222,23 +256,46 @@
     font-weight: 500;
 }
 
-/* PRINT SETTINGS */
+/* RESPONSIVENESS */
+@media screen and (max-width: 768px) {
+    .table-wrapper {
+        max-height: 65vh;
+        font-size: 13px;
+    }
+    .sticky-header {
+        font-size: 13px;
+        padding: 10px;
+    }
+}
+@media screen and (orientation: landscape) {
+    .table-wrapper {
+        transform: scale(0.98);
+        transform-origin: top center;
+        margin-bottom: 20px;
+    }
+}
+
+/* PRINT MODE */
 @media print {
     body {
-        margin: 1.5cm;
+        background: none;
         font-size: 13px;
+        margin: 1.5cm;
     }
     .no-print {
         display: none !important;
     }
-    /* Auto-adjust to portrait or landscape based on table width */
+    .sticky-header {
+        display: none !important;
+    }
+    .table-wrapper {
+        max-height: none;
+        overflow: visible;
+        border: none;
+    }
     @page {
         size: auto;
         margin: 1.5cm;
-    }
-    .salary-table {
-        page-break-after: auto;
-        page-break-inside: auto;
     }
 }
 </style>

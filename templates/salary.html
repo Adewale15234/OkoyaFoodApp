@@ -27,9 +27,9 @@
                             <input type="number" name="calculated_salary" value="{{ worker.calculated_salary }}" readonly class="readonly-input">
                             <input type="hidden" name="worker_id" value="{{ worker.id }}">
                         </td>
-                        <td><input type="text" name="bank_account_name" value="{{ worker.bank_account_name }}" readonly class="readonly-input"></td>
                         <td><input type="text" name="bank_name" value="{{ worker.bank_name }}" readonly class="readonly-input"></td>
-                        <td><input type="text" name="account_number" value="{{ worker.bank_account_number }}" readonly class="readonly-input"></td>
+                        <td><input type="text" name="bank_account_name" value="{{ worker.bank_account_name }}" readonly class="readonly-input"></td>
+                        <td><input type="text" name="account_number" value="{{ worker.bank_account }}" readonly class="readonly-input"></td>
                         <td><input type="submit" value="Save Salary" class="save-btn"></td>
                     </form>
                 </tr>
