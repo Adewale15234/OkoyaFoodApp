@@ -1,44 +1,183 @@
 {% extends 'base.html' %}
 {% block content %}
-<h1>Attendance</h1>
+<section class="attendance-section">
+    <h1>📋 Attendance</h1>
 
-{% if secretary %}
-    <!-- Secretary sees Logout button -->
-    <a href="{{ url_for('logout') }}" class="logout-button">Logout</a>
-{% else %}
-    <!-- Admin sees back to dashboard -->
-    <a href="{{ url_for('dashboard') }}" class="back-link">← Back to Dashboard</a>
-{% endif %}
+    {% if secretary %}
+        <a href="{{ url_for('logout') }}" class="btn logout-btn">Logout</a>
+    {% else %}
+        <a href="{{ url_for('dashboard') }}" class="btn back-btn">← Back to Dashboard</a>
+    {% endif %}
 
-<div class="attendance-table-container">
-    <table class="attendance-table">
-        <thead>
-            <tr>
-                <th>Worker Name</th>
-                <th>Status</th>
-                <th>Submit</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for worker in workers %}
-            <tr>
-                <td>{{ worker.name }}</td>
-                <td>
-                    <form method="post">
-                        <select name="attendance_status" class="attendance-select">
-                            <option value="Present">Present</option>
-                            <option value="Absent">Absent</option>
-                        </select>
-                        <input type="hidden" name="worker_name" value="{{ worker.name }}">
-                        <input type="hidden" name="worker_id" value="{{ worker.id }}">
-                </td>
-                <td>
-                        <button type="submit" class="submit-button">Submit</button>
-                    </form>
-                </td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-</div>
+    <div class="attendance-table-container">
+        <table class="attendance-table">
+            <thead>
+                <tr>
+                    <th>Worker Name</th>
+                    <th>Status</th>
+                    <th>Submit</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for worker in workers %}
+                <tr>
+                    <td>{{ worker.name }}</td>
+                    <td>
+                        <form method="post" class="attendance-form">
+                            <select name="attendance_status" class="attendance-select">
+                                <option value="Present">Present</option>
+                                <option value="Absent">Absent</option>
+                            </select>
+                            <input type="hidden" name="worker_name" value="{{ worker.name }}">
+                            <input type="hidden" name="worker_id" value="{{ worker.id }}">
+                    </td>
+                    <td>
+                            <button type="submit" class="btn submit-btn">Submit</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<style>
+/* =========================
+   ATTENDANCE SECTION
+   ========================= */
+.attendance-section {
+    max-width: 1100px;
+    margin: 30px auto;
+    padding: 20px;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Heading */
+.attendance-section h1 {
+    font-size: 2rem;
+    color: #03492c;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* Buttons */
+.btn {
+    display: inline-block;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    margin-bottom: 20px;
+}
+
+.logout-btn {
+    background: #dc3545;
+    color: #fff;
+}
+.logout-btn:hover {
+    background: #c82333;
+}
+
+.back-btn {
+    background: #03492c;
+    color: #fff;
+}
+.back-btn:hover {
+    background: #046a3a;
+}
+
+/* Table container */
+.attendance-table-container {
+    overflow-x: auto;
+    border-radius: 14px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+}
+
+/* Table */
+.attendance-table {
+    width: 100%;
+    min-width: 600px;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: #fff;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+}
+
+/* Table header */
+.attendance-table th {
+    background: linear-gradient(135deg, #00b894, #00cec9);
+    color: #fff;
+    font-weight: 700;
+    padding: 14px 16px;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+}
+
+/* Table cells */
+.attendance-table td {
+    padding: 12px 15px;
+    text-align: center;
+    font-size: 0.95rem;
+    color: #333;
+    transition: all 0.3s ease;
+}
+
+/* Alternate row colors */
+.attendance-table tr:nth-child(even) td {
+    background: #f5f6fa;
+}
+
+/* Hover effect */
+.attendance-table tr:hover td {
+    background: #dff9fb;
+    transform: scale(1.01);
+}
+
+/* Form & select styling */
+.attendance-select {
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* Submit button */
+.submit-btn {
+    background: linear-gradient(135deg, #28a745, #2ecc71);
+    color: #fff;
+    padding: 8px 18px;
+    border-radius: 8px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease, transform 0.2s ease;
+}
+.submit-btn:hover {
+    background: linear-gradient(135deg, #218838, #28a745);
+    transform: translateY(-2px) scale(1.03);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .attendance-table {
+        min-width: 100%;
+        font-size: 0.9rem;
+    }
+    .attendance-table th, .attendance-table td {
+        padding: 10px 12px;
+    }
+    .submit-btn, .btn {
+        padding: 6px 14px;
+        font-size: 0.9rem;
+    }
+}
+</style>
 {% endblock %}

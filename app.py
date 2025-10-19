@@ -209,9 +209,9 @@ def client_form():
     if request.method == 'POST':
         try:
             data = request.form
-            kilograms = float(data.get('kilograms')) if data.get('kilograms') else 0
+            number_of_bags = int(data.get('number_of_bags')) if data.get('number_of_bags') else 0
             unit_price = float(data.get('unit_price')) if data.get('unit_price') else 0
-            total_amount = kilograms * unit_price
+            total_amount = number_of_bags * unit_price  # total = number of bags × price per 1kg
 
             order = Order(
                 name=data.get('name', '').strip(),
@@ -220,15 +220,16 @@ def client_form():
                 bank_name=data.get('bank_name', '').strip(),
                 items=data.get('items', '').strip(),
                 description=data.get('description', '').strip(),
-                number_of_bags=int(data.get('number_of_bags')) if data.get('number_of_bags') else None,
-                kilograms=kilograms,
+                number_of_bags=number_of_bags,
+                kilograms=None,  # optional, since now we just track number of bags
                 unit_price=unit_price,
                 total_amount=total_amount,
                 driver_name=data.get('driver_name', '').strip(),
                 vehicle_plate_number=data.get('vehicle_plate_number', '').strip(),
                 phone_number=data.get('phone_number', '').strip(),
                 account_number=data.get('account_number', '').strip(),
-                account_bank_name=data.get('account_bank_name', '').strip()
+                account_bank_name=data.get('account_bank_name', '').strip(),
+                status="Pending"  # set default status
             )
             db.session.add(order)
             db.session.commit()
@@ -240,14 +241,9 @@ def client_form():
 
     return render_template('client_form.html', products=products)
 
-
 @app.route('/orders_overview')
-def orders_overview():
-    @app.route('/edit_worker/<int:worker_id>', methods=['GET', 'POST'])
 @login_required(role='admin')
-def edit_worker(worker_id):
-    # rest of your code here
-
+def orders_overview():
     # Fetch orders grouped by product type
     soya_orders = Order.query.filter(Order.items == "SOYA BEANS").all()
     cashew_orders = Order.query.filter(Order.items == "CASHEW NUT").all()
@@ -262,25 +258,18 @@ def edit_worker(worker_id):
 
 
 @app.route('/confirm_order/<int:order_id>', methods=['POST'])
-def confirm_order(order_id):
-    @app.route('/edit_worker/<int:worker_id>', methods=['GET', 'POST'])
 @login_required(role='admin')
-def edit_worker(worker_id):
-    # rest of your code here
-
+def confirm_order(order_id):
     order = Order.query.get_or_404(order_id)
     order.status = "Confirmed"
     db.session.commit()
     flash(f"Order {order.id} marked as Confirmed!", "success")
     return redirect(request.referrer)
 
+
 @app.route('/edit_worker/<int:worker_id>', methods=['GET', 'POST'])
-def edit_worker(worker_id):
-    @app.route('/edit_worker/<int:worker_id>', methods=['GET', 'POST'])
 @login_required(role='admin')
 def edit_worker(worker_id):
-    # rest of your code here
-
     worker = Worker.query.get_or_404(worker_id)
 
     if request.method == 'POST':
@@ -317,11 +306,8 @@ def edit_worker(worker_id):
 
 
 @app.route('/delete_worker/<int:worker_id>', methods=['POST'])
-def delete_worker(worker_id):
-    @app.route('/edit_worker/<int:worker_id>', methods=['GET', 'POST'])
 @login_required(role='admin')
-def edit_worker(worker_id):
-    # rest of your code here
+def delete_worker(worker_id):
     worker = Worker.query.get_or_404(worker_id)
     db.session.delete(worker)
     db.session.commit()
