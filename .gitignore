@@ -1,9 +1,22 @@
-instance/ 
-_pycache_/ 
-*.pyc 
-*.pyo 
-*.db 
-*.sqlite3 
-.env 
-venv/ 
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.db
+*.sqlite3
+
+# Environment files
+.env
+*.env
+
+# VS Code / IDE
+.vscode/
+.idea/
+
+# OS files
 .DS_Store
+Thumbs.db
+
+# Flask / temp
+instance/

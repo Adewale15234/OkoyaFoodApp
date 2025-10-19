@@ -6,6 +6,27 @@ from calendar import monthrange   # ✅ Add this line
 from sqlalchemy import extract
 import os
 import logging
+from functools import wraps
+
+def login_required(role=None):
+    """
+    Protect a route with login and optional role-based access.
+    
+    Usage:
+        @login_required()         -> any logged-in user
+        @login_required(role='admin')  -> only admin
+        @login_required(role='secretary') -> only secretary
+    """
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            user_role = session.get('role')
+            if not user_role or (role and user_role != role):
+                flash("Please login with proper credentials.", "danger")
+                return redirect(url_for('login'))
+            return f(*args, **kwargs)
+        return decorated_function
+    return decorator
 
 # Secretary entrance (hardcoded for now)
 SECRETARY_PASSWORD = os.environ.get('SECRETARY_PASSWORD', 'secret123')
@@ -125,9 +146,6 @@ PASSWORD = os.environ.get('ADMIN_PASSWORD', 'Alayinde001')
 
 @app.route('/register', methods=['GET', 'POST']) 
 def register_worker():
-    if 'admin' not in session:
-        return redirect(url_for('login'))
-
     if request.method == 'POST':
         try:
             # Generate worker code
@@ -178,7 +196,8 @@ def register_worker():
 
 @app.route('/workers')
 def workers_name():
-    if 'admin' not in session:
+    if session.get('role') not in ['admin', 'secretary']:
+        flash("Please login first", "warning")
         return redirect(url_for('login'))
     workers = Worker.query.all()
     return render_template('workers_name.html', workers=workers)
@@ -224,9 +243,10 @@ def client_form():
 
 @app.route('/orders_overview')
 def orders_overview():
-    if 'admin' not in session:
-        flash("Please login as Admin to continue.", "danger")
-        return redirect(url_for('login'))
+    @app.route('/edit_worker/<int:worker_id>', methods=['GET', 'POST'])
+@login_required(role='admin')
+def edit_worker(worker_id):
+    # rest of your code here
 
     # Fetch orders grouped by product type
     soya_orders = Order.query.filter(Order.items == "SOYA BEANS").all()
@@ -243,21 +263,23 @@ def orders_overview():
 
 @app.route('/confirm_order/<int:order_id>', methods=['POST'])
 def confirm_order(order_id):
-    if 'admin' not in session:
-        flash("Please login as Admin to continue.", "danger")
-        return redirect(url_for('login'))
+    @app.route('/edit_worker/<int:worker_id>', methods=['GET', 'POST'])
+@login_required(role='admin')
+def edit_worker(worker_id):
+    # rest of your code here
 
     order = Order.query.get_or_404(order_id)
     order.status = "Confirmed"
     db.session.commit()
     flash(f"Order {order.id} marked as Confirmed!", "success")
-    return redirect(request.referrer)  # redirect back to the same page
-
+    return redirect(request.referrer)
 
 @app.route('/edit_worker/<int:worker_id>', methods=['GET', 'POST'])
 def edit_worker(worker_id):
-    if 'admin' not in session:
-        return redirect(url_for('login'))
+    @app.route('/edit_worker/<int:worker_id>', methods=['GET', 'POST'])
+@login_required(role='admin')
+def edit_worker(worker_id):
+    # rest of your code here
 
     worker = Worker.query.get_or_404(worker_id)
 
@@ -296,8 +318,10 @@ def edit_worker(worker_id):
 
 @app.route('/delete_worker/<int:worker_id>', methods=['POST'])
 def delete_worker(worker_id):
-    if 'admin' not in session:
-        return redirect(url_for('login'))
+    @app.route('/edit_worker/<int:worker_id>', methods=['GET', 'POST'])
+@login_required(role='admin')
+def edit_worker(worker_id):
+    # rest of your code here
     worker = Worker.query.get_or_404(worker_id)
     db.session.delete(worker)
     db.session.commit()
@@ -313,12 +337,13 @@ def secretary_attendance():
 
 
 @app.route('/attendance', methods=['GET', 'POST'])
+@login_required()  # admin or secretary
 def attendance():
-    if 'admin' not in session and 'secretary' not in session:
-        return redirect(url_for('login'))
+    # no manual role check needed
+
 
     workers = Worker.query.all()
-    secretary = 'secretary' in session  # ✅ detect if secretary
+    secretary = session.get('role') == 'secretary'  # detect if secretary
 
     if request.method == 'POST':
         worker_id = request.form.get('worker_id')
@@ -326,7 +351,6 @@ def attendance():
 
         if worker_id and status:
             today = date.today()
-
             try:
                 worker_id_int = int(worker_id)
             except ValueError:
@@ -348,31 +372,26 @@ def attendance():
 
 
 @app.route('/salary', methods=['GET', 'POST'])
+@login_required(role='admin')  # Only admin can access
 def salary():
-    if 'admin' not in session and 'secretary' not in session:
-        return redirect(url_for('login'))
-
     workers = Worker.query.all()
     today = datetime.today()
     current_year = today.year
     current_month = today.month
     total_days_in_month = monthrange(current_year, current_month)[1]
 
-    # Safety: monthrange should never return 0, but guard anyway
     if total_days_in_month == 0:
         total_days_in_month = 1
 
     salary_data = []
     for worker in workers:
-        # Count days present this month
         total_days_present = Attendance.query.filter(
             Attendance.worker_id == worker.id,
             Attendance.status == "Present",
-            db.extract('year', Attendance.date) == current_year,
-            db.extract('month', Attendance.date) == current_month
+            extract('year', Attendance.date) == current_year,
+            extract('month', Attendance.date) == current_month
         ).count()
 
-        # Calculate salary proportionally
         calculated_salary = (total_days_present / total_days_in_month) * worker.amount_of_salary
 
         salary_data.append({
@@ -392,8 +411,8 @@ def salary():
             total_days_present = Attendance.query.filter(
                 Attendance.worker_id == worker.id,
                 Attendance.status == "Present",
-                db.extract('year', Attendance.date) == current_year,
-                db.extract('month', Attendance.date) == current_month
+                extract('year', Attendance.date) == current_year,
+                extract('month', Attendance.date) == current_month
             ).count()
 
             calculated_salary = (total_days_present / total_days_in_month) * worker.amount_of_salary
@@ -411,7 +430,6 @@ def salary():
             db.session.commit()
             flash(f"Salary for {worker.name} recorded successfully.")
             return redirect(url_for('salary_history'))
-
         except Exception as e:
             db.session.rollback()
             logging.error(f"Error recording salary: {e}")
@@ -422,7 +440,7 @@ def salary():
 
 @app.route('/attendance_history')
 def attendance_history():
-    if 'admin' not in session and 'secretary' not in session:
+    if session.get('role') not in ['admin', 'secretary']:
         return redirect(url_for('login'))
 
     selected_month = request.args.get('month')
@@ -455,7 +473,7 @@ def attendance_history():
 
 @app.route('/salary_history')
 def salary_history():
-    if 'admin' not in session and 'secretary' not in session:
+    if session.get('role') not in ['admin', 'secretary']:
         return redirect(url_for('login'))
 
     selected_month = request.args.get('month')
@@ -537,37 +555,28 @@ def login():
             error = 'Invalid username or password.'
 
     return render_template('login.html', error=error)
-
-# --- Admin Dashboard ---
-@app.route('/admin_dashboard')
-def admin_dashboard():
-    if session.get('role') != 'admin':
-        flash("Unauthorized access! Please login as admin.", "error")
-        return redirect(url_for('login'))
-    return render_template('dashboard.html')
-
-# --- Secretary Dashboard ---
-@app.route('/secretary_dashboard')
-def secretary_dashboard():
-    if session.get('role') != 'secretary':
-        flash("Unauthorized access! Please login as secretary.", "error")
-        return redirect(url_for('login'))
-    return render_template('secretary_dashboard.html')
-
-# --- Main Dashboard (alias for admin) ---
+    
 @app.route('/dashboard')
+@login_required()
 def dashboard():
-    if session.get('role') != 'admin':
-        flash("Unauthorized access! Please login as admin.", "error")
-        return redirect(url_for('login'))
-    return render_template('dashboard.html')
+    role = session.get('role')
+    if role == 'admin':
+        return render_template('dashboard.html')
+    else:  # secretary
+        return render_template('secretary_dashboard.html')
 
-# --- Logout (works for both admin & secretary) ---
+
+@app.route('/logout_admin')
+def logout_admin():
+    session.clear()
+    return redirect(url_for('login'))
+
 @app.route('/logout')
 def logout():
     session.clear()
     flash("You have been logged out successfully.", "info")
     return redirect(url_for('login'))
+
 
 # Route to serve favicon.ico from static folder
 @app.route('/favicon.ico')
