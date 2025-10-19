@@ -16,7 +16,7 @@ logging.basicConfig(level=logging.INFO)
 app = Flask(__name__)
 
 # Use environment variable h
-for secret key in production
+# for secret key in production
 app.secret_key = os.environ.get('SECRET_KEY', 'your-secret-key')
 
 # Database setup for Render: use DATABASE_URL if provided, else fallback to local SQLite
@@ -507,12 +507,6 @@ def salary_history():
 # UNIVERSAL LOGIN + DASHBOARDS
 # ===============================
 
-from flask import Flask, render_template, request, redirect, url_for, session, flash
-import os
-
-app = Flask(__name__)
-app.secret_key = 'your_secret_key_here'  # change this to a secure random key
-
 @app.route('/', methods=['GET', 'POST'])
 def login():
     error = None
@@ -573,21 +567,17 @@ def dashboard():
     return render_template('dashboard.html')
 
 
-# --- Secretary Dashboard ---
-@app.route('/secretary_dashboard')
-def secretary_dashboard():
-    if 'secretary' not in session:
-        flash("Please login as Secretary to continue.", "danger")
-        return redirect(url_for('secretary_login'))
-    # ... your existing secretary dashboard logic ...
-    return render_template('secretary_dashboard.html')
-
+@app.route('/logout')
+def logout():
+    session.clear()
+    flash("You have been logged out successfully.", "info")
+    return redirect(url_for('login'))
 
 @app.route('/logout')
 def logout():
     session.clear()
     flash("You have been logged out successfully.", "info")
-    return redirect(url_for('choose_login'))
+    return redirect(url_for('login'))
 
 
 # Route to serve favicon.ico from static folder

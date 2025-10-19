@@ -4,7 +4,13 @@
     <div class="overview-header">
         <h1>📦 Orders Overview</h1>
         <p>All client orders categorized by product type.</p>
-        <a href="{{ url_for('dashboard') }}" class="back-btn">← Back to Dashboard</a>
+
+        <!-- ✅ Back to Dashboard Button -->
+        <a href="{{ url_for('dashboard') }}" 
+           class="back-btn"
+           style="display:inline-block; background:#03492c; color:#fff; padding:10px 18px; border-radius:6px; text-decoration:none; font-weight:500; transition:0.3s;">
+           ← Back to Dashboard
+        </a>
     </div>
 
     {% macro order_card(order) %}
