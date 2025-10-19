@@ -569,7 +569,6 @@ def dashboard():
 @app.route('/logout_admin')
 def logout_admin():
     session.clear()
-     flash("You have been logged out successfully.", "info")
     return redirect(url_for('admin_login'))
 
 @app.route('/logout')
