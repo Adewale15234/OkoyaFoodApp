@@ -1,22 +1,67 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Attendance Records PDF</title>
     <style>
+        /* General page setup */
+        body {
+            font-family: 'Poppins', Arial, sans-serif;
+            margin: 20px;
+            color: #111;
+            background: #fff;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 15px;
+            color: #03492c;
+            text-transform: uppercase;
+        }
+
+        /* Table styling */
         table {
             width: 100%;
             border-collapse: collapse;
+            table-layout: fixed; /* ✅ Forces all columns to fit evenly */
             margin-top: 10px;
         }
+
         th, td {
             border: 1px solid #555;
-            padding: 6px;
-            text-align: left;
-        }
-        h2 {
+            padding: 8px;
             text-align: center;
-            margin-bottom: 10px;
+            word-wrap: break-word; /* ✅ Prevents overflow text */
+        }
+
+        th {
+            background-color: #03492c;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #e6ffe6;
+        }
+
+        /* Print-friendly settings */
+        @media print {
+            body {
+                margin: 0;
+                font-size: 12px;
+            }
+            table {
+                border: 1px solid #000;
+                page-break-inside: auto;
+            }
+            tr {
+                page-break-inside: avoid;
+                page-break-after: auto;
+            }
         }
     </style>
 </head>
