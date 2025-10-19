@@ -20,7 +20,7 @@
         {% elif session['username'] == 'secretary' %}
             <a href="{{ url_for('secretary_dashboard') }}" class="back-btn">← Back to Secretary Dashboard</a>
         {% else %}
-            <a href="{{ url_for('dashboard') }}" class="back-btn">← Back to Dashboard</a>
+            <a href="{{ url_for('admin_dashboard') }}" class="back-btn">← Back to Dashboard</a>
         {% endif %}
     </div>
 

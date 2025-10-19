@@ -1,11 +1,11 @@
 here is attendance history:{% extends 'base.html' %}
 {% block content %}
-<a href="{{ url_for('dashboard') }}" class="back-link no-print">← Back to Dashboard</a>
+<a href="{{ url_for('admin_dashboard') }}" class="back-link no-print">← Back to Dashboard</a>
 <h1 class="no-print">Attendance History</h1>
 
 <!-- Top navigation (hidden when printing) -->
 <nav class="no-print">
-    <a href="{{ url_for('dashboard') }}">Dashboard</a> |
+    <a href="{{ url_for('admin_dashboard') }}">Dashboard</a> |
     <a href="{{ url_for('logout') }}">Logout</a> |
     <a href="#" onclick="window.print()">🖨️ Print This Page</a>
 </nav>
