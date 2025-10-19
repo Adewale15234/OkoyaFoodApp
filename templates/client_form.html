@@ -3,7 +3,7 @@
 <section class="hero">
   <div class="card a4-portrait">
     <!-- Header -->
-    <div class="company-header">
+    <div class="company-header sticky-header">
       <div class="company-text">
         <h1 class="company-name">OKOYA FOOD COMPANY LIMITED</h1>
         <h2 class="company-motto">POVERTY ERADICATION, REDUCE INEQUALITY AND LEAVE NO ONE BEHIND</h2>
@@ -123,7 +123,17 @@ body {
   justify-content: flex-start;
   align-items: center;
   box-shadow: 0 0 20px rgba(0,0,0,0.1);
-  overflow: hidden;
+  overflow-y: auto; /* allows scrolling inside the card */
+}
+
+/* Sticky header */
+.sticky-header {
+  position: sticky;
+  top: 0;
+  background: #fff;
+  z-index: 100;
+  padding-bottom: 20px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
 /* Header section */

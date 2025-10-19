@@ -11,8 +11,8 @@
                     <th>Worker Name</th>
                     <th>Total Days Present</th>
                     <th>Calculated Salary (₦)</th>
-                    <th>Bank Name</th>
                     <th>Bank Account Name</th>
+                    <th>Bank Name</th>
                     <th>Account Number</th>
                     <th>Action</th>
                 </tr>
@@ -29,7 +29,7 @@
                         </td>
                         <td><input type="text" name="bank_name" value="{{ worker.bank_name }}" readonly></td>
                         <td><input type="text" name="bank_account_name" value="{{ worker.bank_account_name }}" readonly></td>
-                        <td><input type="text" name="bank_account" value="{{ worker.bank_account }}" readonly></td>
+                        <td><input type="text" name="bank_name" value="{{ worker.bank_name }}" readonly></td>
                         <td><input type="submit" value="Save Salary" class="save-btn"></td>
                     </form>
                 </tr>
@@ -87,7 +87,6 @@
     padding: 12px 15px;
     text-align: center;
     border-bottom: 1px solid #ccc;
-    color: #000; /* Ensure all text is black */
 }
 
 /* Table Header */
@@ -120,7 +119,6 @@
     font-weight: 500;
     text-align: center;
     background: #f0f8ff;
-    color: #000; /* Make text black */
 }
 
 /* Submit button */
