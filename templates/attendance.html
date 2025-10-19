@@ -1,14 +1,17 @@
 {% extends 'base.html' %}
 {% block content %}
 <section class="attendance-section">
-    <h1>📋 Attendance</h1>
+    <h1 class="attendance-title">📋 Attendance</h1>
 
     {% if secretary %}
+        <!-- Secretary sees only Logout -->
         <a href="{{ url_for('logout') }}" class="btn logout-btn">Logout</a>
     {% else %}
+        <!-- Admin sees Back to Dashboard and Logout -->
         <a href="{{ url_for('admin_dashboard') }}" class="btn back-btn">← Back to Dashboard</a>
+        <a href="{{ url_for('logout') }}" class="btn logout-btn">Logout</a>
     {% endif %}
-
+    
     <div class="attendance-table-container">
         <table class="attendance-table">
             <thead>

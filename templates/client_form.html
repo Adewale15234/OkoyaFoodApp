@@ -109,15 +109,16 @@ document.getElementById('number_of_bags').addEventListener('input', recalcTotal)
 </script>
 
 <style>
-/* Page background */
+/* Body and page alignment */
 body {
   background: linear-gradient(135deg, #cce7ff, #99ccff);
   min-height: 100vh;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;  /* start at top */
+  padding-top: 50px;        /* spacing from top */
+  flex-direction: column;
   margin: 0;
-  padding: 0;
 }
 
 /* A4 Portrait card */
@@ -132,6 +133,8 @@ body {
   justify-content: flex-start;
   align-items: center;
   box-shadow: 0 0 20px rgba(0,0,0,0.1);
+  border: 3px solid #28a745;   /* added border for elegance */
+  border-radius: 12px;          /* rounded corners */
   overflow: hidden;
 }
 
@@ -281,11 +284,12 @@ body {
   body {
     background: none;
     display: block;
-  }
+  }  
   .a4-portrait {
     box-shadow: none;
     margin: 0;
     padding: 15mm;
+    border: none;
   }
   .back-link {
     display: none;
