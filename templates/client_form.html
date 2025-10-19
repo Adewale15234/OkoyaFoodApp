@@ -18,7 +18,7 @@
     </div>
 
     <!-- Order Form -->
-    <form action="{{ url_for('client_form') }}" method="post" class="order-form two-column-form">
+    <form action="{{ url_for('client_form') }}" method="post" class="order-form two-column-form" id="orderForm">
       <div class="form-column left-column">
         <div class="form-row">
           <label for="name">NAME</label>
@@ -85,8 +85,9 @@
         </div>
       </div>
 
-      <!-- Submit -->
+      <!-- Submit and Print Buttons -->
       <div class="submit-center">
+        <button type="button" class="btn-secondary" onclick="window.print()">🖨️ Print Form</button>
         <button type="submit" class="btn-primary">Submit Order</button>
       </div>
     </form>
@@ -154,7 +155,7 @@ body {
 .company-name {
   font-size: 1.8rem;
   font-weight: 800;
-  color: #008000; /* changed to green */
+  color: #008000;
   text-transform: uppercase;
   letter-spacing: 1px;
   text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
@@ -169,7 +170,7 @@ body {
 
 .company-address {
   font-size: 0.9rem;
-  color: #ffffff; /* changed to white */
+  color: #ffffff;
   font-weight: 500;
 }
 
@@ -234,16 +235,16 @@ body {
 .order-form textarea:focus {
   border-bottom-color: #28a745;
   outline: none;
-  box-shadow: none;
   background: transparent;
   color: #000;
 }
 
-/* ===== Submit Button ===== */
+/* ===== Buttons ===== */
 .submit-center {
   display: flex;
   justify-content: center;
   align-items: center;
+  gap: 15px;
   width: 100%;
   margin-top: 25px;
 }
@@ -260,6 +261,21 @@ body {
 }
 .btn-primary:hover {
   background: #0056b3;
+  transform: scale(1.05);
+}
+.btn-secondary {
+  background: #28a745;
+  color: #fff;
+  padding: 12px 25px;
+  font-size: 16px;
+  font-weight: 700;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.2s;
+}
+.btn-secondary:hover {
+  background: #218838;
   transform: scale(1.05);
 }
 
@@ -316,6 +332,9 @@ body {
   .sticky-header {
     position: static;
     box-shadow: none;
+  }
+  .submit-center, .back-btn {
+    display: none !important; /* hide buttons during print */
   }
 }
 </style>

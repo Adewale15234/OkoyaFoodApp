@@ -9,11 +9,15 @@
         <!-- Sticky Header -->
         <div class="overview-header sticky-header">
             <div class="header-top">
+                <!-- ✅ New Back to Dashboard Button (top-left) -->
+                <a href="{{ url_for('admin_dashboard') }}" class="top-back-btn">← Back to Dashboard</a>
+
                 {% if session.get('username') == 'admin' %}
                     <a href="{{ url_for('admin_dashboard') }}" class="back-btn">← Back to Admin Dashboard</a>
                 {% else %}
                     <a href="{{ url_for('client_form') }}" class="back-btn">← Add New Order</a>
                 {% endif %}
+
                 <div class="header-text">
                     <h1>📦 Orders Overview</h1>
                     <p>All client orders categorized by product type.</p>
@@ -180,6 +184,25 @@ document.addEventListener('DOMContentLoaded', () => {
     flex-wrap: wrap;
 }
 
+/* === Top Back Button (new) === */
+.top-back-btn {
+    position: absolute;
+    top: 15px;
+    left: 20px;
+    background: #004080;
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    z-index: 1100;
+}
+.top-back-btn:hover {
+    background: #0066cc;
+    transform: scale(1.05);
+}
+
 /* === Header Text === */
 .header-text h1 {
     color: #03492c;
@@ -294,17 +317,9 @@ document.addEventListener('DOMContentLoaded', () => {
     font-size: 0.85rem;
 }
 
-.status.confirmed {
-    background: #28a745;
-}
-
-.status.pending {
-    background: #f0ad4e;
-}
-
-.status.cancelled {
-    background: #dc3545;
-}
+.status.confirmed { background: #28a745; }
+.status.pending { background: #f0ad4e; }
+.status.cancelled { background: #dc3545; }
 
 .confirm-btn {
     margin-top: 10px;
@@ -317,10 +332,7 @@ document.addEventListener('DOMContentLoaded', () => {
     cursor: pointer;
     transition: all 0.3s;
 }
-
-.confirm-btn:hover {
-    filter: brightness(1.1);
-}
+.confirm-btn:hover { filter: brightness(1.1); }
 
 @media (max-width: 992px) {
     .header-and-filters {
