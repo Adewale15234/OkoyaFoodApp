@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
+
 <section class="hero">
   <div class="card a4-portrait">
     <!-- Header -->
@@ -11,6 +12,9 @@
           KM 7 idi APA community, along Ilesha Ibaruba express way, Shaki, Oyo State, Nigeria
         </p>
       </div>
+
+      <!-- Back Button -->
+      <a href="{{ url_for('admin_dashboard') }}" class="back-btn">← Back to Dashboard</a>
     </div>
 
     <!-- Order Form -->
@@ -93,14 +97,14 @@
 
 <script>
 function recalcTotal() {
-    const numberOfBags = parseFloat(document.getElementById('number_of_bags').value) || 0;
-    const unitPrice = parseFloat(document.getElementById('unit_price').value) || 0;
-    document.getElementById('total_amount').value = (numberOfBags * unitPrice).toFixed(2);
+  const numberOfBags = parseFloat(document.getElementById('number_of_bags').value) || 0;
+  const unitPrice = parseFloat(document.getElementById('unit_price').value) || 0;
+  document.getElementById('total_amount').value = (numberOfBags * unitPrice).toFixed(2);
 }
 </script>
 
 <style>
-/* Page background */
+/* ===== Page Background ===== */
 body {
   background: linear-gradient(135deg, #cce7ff, #99ccff);
   min-height: 100vh;
@@ -111,7 +115,7 @@ body {
   overflow: auto;
 }
 
-/* A4 Portrait card */
+/* ===== A4 Card ===== */
 .a4-portrait {
   width: 210mm;
   min-height: 297mm;
@@ -127,7 +131,7 @@ body {
   scroll-behavior: smooth;
 }
 
-/* Sticky header */
+/* ===== Sticky Header ===== */
 .sticky-header {
   position: sticky;
   top: 0;
@@ -138,7 +142,7 @@ body {
   box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
-/* Header section */
+/* ===== Company Header ===== */
 .company-header {
   display: flex;
   flex-direction: column;
@@ -147,19 +151,52 @@ body {
   gap: 10px;
 }
 
-.company-text h1, .company-text h2, .company-text p {
-  margin: 0;
+.company-name {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #000;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
 }
 
-/* Two-column form layout */
+.company-motto {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #111;
+  margin-top: 6px;
+}
+
+.company-address {
+  font-size: 0.9rem;
+  color: #444;
+  font-weight: 500;
+}
+
+/* ===== Back Button ===== */
+.back-btn {
+  display: inline-block;
+  margin-top: 10px;
+  text-decoration: none;
+  color: #007bff;
+  font-weight: 700;
+  font-size: 0.95rem;
+  transition: color 0.2s, transform 0.2s;
+}
+.back-btn:hover {
+  color: #0056b3;
+  transform: scale(1.05);
+}
+
+/* ===== Two-Column Layout ===== */
 .two-column-form {
   display: flex;
   gap: 20px;
   flex-wrap: wrap;
   width: 100%;
+  margin-top: 10px;
 }
 
-/* Form columns */
 .two-column-form .form-column {
   flex: 1;
   min-width: 200px;
@@ -168,20 +205,20 @@ body {
   gap: 12px;
 }
 
-/* Form rows */
+/* ===== Form Fields ===== */
 .order-form .form-row {
   margin-bottom: 12px;
   display: flex;
   flex-direction: column;
 }
-
-/* Labels and inputs */
 .order-form label {
   font-weight: 700;
   margin-bottom: 4px;
   color: #333;
 }
-.order-form input, .order-form select, .order-form textarea {
+.order-form input,
+.order-form select,
+.order-form textarea {
   border: none;
   border-bottom: 3px solid #28a745;
   background: transparent;
@@ -192,7 +229,9 @@ body {
   color: #000;
   transition: all 0.2s ease;
 }
-.order-form input:focus, .order-form select:focus, .order-form textarea:focus {
+.order-form input:focus,
+.order-form select:focus,
+.order-form textarea:focus {
   border-bottom-color: #28a745;
   outline: none;
   box-shadow: none;
@@ -200,12 +239,11 @@ body {
   color: #000;
 }
 
-/* Submit button */
+/* ===== Submit Button ===== */
 .submit-center {
   display: flex;
   justify-content: center;
   align-items: center;
-  flex-grow: 1;
   width: 100%;
   margin-top: 25px;
 }
@@ -225,7 +263,7 @@ body {
   transform: scale(1.05);
 }
 
-/* Footer */
+/* ===== Footer ===== */
 .footer {
   text-align: center;
   font-size: 14px;
@@ -235,8 +273,6 @@ body {
 }
 
 /* ===== Responsive Fixes ===== */
-
-/* Landscape mode */
 @media screen and (orientation: landscape) {
   .a4-portrait {
     width: 100%;
@@ -255,7 +291,6 @@ body {
   }
 }
 
-/* Portrait mode */
 @media screen and (orientation: portrait) {
   .a4-portrait {
     width: 100%;
@@ -265,7 +300,7 @@ body {
   }
 }
 
-/* Print settings */
+/* ===== Print Mode ===== */
 @media print {
   body {
     background: none;
@@ -284,4 +319,5 @@ body {
   }
 }
 </style>
+
 {% endblock %}

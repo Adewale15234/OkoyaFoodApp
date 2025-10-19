@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'base.html' %} 
 {% block content %}
 
 <div class="orders-overview-container">
@@ -8,14 +8,17 @@
 
         <!-- Sticky Header -->
         <div class="overview-header sticky-header">
-            <h1>📦 Orders Overview</h1>
-            <p>All client orders categorized by product type.</p>
-
-            {% if session.get('username') == 'admin' %}
-                <a href="{{ url_for('admin_dashboard') }}" class="back-btn">← Back to Admin Dashboard</a>
-            {% else %}
-                <a href="{{ url_for('client_form') }}" class="back-btn">← Add New Order</a>
-            {% endif %}
+            <div class="header-top">
+                {% if session.get('username') == 'admin' %}
+                    <a href="{{ url_for('admin_dashboard') }}" class="back-btn">← Back to Admin Dashboard</a>
+                {% else %}
+                    <a href="{{ url_for('client_form') }}" class="back-btn">← Add New Order</a>
+                {% endif %}
+                <div class="header-text">
+                    <h1>📦 Orders Overview</h1>
+                    <p>All client orders categorized by product type.</p>
+                </div>
+            </div>
         </div>
 
         <!-- Sticky Side Filter -->
@@ -138,16 +141,42 @@
         min-width: 260px;
     }
 
+    .header-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+    }
+
+    /* === Header Text === */
+    .header-text h1 {
+        color: #03492c;  /* Deep green */
+        font-size: 1.8rem;
+        margin: 0;
+        font-weight: 700;
+    }
+
+    .header-text p {
+        color: #000;  /* Black */
+        margin: 5px 0 0;
+        font-size: 1rem;
+    }
+
     /* === Back Button === */
     .back-btn {
         display: inline-block;
-        margin-top: 8px;
         text-decoration: none;
-        color: #28a745;
+        background: #09a74f;
+        color: #fff;
+        padding: 8px 14px;
+        border-radius: 8px;
         font-weight: 600;
+        transition: all 0.3s;
+        margin-bottom: 10px;
     }
     .back-btn:hover {
-        color: #046a3a;
+        background: #046a3a;
+        transform: scale(1.05);
     }
 
     /* === Side Filter === */
@@ -201,6 +230,7 @@
         padding: 18px 20px;
         transition: transform 0.2s, box-shadow 0.2s;
         word-wrap: break-word;
+        color: #000; /* Ensure all text appears black */
     }
 
     .order-card:hover {
@@ -235,16 +265,6 @@
     .status.pending { background: #f0ad4e; }
     .status.cancelled { background: #dc3545; }
 
-    /* === Text Info === */
-    .order-info p,
-    .order-details p,
-    .order-logistics p,
-    .order-bank p {
-        margin: 4px 0;
-        font-size: 0.9rem;
-        overflow-wrap: break-word;
-    }
-
     /* === Delete Button === */
     .confirm-btn {
         margin-top: 10px;
@@ -275,17 +295,10 @@
             position: static;
             box-shadow: none;
         }
-    }
-
-    /* === Orientation Fix for Landscape === */
-    @media screen and (orientation: landscape) {
-        .orders-overview-container {
-            overflow-y: auto;
-            max-height: 100vh;
-            padding-bottom: 40px;
-        }
-        .order-card {
-            transform: scale(0.95);
+        .header-top {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
         }
     }
 
