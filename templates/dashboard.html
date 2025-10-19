@@ -1,15 +1,17 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="dashboard-container">
-    
+
     <!-- Top Header -->
     <header class="dashboard-header">
         <div class="logo-section">
             <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="dashboard-logo">
             <div class="company-info">
-                <h1 class="company-name">OKOYA FOOD Co,. COMPANY LIMITED</h1>
+                <h1 class="company-name">OKOYA FOOD Co. COMPANY LIMITED</h1>
                 <h2 class="company-motto">POVERTY ERADICATION • REDUCE INEQUALITY • LEAVE NO ONE BEHIND</h2>
-                <p class="company-address">KM 7 Idi APA Community, Along Ilesha Ibaruba Expressway, Saki, Oyo State, Nigeria</p>
+                <p class="company-address">
+                    KM 7 Idi APA Community, Along Ilesha Ibaruba Expressway, Saki, Oyo State, Nigeria
+                </p>
             </div>
         </div>
 
@@ -18,9 +20,7 @@
             <p class="today-date">📅 Today: <span id="todayDate"></span></p>
             <div class="header-links">
                 <a href="{{ url_for('dashboard') }}" class="nav-btn">🏠 Dashboard</a>
-                {% if session.get('admin') %}
-                    <a href="{{ url_for('logout') }}" class="nav-btn logout-btn">🚪 Logout</a>
-                {% endif %}
+                <a href="{{ url_for('logout') }}" class="nav-btn logout-btn">🚪 Logout</a>
             </div>
         </div>
     </header>
@@ -32,18 +32,18 @@
     </section>
 
     <!-- Dashboard Cards -->
-    <!-- Dashboard Cards -->
     <section class="dashboard-grid">
-    <a href="{{ url_for('register_worker') }}" class="dash-card green">📋 Register Worker</a>
-    <a href="{{ url_for('attendance') }}" class="dash-card teal">🕒 Mark Attendance</a>
-    <a href="{{ url_for('salary') }}" class="dash-card gold">💰 Record Salary</a>
-    <a href="{{ url_for('attendance_history') }}" class="dash-card blue">📅 Attendance History</a>
-    <a href="{{ url_for('salary_history') }}" class="dash-card purple">🧾 Salary History</a>
-    <a href="{{ url_for('workers_name') }}" class="dash-card grey">👥 View Workers</a>
-    <a href="{{ url_for('client_form') }}" class="dash-card orange">📝 Client Form</a>
-    <a href="{{ url_for('orders_overview') }}" class="dash-card lime">📦 Orders Overview</a> <!-- NEW CARD -->
-    <a href="{{ url_for('logout') }}" class="dash-card red">🚪 Logout</a>
-</section>
+        <a href="{{ url_for('register_worker') }}" class="dash-card green">📋 Register Worker</a>
+        <a href="{{ url_for('attendance') }}" class="dash-card teal">🕒 Mark Attendance</a>
+        <a href="{{ url_for('salary') }}" class="dash-card gold">💰 Record Salary</a>
+        <a href="{{ url_for('attendance_history') }}" class="dash-card blue">📅 Attendance History</a>
+        <a href="{{ url_for('salary_history') }}" class="dash-card purple">🧾 Salary History</a>
+        <a href="{{ url_for('workers_name') }}" class="dash-card grey">👥 View Workers</a>
+        <a href="{{ url_for('client_form') }}" class="dash-card orange">📝 Client Form</a>
+        <a href="{{ url_for('orders_overview') }}" class="dash-card lime">📦 Orders Overview</a>
+        <a href="{{ url_for('logout') }}" class="dash-card red">🚪 Logout</a>
+    </section>
+
 </div>
 
 <script>
@@ -53,4 +53,263 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('todayDate').textContent = today.toLocaleDateString('en-US', options);
 });
 </script>
+
+<style>
+/* ======================================================
+   PREMIUM EMERALD DASHBOARD - MODERN 3D DESIGN
+   ====================================================== */
+
+/* BODY */
+body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    width: 100vw;
+    overflow-x: hidden;
+    background: linear-gradient(135deg, #012a1a, #026533, #0de07a);
+    color: #f5f7f6;
+}
+
+/* DASHBOARD CONTAINER */
+.dashboard-container {
+    padding: 20px;
+}
+
+/* =========================
+   DASHBOARD HEADER
+   ========================= */
+.dashboard-header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    padding: 30px 50px;
+    border-radius: 25px;
+    background: linear-gradient(135deg, #045e32, #078f4a, #0bbf59);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.35), inset 0 0 20px rgba(255,255,255,0.08);
+    backdrop-filter: blur(6px);
+    transition: all 0.3s ease;
+    color: #fff;
+}
+
+.dashboard-header:hover {
+    transform: translateY(-2px);
+}
+
+/* LOGO & INFO */
+.logo-section {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+.dashboard-logo {
+    width: 160px;
+    height: 160px;
+    object-fit: cover;
+    border-radius: 25px;
+    border: 3px solid rgba(255,255,255,0.35);
+    box-shadow: 0 12px 28px rgba(0,0,0,0.45);
+    background: rgba(255,255,255,0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.dashboard-logo:hover {
+    transform: scale(1.07);
+    box-shadow: 0 16px 36px rgba(0,0,0,0.55);
+}
+
+.company-info {
+    line-height: 1.5;
+}
+
+.company-name {
+    font-size: 2.6rem;
+    color: #00ff99;
+    font-weight: 800;
+    text-shadow: 0 2px 10px rgba(0,255,153,0.5), 0 0 15px rgba(0,255,153,0.3);
+    letter-spacing: 1.2px;
+}
+
+.company-motto {
+    font-size: 1.1rem;
+    color: #fff8dc;
+    font-weight: 500;
+}
+
+.company-address {
+    font-size: 1.15rem;
+    color: #e0f2e9;
+    background: rgba(255,255,255,0.15);
+    padding: 8px 16px;
+    border-radius: 12px;
+}
+
+/* USER PANEL */
+.user-panel {
+    text-align: right;
+    min-width: 260px;
+}
+
+.user-panel .greeting {
+    font-size: 1.1rem;
+    color: #e3ffe9;
+    margin-bottom: 5px;
+}
+
+.today-date {
+    font-size: 1rem;
+    color: #cff7d7;
+    margin-bottom: 12px;
+}
+
+.header-links {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+.nav-btn {
+    background: linear-gradient(135deg,#07a54d,#1eea7c);
+    color: #fff;
+    padding: 14px 28px;
+    border-radius: 14px;
+    font-weight: 600;
+    border: none;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    box-shadow:0 6px 18px rgba(0,0,0,0.25);
+}
+
+.nav-btn:hover {
+    background: linear-gradient(135deg,#0bd764,#33ff91);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 22px rgba(10,166,77,0.45);
+}
+
+.logout-btn {
+    background: linear-gradient(135deg,#cc0000,#ff4444);
+}
+
+.logout-btn:hover {
+    background: linear-gradient(135deg,#ff4444,#ff7777);
+}
+
+/* WELCOME SECTION */
+.dashboard-welcome {
+    text-align: center;
+    margin: 60px 0 40px;
+    animation: fadeIn 1s ease forwards;
+}
+
+.dashboard-welcome h1 {
+    font-size: 3rem;
+    font-weight: 900;
+    background: linear-gradient(90deg,#00ff99,#00d4ff,#78ffd6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 1.3px;
+    text-shadow:2px 2px 16px rgba(0,0,0,0.3);
+    margin: 0;
+    transition: all 0.3s ease;
+}
+
+.dashboard-welcome h1 span {
+    background: linear-gradient(90deg,#faff72,#00ff99,#00d4ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow:0 0 18px rgba(0,255,153,0.6);
+}
+
+.dashboard-welcome h1:hover {
+    transform: translateY(-4px) scale(1.03);
+}
+
+.dashboard-welcome p {
+    color:#e0ffeb;
+    font-size:1.2rem;
+    font-weight:500;
+    margin-top:12px;
+}
+
+/* FADE IN */
+@keyframes fadeIn {
+    0% { opacity:0; transform: translateY(-12px); }
+    100% { opacity:1; transform: translateY(0); }
+}
+
+/* DASHBOARD GRID */
+.dashboard-grid {
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    gap:32px;
+    margin-top:40px;
+    padding:0 10px;
+}
+
+/* DASHBOARD CARD */
+.dash-card {
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding:50px 30px;
+    border-radius:24px;
+    font-size:1.3rem;
+    font-weight:700;
+    text-decoration:none;
+    color:#024d27;
+    background: linear-gradient(145deg,#ffffff,#f0f5f0);
+    box-shadow: 0 14px 30px rgba(0,0,0,0.22), 0 6px 16px rgba(0,0,0,0.12);
+    position:relative;
+    overflow:hidden;
+    transition: all 0.45s ease;
+    cursor:pointer;
+}
+
+/* Hover effects */
+.dash-card::before {
+    content:"";
+    position:absolute;
+    top:0;
+    left:-120%;
+    width:120%;
+    height:100%;
+    background: linear-gradient(120deg, rgba(18,204,107,0.18), rgba(0,179,179,0.12), rgba(224,176,0,0.18));
+    transform: skewX(-25deg);
+    transition: all 0.5s ease;
+    z-index:1;
+}
+
+.dash-card:hover::before { left:-10%; }
+
+.dash-card:hover {
+    transform: translateY(-10px) scale(1.05);
+    box-shadow:0 22px 44px rgba(0,0,0,0.35),0 10px 20px rgba(0,0,0,0.2);
+}
+
+.dash-card > * { position: relative; z-index:2; }
+
+/* Card Colors */
+.dash-card.green  { border-left:6px solid #12cc6b; background:linear-gradient(145deg,#eafff0,#d4f8e8); }
+.dash-card.teal   { border-left:6px solid #00b3b3; background:linear-gradient(145deg,#e0f7f7,#c0f0f0); }
+.dash-card.gold   { border-left:6px solid #e0b000; background:linear-gradient(145deg,#fff8e1,#ffe6a0); }
+.dash-card.blue   { border-left:6px solid #2196f3; background:linear-gradient(145deg,#e3f2fd,#a0d4ff); }
+.dash-card.purple { border-left:6px solid #b24dff; background:linear-gradient(145deg,#f3e8ff,#d0b4ff); }
+.dash-card.grey   { border-left:6px solid #6b7280; background:linear-gradient(145deg,#f5f5f5,#dcdcdc); }
+.dash-card.orange { border-left:6px solid #ea580c; background:linear-gradient(145deg,#fff0e0,#ffd2b0); }
+.dash-card.lime   { border-left:6px solid #65a30d; background:linear-gradient(145deg,#f0ffe0,#c8f080); }
+.dash-card.red    { border-left:6px solid #b91c1c; background:linear-gradient(145deg,#ffe0e0,#ffb0b0); }
+
+/* RESPONSIVE */
+@media(max-width:768px){
+    .dashboard-header{ flex-direction:column; text-align:center; }
+    .user-panel{ margin-top:15px; }
+    .dashboard-logo{ width:120px; height:120px; }
+    .company-name{ font-size:2rem; }
+    .dashboard-welcome h1{ font-size:2.2rem; }
+    .dash-card{ padding:35px 20px; font-size:1.1rem; }
+}
+</style>
 {% endblock %}
