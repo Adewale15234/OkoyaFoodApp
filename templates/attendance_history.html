@@ -1,16 +1,20 @@
-here is attendance history:{% extends 'base.html' %}
+{% extends 'base.html' %}
+
 {% block content %}
-<a href="{{ url_for('admin_dashboard') }}" class="back-link no-print">← Back to Dashboard</a>
-<h1 class="no-print">Attendance History</h1>
+<!-- Page Header with Back Button & Navigation -->
+<div class="attendance-header">
+    <a href="{{ url_for('admin_dashboard') }}" class="back-link no-print">← Back to Dashboard</a>
+    <nav class="top-nav no-print">
+        <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+        <a href="{{ url_for('logout') }}">Logout</a>
+        <a href="#" onclick="window.print()">🖨️ Print This Page</a>
+    </nav>
+</div>
 
-<!-- Top navigation (hidden when printing) -->
-<nav class="no-print">
-    <a href="{{ url_for('admin_dashboard') }}">Dashboard</a> |
-    <a href="{{ url_for('logout') }}">Logout</a> |
-    <a href="#" onclick="window.print()">🖨️ Print This Page</a>
-</nav>
+<!-- Page Title -->
+<h1 class="page-title no-print">Attendance History</h1>
 
-<!-- Month Filter Dropdown -->
+<!-- Filter Section -->
 <div class="filter-section no-print">
     <form method="get" action="{{ url_for('attendance_history') }}">
         <label for="month_filter">Filter by Month:</label>
@@ -23,11 +27,9 @@ here is attendance history:{% extends 'base.html' %}
             {% endfor %}
         </select>
     </form>
-    {% if selected_month %}
-        <p class="selected-month">Showing results for: <strong>{{ selected_month }}</strong></p>
-    {% else %}
-        <p class="selected-month">Showing results for: <strong>All Months</strong></p>
-    {% endif %}
+    <p class="selected-month">
+        Showing results for: <strong>{{ selected_month if selected_month else 'All Months' }}</strong>
+    </p>
 </div>
 
 <!-- Printable Section -->
@@ -40,16 +42,16 @@ here is attendance history:{% extends 'base.html' %}
             <p class="company-motto">"Quality Service, Trusted Management"</p>
             <p class="company-address">Saki, Oyo State, Nigeria</p>
         </div>
-        <img src="{{ url_for('static', filename='android-chrome-512x512.png') }}" alt="Favicon" class="print-favicon">
     </div>
     <hr>
 
-    <!-- Report Title -->
+    <!-- Report Info -->
     <h2 class="report-title">Attendance Report</h2>
     <p class="report-date">Printed on: {{ now.strftime('%d %B %Y, %I:%M %p') }}</p>
 
     <!-- Attendance Table -->
     {% if attendance_records %}
+    <div class="table-container">
         <table class="attendance-table">
             <thead>
                 <tr>
@@ -68,8 +70,9 @@ here is attendance history:{% extends 'base.html' %}
                 {% endfor %}
             </tbody>
         </table>
+    </div>
     {% else %}
-        <p>No attendance records available.</p>
+        <p class="no-records">No attendance records available.</p>
     {% endif %}
 
     <!-- Signature Section -->
@@ -85,5 +88,177 @@ here is attendance history:{% extends 'base.html' %}
     </div>
 </div>
 
-<link rel="stylesheet" href="{{ url_for('static', filename='css/attendance_history.css') }}">
+<!-- Custom CSS -->
+<style>
+/* ===== General Page ===== */
+body {
+    font-family: 'Poppins', sans-serif;
+    background: #f5f7fa;
+    margin: 0;
+    padding: 0;
+}
+
+/* ===== Header & Nav ===== */
+.attendance-header {
+    background: #ffffff;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #28a745;
+    flex-wrap: wrap;
+}
+
+.attendance-header .top-nav a {
+    margin-left: 15px;
+    text-decoration: none;
+    font-weight: 600;
+    color: #03492c;
+    transition: 0.3s;
+}
+.attendance-header .top-nav a:hover { color: #28a745; }
+
+/* Back Link */
+.back-link {
+    font-weight: 600;
+    text-decoration: none;
+    color: #03492c;
+    transition: 0.3s;
+}
+.back-link:hover { color: #28a745; }
+
+/* Page Title */
+.page-title {
+    text-align: center;
+    margin: 25px 0 15px;
+    color: #03492c;
+    font-size: 2rem;
+}
+
+/* Filter Section */
+.filter-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+}
+.filter-section label {
+    font-weight: 600;
+    color: #03492c;
+}
+.filter-section select {
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+.selected-month {
+    text-align: center;
+    margin-top: 5px;
+    font-weight: bold;
+}
+
+/* Printable Area */
+.print-area {
+    background: #fff;
+    margin: 0 auto 30px;
+    padding: 25px;
+    width: 95%;
+    max-width: 1200px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    border-radius: 12px;
+}
+
+/* Print Header */
+.print-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    text-align: center;
+    flex-wrap: wrap;
+}
+.print-logo {
+    height: 100px;
+    width: 100px;
+    object-fit: contain;
+}
+.print-header-text .company-name { 
+    color: #28a745;
+    font-weight: 700;
+    font-size: 28px;
+}
+.print-header-text .company-motto {
+    color: #daa520;
+    font-weight: 600;
+}
+.print-header-text .company-address {
+    color: #333;
+    font-size: 14px;
+}
+
+/* Report Title */
+.report-title {
+    text-align: center;
+    margin: 20px 0 10px;
+    font-size: 22px;
+    color: #03492c;
+}
+.report-date {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 14px;
+    color: #555;
+}
+
+/* Table Styling */
+.table-container {
+    overflow-x: auto;
+}
+.attendance-table {
+    width: 100%;
+    border-collapse: collapse;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+.attendance-table th, .attendance-table td {
+    padding: 12px 15px;
+    border: 1px solid #ccc;
+    text-align: center;
+}
+.attendance-table th {
+    background: linear-gradient(135deg, #28a745, #0dc95d);
+    color: #fff;
+    font-weight: 700;
+}
+.attendance-table tr:nth-child(even) { background: #f5f7fa; }
+.attendance-table tr:hover { background: #dff9fb; }
+
+/* Signature Section */
+.signature-section {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 50px;
+    font-weight: bold;
+    color: #03492c;
+}
+.signature-section div { text-align: center; }
+
+/* Print Adjustments */
+@media print {
+    body { background: #fff; }
+    .no-print { display: none !important; }
+    .attendance-header, .filter-section { display: none !important; }
+    .print-area { box-shadow: none; width: 100%; margin: 0; padding: 15mm; }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .attendance-header { flex-direction: column; align-items: flex-start; }
+    .attendance-header .top-nav a { margin-left: 0; margin-right: 10px; }
+    .page-title { font-size: 1.6rem; }
+    .attendance-table th, .attendance-table td { padding: 10px 8px; font-size: 0.9rem; }
+    .print-logo { height: 80px; width: 80px; }
+}
+</style>
 {% endblock %}

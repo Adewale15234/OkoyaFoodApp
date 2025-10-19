@@ -1,33 +1,150 @@
 {% extends 'base.html' %}
 {% block content %}
-<h1>Salary</h1>
-<a href="{{ url_for('admin_dashboard') }}" class="back-link">← Back to Dashboard</a>
+<section class="salary-section">
+    <h1 class="salary-title">💰 Salary</h1>
+    <a href="{{ url_for('admin_dashboard') }}" class="back-link">← Back to Dashboard</a>
 
-<table>
-    <tr>
-        <th>Worker Name</th>
-        <th>Total Days Present</th>
-        <th>Calculated Salary (₦)</th>
-        <th>Bank Name</th>
-        <th>Bank Account Name</th>
-        <th>Account Number</th>
-        <th>Action</th>
-    </tr>
-    {% for worker in salary_data %}
-    <tr>
-        <form method="post">
-            <td>{{ worker.name }}</td>
-            <td>{{ worker.total_days_present }}</td>
-            <td>
-                <input type="number" name="calculated_salary" value="{{ worker.calculated_salary }}" readonly>
-                <input type="hidden" name="worker_id" value="{{ worker.id }}">
-            </td>
-            <td><input type="text" name="bank_name" value="{{ worker.bank_name }}" readonly></td>
-            <td><input type="text" name="bank_account_name" value="{{ worker.bank_account_name }}" readonly></td>
-            <td><input type="text" name="bank_account" value="{{ worker.bank_account }}" readonly></td>
-            <td><input type="submit" value="Save Salary"></td>
-        </form>
-    </tr>
-    {% endfor %}
-</table>
+    <div class="table-container">
+        <table class="salary-table">
+            <thead>
+                <tr>
+                    <th>Worker Name</th>
+                    <th>Total Days Present</th>
+                    <th>Calculated Salary (₦)</th>
+                    <th>Bank Name</th>
+                    <th>Bank Account Name</th>
+                    <th>Account Number</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for worker in salary_data %}
+                <tr>
+                    <form method="post">
+                        <td>{{ worker.name }}</td>
+                        <td>{{ worker.total_days_present }}</td>
+                        <td>
+                            <input type="number" name="calculated_salary" value="{{ worker.calculated_salary }}" readonly>
+                            <input type="hidden" name="worker_id" value="{{ worker.id }}">
+                        </td>
+                        <td><input type="text" name="bank_name" value="{{ worker.bank_name }}" readonly></td>
+                        <td><input type="text" name="bank_account_name" value="{{ worker.bank_account_name }}" readonly></td>
+                        <td><input type="text" name="bank_account" value="{{ worker.bank_account }}" readonly></td>
+                        <td><input type="submit" value="Save Salary" class="save-btn"></td>
+                    </form>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<style>
+/* ======= Salary Section ======= */
+.salary-section {
+    max-width: 1200px;
+    margin: 30px auto;
+    padding: 20px;
+    font-family: 'Poppins', sans-serif;
+    background: #f5f7fa;
+    border-radius: 12px;
+}
+
+/* Page Title */
+.salary-title {
+    color: #03492c;
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 15px;
+}
+
+/* Back Link */
+.back-link {
+    display: inline-block;
+    margin-bottom: 20px;
+    text-decoration: none;
+    color: #28a745;
+    font-weight: 600;
+    transition: 0.3s;
+}
+.back-link:hover { color: #046a3a; }
+
+/* Table Container */
+.table-container {
+    overflow-x: auto;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    border-radius: 12px;
+}
+
+/* Table Styling */
+.salary-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    min-width: 800px;
+}
+.salary-table th, .salary-table td {
+    padding: 12px 15px;
+    text-align: center;
+    border-bottom: 1px solid #ccc;
+}
+
+/* Table Header */
+.salary-table th {
+    background: linear-gradient(135deg, #28a745, #2ecc71);
+    color: #fff;
+    font-weight: 700;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+}
+
+/* Alternate row colors */
+.salary-table tbody tr:nth-child(even) {
+    background: #f5f7fa;
+}
+
+/* Row hover effect */
+.salary-table tbody tr:hover {
+    background: #dff9fb;
+}
+
+/* Input fields */
+.salary-table input[type="text"],
+.salary-table input[type="number"] {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-weight: 500;
+    text-align: center;
+    background: #f0f8ff;
+}
+
+/* Submit button */
+.save-btn {
+    background: linear-gradient(135deg, #28a745, #2ecc71);
+    color: #fff;
+    padding: 6px 12px;
+    font-weight: 600;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.save-btn:hover {
+    background: linear-gradient(135deg, #218838, #28a745);
+    transform: translateY(-2px) scale(1.05);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .salary-table th, .salary-table td {
+        padding: 8px 10px;
+        font-size: 0.9rem;
+    }
+    .salary-section { padding: 10px; }
+    .save-btn { padding: 4px 10px; font-size: 0.85rem; }
+}
+</style>
 {% endblock %}
