@@ -97,20 +97,26 @@ filterButtons.forEach(btn => {
 </script>
 
 <style>
+/* Main Container */
 .orders-overview-container {
-    max-width: 1200px;
-    margin: 20px auto;
+    max-width: 100%;
+    margin: 0 auto;
     padding: 20px;
     font-family: 'Poppins', sans-serif;
     display: flex;
     flex-direction: column;
+    overflow-x: hidden; /* prevent horizontal scroll */
+    box-sizing: border-box;
 }
 
 /* Header + Filter Layout */
 .header-and-filters {
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
+    align-items: flex-start;
     gap: 20px;
+    width: 100%;
 }
 
 /* Sticky Header */
@@ -121,8 +127,9 @@ filterButtons.forEach(btn => {
     z-index: 1000;
     padding: 15px;
     border-bottom: 2px solid #eee;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     flex: 1;
+    min-width: 260px;
 }
 
 /* Back Button */
@@ -138,21 +145,21 @@ filterButtons.forEach(btn => {
 /* Sticky Side Filter */
 .side-filter-container {
     position: sticky;
-    top: 80px; /* offset below sticky header */
+    top: 100px; /* offset below sticky header */
     background: #f7fff7;
     padding: 15px;
-    border-radius: 8px;
+    border-radius: 10px;
     border: 1px solid #ccc;
-    width: 200px;
+    width: 220px;
     flex-shrink: 0;
 }
 
 /* Filter Buttons */
 .filter-buttons { display: flex; flex-direction: column; gap: 10px; }
 .filter-btn {
-    padding: 8px 12px;
+    padding: 10px 14px;
     border: none;
-    border-radius: 6px;
+    border-radius: 8px;
     background: #09a74f;
     color: #fff;
     cursor: pointer;
@@ -166,7 +173,8 @@ filterButtons.forEach(btn => {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 20px;
-    margin-top: 20px;
+    margin-top: 30px;
+    width: 100%;
 }
 
 /* Order Card */
@@ -176,11 +184,12 @@ filterButtons.forEach(btn => {
     box-shadow: 0 6px 18px rgba(0,0,0,0.15);
     padding: 18px 20px;
     transition: transform 0.2s, box-shadow 0.2s;
+    word-wrap: break-word;
 }
 .order-card:hover { transform: translateY(-4px); box-shadow: 0 10px 22px rgba(0,0,0,0.25); }
 
 /* Order Header */
-.order-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.order-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; }
 .order-header h2 { font-size: 1.25rem; color: #03492c; }
 .status { font-weight: 600; padding: 4px 10px; border-radius: 6px; color: #fff; text-transform: uppercase; font-size: 0.85rem; }
 .status.confirmed { background: #28a745; }
@@ -188,13 +197,17 @@ filterButtons.forEach(btn => {
 .status.cancelled { background: #dc3545; }
 
 /* Info Sections */
-.order-info p, .order-details p, .order-logistics p, .order-bank p { margin: 4px 0; font-size: 0.9rem; }
+.order-info p, .order-details p, .order-logistics p, .order-bank p {
+    margin: 4px 0;
+    font-size: 0.9rem;
+    overflow-wrap: break-word;
+}
 
 /* Delete Button */
 .confirm-btn {
     margin-top: 10px;
     width: 100%;
-    padding: 8px 0;
+    padding: 10px 0;
     border: none;
     border-radius: 8px;
     color: #fff;
@@ -204,7 +217,36 @@ filterButtons.forEach(btn => {
 }
 .confirm-btn:hover { filter: brightness(1.1); }
 
-/* Empty Message */
-.empty-msg { text-align: center; color: #777; font-style: italic; }
+/* Responsive Adjustments */
+@media (max-width: 992px) {
+    .header-and-filters {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .side-filter-container {
+        position: static;
+        width: 100%;
+    }
+    .sticky-header {
+        position: static;
+        box-shadow: none;
+    }
+}
+
+/* Print and Orientation Fix */
+@media print {
+  body {
+    background: none;
+    display: block;
+  }
+  .orders-overview-container {
+    max-width: 100%;
+    overflow: visible;
+  }
+  .sticky-header, .side-filter-container {
+    position: static !important;
+    box-shadow: none;
+  }
+}
 </style>
 {% endblock %}

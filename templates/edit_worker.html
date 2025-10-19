@@ -9,39 +9,44 @@
 
 <!-- Form Container -->
 <div class="register-container">
+    <form method="POST" class="register-form">
+        <div class="form-grid">
+            <div><label>Name:</label><input type="text" name="name" value="{{ worker.name }}" class="green-input" required></div>
+            <div><label>Phone:</label><input type="text" name="phone_number" value="{{ worker.phone_number }}" class="green-input" required></div>
+            <div><label>Date of Birth:</label><input type="date" name="date_of_birth" value="{{ worker.date_of_birth.strftime('%Y-%m-%d') }}" required></div>
+            <div><label>Gender:</label><input type="text" name="gender" value="{{ worker.gender }}" required></div>
+            <div><label>Email:</label><input type="email" name="email" value="{{ worker.email }}" required></div>
+            <div><label>Qualifications:</label><input type="text" name="qualifications" value="{{ worker.qualifications }}" required></div>
+            <div><label>Position:</label><input type="text" name="position" value="{{ worker.position }}" required></div>
+            <div><label>Amount of Salary:</label><input type="number" name="amount_of_salary" value="{{ worker.amount_of_salary }}" required></div>
+            <div><label>Date of Employment:</label><input type="date" name="date_of_employment" value="{{ worker.date_of_employment.strftime('%Y-%m-%d') }}" required></div>
+            <div><label>Guarantor:</label><input type="text" name="guarantor" value="{{ worker.guarantor }}" required></div>
+            <div><label>National ID:</label><input type="text" name="national_id" value="{{ worker.national_id }}" required></div>
+            <div><label>Nationality:</label><input type="text" name="nationality" value="{{ worker.nationality }}" required></div>
+            <div><label>Ethnic Group:</label><input type="text" name="ethnic_group" value="{{ worker.ethnic_group }}" required></div>
+            <div><label>Disability:</label><input type="text" name="disability" value="{{ worker.disability }}"></div>
+            <div><label>Home Address:</label><input type="text" name="home_address" value="{{ worker.home_address }}" required></div>
+            <div><label>Place of Residence:</label><input type="text" name="place_of_residence" value="{{ worker.place_of_residence }}" required></div>
+            <div><label>Bank Account Name:</label><input type="text" name="bank_account_name" value="{{ worker.bank_account_name }}" required></div>
+            <div><label>Bank Name:</label><input type="text" name="bank_name" value="{{ worker.bank_name }}" required></div>
+            <div><label>Bank Account:</label><input type="number" name="bank_account" value="{{ worker.bank_account }}" required></div>
+        </div>
 
-<form method="POST" class="register-form">
-
-    <div class="form-grid">
-        <div><label>Name:</label><input type="text" name="name" value="{{ worker.name }}" class="green-input" required></div>
-        <div><label>Phone:</label><input type="text" name="phone_number" value="{{ worker.phone_number }}" class="green-input" required></div>
-        <div><label>Date of Birth:</label><input type="date" name="date_of_birth" value="{{ worker.date_of_birth.strftime('%Y-%m-%d') }}" required></div>
-        <div><label>Gender:</label><input type="text" name="gender" value="{{ worker.gender }}" required></div>
-        <div><label>Email:</label><input type="email" name="email" value="{{ worker.email }}" required></div>
-        <div><label>Qualifications:</label><input type="text" name="qualifications" value="{{ worker.qualifications }}" required></div>
-        <div><label>Position:</label><input type="text" name="position" value="{{ worker.position }}" required></div>
-        <div><label>Amount of Salary:</label><input type="number" name="amount_of_salary" value="{{ worker.amount_of_salary }}" required></div>
-        <div><label>Date of Employment:</label><input type="date" name="date_of_employment" value="{{ worker.date_of_employment.strftime('%Y-%m-%d') }}" required></div>
-        <div><label>Guarantor:</label><input type="text" name="guarantor" value="{{ worker.guarantor }}" required></div>
-        <div><label>National ID:</label><input type="text" name="national_id" value="{{ worker.national_id }}" required></div>
-        <div><label>Nationality:</label><input type="text" name="nationality" value="{{ worker.nationality }}" required></div>
-        <div><label>Ethnic Group:</label><input type="text" name="ethnic_group" value="{{ worker.ethnic_group }}" required></div>
-        <div><label>Disability:</label><input type="text" name="disability" value="{{ worker.disability }}"></div>
-        <div><label>Home Address:</label><input type="text" name="home_address" value="{{ worker.home_address }}" required></div>
-        <div><label>Place of Residence:</label><input type="text" name="place_of_residence" value="{{ worker.place_of_residence }}" required></div>
-        <div><label>Bank Account Name:</label><input type="text" name="bank_account_name" value="{{ worker.bank_account_name }}" required></div>
-        <div><label>Bank Name:</label><input type="text" name="bank_name" value="{{ worker.bank_name }}" required></div>
-        <div><label>Bank Account:</label><input type="number" name="bank_account" value="{{ worker.bank_account }}" required></div>
-    </div>
-
-    <div class="form-submit">
-        <input type="submit" value="Update Worker">
-    </div>
-</form>
+        <div class="form-submit">
+            <input type="submit" value="Update Worker">
+        </div>
+    </form>
 </div>
 
-<!-- Custom CSS for Sticky Header and Inputs -->
+<!-- Custom CSS -->
 <style>
+/* Reset page spacing */
+body {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+}
+
 /* Sticky header */
 .sticky-header {
     position: sticky;
@@ -49,7 +54,7 @@
     background: #004080;
     color: #fff;
     padding: 15px 20px;
-    z-index: 999;
+    z-index: 1000;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -57,6 +62,7 @@
     box-shadow: 0 2px 6px rgba(0,0,0,0.2);
 }
 
+/* Header content */
 .sticky-header h1 {
     margin: 0;
     font-size: 1.8rem;
@@ -74,65 +80,92 @@
 
 /* Form container */
 .register-container {
-    margin-top: 20px;
-    max-width: 900px;
+    margin-top: 100px; /* ensures form starts below sticky header */
+    max-width: 1000px;
     margin-left: auto;
     margin-right: auto;
-    padding: 20px;
-    border: 1px solid #000;
-    background: #fff;
-    font-family: Arial, sans-serif;
+    padding: 25px;
+    border-radius: 10px;
+    background: #ffffff;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    font-family: 'Poppins', sans-serif;
+    overflow: hidden;
 }
 
 /* Form grid */
 .form-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 15px 40px;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px 40px;
     margin-bottom: 20px;
 }
 
 .form-grid label {
     display: block;
-    font-weight: bold;
-    margin-bottom: 3px;
-    color: black;
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: #004080;
 }
 
 .form-grid input {
     border: none;
-    border-bottom: 1px solid #000;
+    border-bottom: 2px solid #004080;
     width: 100%;
-    padding: 4px 5px;
+    padding: 6px 5px;
     background: transparent;
     outline: none;
-    color: black; /* user input text */
+    color: #000;
     font-weight: 500;
+    transition: border-color 0.3s;
+}
+
+.form-grid input:focus {
+    border-color: #0a8a43;
 }
 
 .form-grid input.green-input {
-    color: green; /* optional green for selected fields */
+    color: green;
 }
 
 /* Submit button */
 .form-submit {
     text-align: center;
-    margin-top: 20px;
+    margin-top: 25px;
 }
 
 .form-submit input {
-    padding: 10px 20px;
+    padding: 12px 30px;
     font-size: 16px;
-    font-weight: bold;
+    font-weight: 600;
     background: #004080;
     color: #fff;
     border: none;
     cursor: pointer;
-    border-radius: 5px;
+    border-radius: 8px;
+    transition: background 0.3s ease, transform 0.2s;
 }
 
 .form-submit input:hover {
     background: #0066cc;
+    transform: scale(1.05);
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .sticky-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .register-container {
+        margin-top: 90px;
+        padding: 15px;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
 }
 </style>
 {% endblock %}
