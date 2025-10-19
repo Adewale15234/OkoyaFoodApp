@@ -106,7 +106,6 @@ body {
   min-height: 100vh;
   display: flex;
   justify-content: center;
-  align-items: center;
   margin: 0;
   padding: 0;
 }
@@ -114,16 +113,16 @@ body {
 /* A4 Portrait card */
 .a4-portrait {
   width: 210mm;
-  height: 297mm;
+  min-height: 297mm;
   background: #fff;
   padding: 40px;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  align-items: center;
+  align-items: stretch; /* fixes header centering */
   box-shadow: 0 0 20px rgba(0,0,0,0.1);
-  overflow-y: auto;
+  overflow-y: auto; /* sticky header works */
 }
 
 /* Sticky header */
@@ -133,57 +132,27 @@ body {
   background: #fff;
   z-index: 1000;
   padding-bottom: 20px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
   margin-bottom: 20px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
 /* Header section */
 .company-header {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 20px;
-  margin-bottom: 30px;
   text-align: center;
+  gap: 10px;
 }
 
-.company-logo {
-  width: 90px;
-  height: 90px;
-  object-fit: contain;
-}
-
-.company-text {
-  text-align: center;
-}
-
-.company-name {
-  color: #28a745;
-  font-weight: 800;
-  font-size: 32px;
-  margin-bottom: 10px;
-}
-.company-motto {
-  color: #daa520;
-  font-weight: 600;
-  font-size: 20px;
-  margin-bottom: 8px;
-}
-.company-address {
-  background: #000;
-  color: #fff;
-  display: inline-block;
-  padding: 6px 12px;
-  font-size: 16px;
-  font-weight: 400;
-  border-radius: 6px;
+.company-text h1, .company-text h2, .company-text p {
+  margin: 0;
 }
 
 /* Two-column form layout */
 .two-column-form {
   display: flex;
   gap: 20px;
-  justify-content: center;
   flex-wrap: wrap;
   width: 100%;
 }
@@ -194,7 +163,7 @@ body {
   min-width: 200px;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
+  gap: 12px;
 }
 
 /* Form rows */
@@ -204,49 +173,32 @@ body {
   flex-direction: column;
 }
 
-/* Reduce space in description */
-.description-row label {
-  margin-bottom: 2px;
-}
-.description-row textarea {
-  margin-top: 0;
-  padding-top: 4px;
-}
-
-/* Labels */
+/* Labels and inputs */
 .order-form label {
   font-weight: 700;
   margin-bottom: 4px;
   color: #333;
 }
-
-/* Inputs all black text with green border */
-.order-form input,
-.order-form select,
-.order-form textarea {
+.order-form input, .order-form select, .order-form textarea {
   border: none;
   border-bottom: 3px solid #28a745;
-  border-radius: 0;
   background: transparent;
   padding: 6px 4px;
   font-size: 15px;
   font-weight: 600;
   width: 100%;
-  color: #000; /* black text */
+  color: #000;
   transition: all 0.2s ease;
 }
-
-.order-form input:focus,
-.order-form select:focus,
-.order-form textarea:focus {
-  border-bottom-color: #28a745; /* green focus */
+.order-form input:focus, .order-form select:focus, .order-form textarea:focus {
+  border-bottom-color: #28a745;
   outline: none;
   box-shadow: none;
   background: transparent;
-  color: #000; /* black text on focus */
+  color: #000;
 }
 
-/* Submit button centered */
+/* Submit button */
 .submit-center {
   display: flex;
   justify-content: center;
@@ -255,8 +207,6 @@ body {
   width: 100%;
   margin-top: 25px;
 }
-
-/* Submit Button */
 .btn-primary {
   background: #007bff;
   color: #fff;
@@ -282,15 +232,22 @@ body {
   align-self: center;
 }
 
-/* Print settings for A4 Portrait */
+/* Print settings */
 @media print {
   body {
     background: none;
     display: block;
   }
   .a4-portrait {
+    width: 100%;
+    min-height: auto;
     box-shadow: none;
-    margin: 0;
+    padding: 20px;
+    page-break-inside: avoid;
+  }
+  .sticky-header {
+    position: static; /* sticky not supported in print */
+    box-shadow: none;
   }
 }
 </style>
