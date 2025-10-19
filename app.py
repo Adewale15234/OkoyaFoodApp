@@ -566,12 +566,11 @@ def dashboard():
     # ... your existing dashboard logic ...
     return render_template('dashboard.html')
 
-
-@app.route('/logout')
-def logout():
+@app.route('/logout_admin')
+def logout_admin():
     session.clear()
-    flash("You have been logged out successfully.", "info")
-    return redirect(url_for('login'))
+     flash("You have been logged out successfully.", "info")
+    return redirect(url_for('admin_login'))
 
 @app.route('/logout')
 def logout():
