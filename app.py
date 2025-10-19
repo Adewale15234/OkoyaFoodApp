@@ -542,15 +542,15 @@ def login():
 
     return render_template('login.html', error=error)
     
-@app.route('/dashboard')
-@login_required()
-def dashboard():
-    role = session.get('role')
-    if role == 'admin':
-        return render_template('dashboard.html')
-    else:  # secretary
-        return render_template('secretary_dashboard.html')
+@app.route('/admin_dashboard')
+@login_required(role='admin')
+def admin_dashboard():
+    return render_template('admin_dashboard.html')
 
+@app.route('/secretary_dashboard')
+@login_required(role='secretary')
+def secretary_dashboard():
+    return render_template('secretary_dashboard.html')
 
 @app.route('/logout_admin')
 def logout_admin():
