@@ -77,13 +77,9 @@
 
   // Auto Print after Submit
   document.getElementById('workerForm').addEventListener('submit', function(event) {
-    // Optional: prevent default if you want to print before actual submission
-    // event.preventDefault();
-
-    // Delay print slightly to ensure form submission goes through
     setTimeout(function() {
       window.print();
-    }, 100); // 100ms delay
+    }, 100);
   });
 </script>
 
@@ -140,7 +136,7 @@ body {
   gap: 15px 40px;
   width: 100%;
 }
-.form-grid label { font-weight: bold; margin-bottom: 2px; }
+.form-grid label { font-weight: bold; margin-bottom: 2px; color: #000; } /* Labels black */
 .form-grid input, .form-grid select, .form-grid textarea {
   width: 100%;
   border: none;
@@ -148,6 +144,7 @@ body {
   padding: 5px 4px;
   font-size: 14px;
   background: transparent;
+  color: #000; /* Input text black */
 }
 .form-grid input:focus, .form-grid select:focus, .form-grid textarea:focus {
   outline: none;

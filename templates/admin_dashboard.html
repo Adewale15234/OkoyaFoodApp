@@ -2,8 +2,8 @@
 {% block content %}
 <div class="dashboard-container">
 
-    <!-- Top Header -->
-    <header class="dashboard-header">
+    <!-- Top Header (Sticky) -->
+    <header class="dashboard-header sticky-header">
         <div class="logo-section">
             <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="dashboard-logo">
             <div class="company-info">
@@ -90,6 +90,13 @@ body {
     transition: all 0.3s ease;
     color: #fff;
     margin-bottom: 50px;
+}
+
+/* Sticky Header */
+.sticky-header {
+    position: sticky;
+    top: 0;
+    z-index: 999;
 }
 
 /* LOGO & INFO */
