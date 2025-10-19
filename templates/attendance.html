@@ -12,36 +12,38 @@
         <a href="{{ url_for('logout') }}" class="btn logout-btn">Logout</a>
     {% endif %}
     
-    <div class="attendance-table-container">
-        <table class="attendance-table">
-            <thead>
-                <tr>
-                    <th>Worker Name</th>
-                    <th>Status</th>
-                    <th>Submit</th>
-                </tr>
-            </thead>
-            <tbody>
-            {% for worker in workers %}
-                <tr>
-                    <td>{{ worker.name }}</td>
-                    <td>
-                        <form method="post" class="attendance-form">
-                            <select name="attendance_status" class="attendance-select">
-                                <option value="Present">Present</option>
-                                <option value="Absent">Absent</option>
-                            </select>
-                            <input type="hidden" name="worker_name" value="{{ worker.name }}">
-                            <input type="hidden" name="worker_id" value="{{ worker.id }}">
-                    </td>
-                    <td>
-                            <button type="submit" class="btn submit-btn">Submit</button>
-                        </form>
-                    </td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+    <div class="attendance-table-wrapper">
+        <div class="attendance-table-container">
+            <table class="attendance-table">
+                <thead>
+                    <tr>
+                        <th>Worker Name</th>
+                        <th>Status</th>
+                        <th>Submit</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for worker in workers %}
+                    <tr>
+                        <td>{{ worker.name }}</td>
+                        <td>
+                            <form method="post" class="attendance-form">
+                                <select name="attendance_status" class="attendance-select">
+                                    <option value="Present">Present</option>
+                                    <option value="Absent">Absent</option>
+                                </select>
+                                <input type="hidden" name="worker_name" value="{{ worker.name }}">
+                                <input type="hidden" name="worker_id" value="{{ worker.id }}">
+                        </td>
+                        <td>
+                                <button type="submit" class="btn submit-btn">Submit</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 </section>
 
@@ -54,14 +56,14 @@
     margin: 30px auto;
     padding: 20px;
     font-family: 'Poppins', sans-serif;
-    background: #03492c; /* Optional: dark background for white text to stand out */
+    background: #03492c;
     border-radius: 12px;
 }
 
 /* Heading */
-.attendance-section h1.attendance-title {
+.attendance-title {
     font-size: 2rem;
-    color: #fff; /* Changed to white */
+    color: #fff;
     margin-bottom: 20px;
     text-align: center;
 }
@@ -93,18 +95,23 @@
     background: #046a3a;
 }
 
+/* Table Wrapper for scrollable area */
+.attendance-table-wrapper {
+    max-height: 60vh; /* Set max height for scroll */
+    overflow-y: auto;
+    border-radius: 14px;
+}
+
 /* Table container */
 .attendance-table-container {
-    overflow-x: auto;
+    min-width: 600px;
     border-radius: 14px;
     box-shadow: 0 6px 18px rgba(0,0,0,0.1);
-    margin-top: 15px;
 }
 
 /* Table */
 .attendance-table {
     width: 100%;
-    min-width: 600px;
     border-collapse: separate;
     border-spacing: 0;
     background: #fff;
@@ -114,7 +121,7 @@
     transition: all 0.3s ease;
 }
 
-/* Table header */
+/* Table header - sticky fix */
 .attendance-table th {
     background: linear-gradient(135deg, #00b894, #00cec9);
     color: #fff;
@@ -123,7 +130,7 @@
     text-align: center;
     position: sticky;
     top: 0;
-    z-index: 2;
+    z-index: 10; /* Ensure above table rows */
 }
 
 /* Table cells */
@@ -173,6 +180,9 @@
 
 /* Responsive */
 @media (max-width: 768px) {
+    .attendance-table-wrapper {
+        max-height: 50vh;
+    }
     .attendance-table {
         min-width: 100%;
         font-size: 0.9rem;
