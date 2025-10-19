@@ -9,9 +9,11 @@
 
     <!-- Top Navigation (Sticky) -->
     <nav class="sticky-header">
-        <a href="{{ url_for('admin_dashboard') }}">Dashboard</a> |
-        <a href="{{ url_for('logout') }}">Logout</a> |
-        <a href="#" onclick="window.print()">🖨️ Print This Page</a>
+        <div class="nav-right">
+            <a href="{{ url_for('admin_dashboard') }}">Dashboard</a> |
+            <a href="{{ url_for('logout') }}">Logout</a> |
+            <a href="#" onclick="window.print()">🖨️ Print This Page</a>
+        </div>
     </nav>
 </header>
 
@@ -154,20 +156,22 @@ body {
     font-weight: bold;
     z-index: 999;
     box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-    text-align: center;
+    text-align: right;
 }
 .sticky-header a {
-    color: #fff;
+    color: #00ffff;
     text-decoration: none;
     margin: 0 10px;
+    font-weight: 500;
 }
 .sticky-header a:hover {
     text-decoration: underline;
+    color: #66ffff;
 }
 
 /* Ensure content does not hide under sticky nav */
 .print-area, .filter-section {
-    padding-top: 70px; /* adjust if your sticky header height changes */
+    padding-top: 70px;
 }
 
 /* FILTER SECTION */
@@ -178,12 +182,17 @@ body {
 .filter-section label {
     font-weight: bold;
     margin-right: 8px;
+    color: black;
 }
 .filter-section select {
     padding: 6px 12px;
     font-size: 14px;
     border: 1px solid #aaa;
     border-radius: 4px;
+}
+.selected-month {
+    color: green;
+    font-weight: 600;
 }
 
 /* PRINT HEADER */
@@ -210,7 +219,7 @@ body {
     color: #03492c;
 }
 .company-address {
-    color: #333;
+    color: #006b3c; /* Updated color: deep green for better visibility */
 }
 
 /* TABLE WRAPPER */

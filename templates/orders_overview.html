@@ -90,15 +90,33 @@
 </div>
 
 <script>
-const filterButtons = document.querySelectorAll('.filter-btn');
-const orderCards = document.querySelectorAll('.order-card');
-filterButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-        filterButtons.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        const cat = btn.dataset.category;
-        orderCards.forEach(card => {
-            card.style.display = (cat === 'all' || card.dataset.category === cat) ? 'block' : 'none';
+// ✅ Improved filtering script — works for all categories
+document.addEventListener('DOMContentLoaded', () => {
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const orderCards = document.querySelectorAll('.order-card');
+
+    filterButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            filterButtons.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const cat = btn.dataset.category.toLowerCase();
+
+            orderCards.forEach(card => {
+                const dataCat = card.dataset.category.toLowerCase();
+
+                // Normalize names so "soyabeans" or "soya beans" both match "soya"
+                if (cat === 'all' ||
+                    dataCat.includes(cat) ||
+                    (cat === 'soya' && dataCat.includes('soya')) ||
+                    (cat === 'cashew' && dataCat.includes('cashew')) ||
+                    (cat === 'maize' && dataCat.includes('maize')) ||
+                    (cat === 'rice' && dataCat.includes('rice'))
+                ) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
         });
     });
 });
@@ -124,7 +142,7 @@ filterButtons.forEach(btn => {
     .orders-overview-container {
         overflow-y: auto;
         max-height: 100vh;
-        padding-bottom: 60px; /* prevent cutoff */
+        padding-bottom: 60px;
     }
     .orders-grid {
         transform: scale(0.95);

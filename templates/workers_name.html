@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 <h1>Registered Workers</h1>
-<a href="{{ url_for('admin_dashboard') }}" class="back-link">← Back to Dashboard</a>
+<a href="{{ url_for('dashboard') }}" class="back-link">← Back to Dashboard</a>
 
 <div class="workers-table-container">
     <table>
@@ -14,8 +14,8 @@
                 <th>Employment Date</th>
                 <th>Email</th>
                 <th>Details</th>
-                <th>Edit</th>   <!-- New column for Edit button -->
-                <th>Delete</th> <!-- Delete button column -->
+                <th>Edit</th>
+                <th>Delete</th>
             </tr>
         </thead>
         <tbody>
@@ -46,9 +46,8 @@
             <!-- Collapsible details row -->
             <tr id="details-{{ worker.id }}" class="details-row" style="display:none;">
                 <td colspan="9">
-                    <div>
-                        <!-- Personal Info -->
-                        <div>
+                    <div class="details-container">
+                        <div class="details-section">
                             <strong>DOB:</strong> {{ worker.date_of_birth.strftime('%Y-%m-%d') if worker.date_of_birth else '—' }}<br>
                             <strong>Gender:</strong> {{ worker.gender or '—' }}<br>
                             <strong>Qualifications:</strong> {{ worker.qualifications or '—' }}<br>
@@ -58,16 +57,14 @@
                             <strong>Date of Employment:</strong> {{ worker.date_of_employment.strftime('%Y-%m-%d') if worker.date_of_employment else '—' }}
                         </div>
 
-                        <!-- Address Info -->
-                        <div>
+                        <div class="details-section">
                             <strong>Home Address:</strong> {{ worker.home_address or '—' }}<br>
                             <strong>Ethnic Group:</strong> {{ worker.ethnic_group or '—' }}<br>
                             <strong>Place of Residence:</strong> {{ worker.place_of_residence or '—' }}<br>
                             <strong>Disability:</strong> {{ worker.disability or '—' }}
                         </div>
 
-                        <!-- Salary & Bank Info -->
-                        <div>
+                        <div class="details-section">
                             <strong>Amount of Salary:</strong> {{ worker.amount_of_salary or '—' }}<br>
                             <strong>Guarantor:</strong> {{ worker.guarantor or '—' }}<br>
                             <strong>Bank Account Name:</strong> {{ worker.bank_account_name or '—' }}<br>
@@ -82,13 +79,81 @@
     </table>
 </div>
 
+<style>
+.workers-table-container {
+    width: 95%;
+    margin: 0 auto;
+    overflow-x: auto;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+th, td {
+    padding: 12px 15px;
+    border: 1px solid #ccc;
+    text-align: left;
+}
+th {
+    background-color: #03492c;
+    color: white;
+}
+tr:nth-child(even) { background-color: #f8f8f8; }
+.edit-button, .delete-button, button {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+}
+.edit-button {
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+}
+.delete-button {
+    background-color: #dc3545;
+    color: white;
+}
+button {
+    background-color: #28a745;
+    color: white;
+}
+.details-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    padding: 15px;
+    background: #f5f7fa;
+    border-radius: 10px;
+}
+.details-section {
+    flex: 1 1 250px;
+    min-width: 250px;
+}
+.back-link {
+    text-decoration: none;
+    font-weight: bold;
+    color: #03492c;
+}
+.back-link:hover {
+    color: #28a745;
+}
+</style>
+
 <script>
 function toggleDetails(id) {
     const row = document.getElementById('details-' + id);
-    if (row.style.display === 'none') {
+    const isHidden = row.style.display === 'none';
+    document.querySelectorAll('.details-row').forEach(r => r.style.display = 'none');
+
+    if (isHidden) {
         row.style.display = 'table-row';
-    } else {
-        row.style.display = 'none';
+        // Smooth scroll to make the opened details fully visible
+        setTimeout(() => {
+            row.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
     }
 }
 </script>
