@@ -3,16 +3,14 @@
 
 <!-- HEADER CONTAINER -->
 <header class="page-header no-print">
-    <!-- Back to Dashboard -->
-    <a href="{{ url_for('admin_dashboard') }}" class="back-link">← Back to Dashboard</a>
     <h1>Salary History</h1>
 
     <!-- Top Navigation (Sticky) -->
     <nav class="sticky-header">
         <div class="nav-right">
-            <a href="{{ url_for('admin_dashboard') }}">Dashboard</a> |
-            <a href="{{ url_for('logout') }}">Logout</a> |
-            <a href="#" onclick="window.print()">🖨️ Print This Page</a>
+            <a href="{{ url_for('admin_dashboard') }}">← Dashboard</a> |
+            <a href="#" onclick="window.print()">🖨️ Print</a> |
+            <a href="{{ url_for('logout') }}">Logout</a>
         </div>
     </nav>
 </header>
@@ -120,7 +118,7 @@ body {
     position: relative;
     background: #004080;
     color: #fff;
-    padding: 20px 20px 60px 20px; /* extra bottom padding for sticky nav */
+    padding: 20px 20px 60px 20px;
     border-radius: 8px;
     margin-bottom: 25px;
     z-index: 1000;
@@ -129,16 +127,6 @@ body {
     margin: 10px 0;
     font-size: 24px;
     font-weight: 600;
-}
-.page-header .back-link {
-    display: inline-block;
-    color: #fff;
-    text-decoration: none;
-    margin-bottom: 10px;
-    font-weight: 500;
-}
-.page-header .back-link:hover {
-    text-decoration: underline;
 }
 
 /* STICKY NAVIGATION */
@@ -162,11 +150,6 @@ body {
 .sticky-header a:hover {
     text-decoration: underline;
     color: #66ffff;
-}
-
-/* Ensure content does not hide under sticky nav */
-.print-area, .filter-section {
-    padding-top: 20px;
 }
 
 /* FILTER SECTION */
@@ -234,13 +217,13 @@ body {
     width: 100%;
     border-collapse: collapse;
     margin-top: 0;
+    font-size: 13px;
 }
 .salary-table th,
 .salary-table td {
     border: 1px solid #333;
-    padding: 8px 10px;
+    padding: 6px 8px;
     text-align: center;
-    font-size: 14px;
 }
 .salary-table th {
     background-color: #03492c;
@@ -252,7 +235,7 @@ body {
     display: flex;
     justify-content: space-between;
     margin-top: 60px;
-    padding: 0 40px;
+    padding: 0 20px;
     page-break-inside: avoid;
 }
 .signature-left,
@@ -265,7 +248,7 @@ body {
 @media screen and (max-width: 768px) {
     .table-wrapper {
         max-height: 65vh;
-        font-size: 13px;
+        font-size: 12px;
     }
     .sticky-header {
         font-size: 13px;
@@ -284,7 +267,7 @@ body {
 @media print {
     body {
         background: none;
-        font-size: 13px;
+        font-size: 12px;
         margin: 1.5cm;
     }
     .no-print {
@@ -296,10 +279,14 @@ body {
     .table-wrapper {
         max-height: none;
         overflow: visible;
-        border: none;
+        border: 1px solid #000;
+    }
+    .salary-table {
+        width: 100%;
+        font-size: 12px;
     }
     @page {
-        size: auto;
+        size: A4 landscape;
         margin: 1.5cm;
     }
 }
