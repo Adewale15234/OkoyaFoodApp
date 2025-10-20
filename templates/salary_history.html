@@ -4,16 +4,14 @@
 <!-- HEADER CONTAINER -->
 <header class="page-header no-print">
     <h1>Salary History</h1>
-
-    <!-- Top Navigation (Sticky) -->
-    <nav class="sticky-header">
-        <div class="nav-right">
-            <a href="{{ url_for('admin_dashboard') }}" class="nav-link">← Dashboard</a>
-            <a href="#" onclick="window.print()" class="nav-link">🖨️ Print</a>
-            <a href="{{ url_for('logout') }}" class="nav-link logout">Logout</a>
-        </div>
-    </nav>
 </header>
+
+<!-- FLOATING ACTION NAV (TOP-RIGHT CORNER) -->
+<nav class="floating-nav no-print">
+    <a href="{{ url_for('admin_dashboard') }}" class="nav-link">← Dashboard</a>
+    <a href="#" onclick="window.print()" class="nav-link">🖨️ Print</a>
+    <a href="{{ url_for('logout') }}" class="nav-link logout">Logout</a>
+</nav>
 
 <!-- Month Filter -->
 <div class="filter-section no-print">
@@ -115,13 +113,13 @@ body {
 
 /* PAGE HEADER */
 .page-header {
-    position: relative;
     background: #004080;
     color: #fff;
     padding: 20px 20px 60px 20px;
     border-radius: 8px;
     margin-bottom: 25px;
     z-index: 1000;
+    text-align: left;
 }
 .page-header h1 {
     margin: 10px 0;
@@ -129,35 +127,30 @@ body {
     font-weight: 600;
 }
 
-/* STICKY NAVIGATION */
-.sticky-header {
-    position: sticky;
-    top: 0;
-    background: #003366;
-    padding: 10px 20px;
-    color: #fff;
-    font-weight: bold;
-    z-index: 999;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+/* FLOATING NAVIGATION (TOP-RIGHT CORNER) */
+.floating-nav {
+    position: fixed;
+    top: 15px;
+    right: 20px;
     display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    gap: 15px;
+    gap: 10px;
+    z-index: 2000;
 }
-.sticky-header a.nav-link {
+.floating-nav a.nav-link {
     color: #ffffff;
     background: #0066cc;
     padding: 6px 12px;
     border-radius: 6px;
     text-decoration: none;
     font-weight: 500;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     transition: all 0.3s ease;
 }
-.sticky-header a.nav-link:hover {
+.floating-nav a.nav-link:hover {
     background: #0099ff;
     transform: scale(1.05);
 }
-.sticky-header a.logout {
+.floating-nav a.logout {
     background: #dc3545;
 }
 
@@ -261,18 +254,10 @@ body {
         max-height: 65vh;
         font-size: 12px;
     }
-    .sticky-header {
+    .floating-nav {
         flex-wrap: wrap;
         justify-content: center;
-        font-size: 13px;
-        gap: 10px;
-    }
-}
-@media screen and (orientation: landscape) {
-    .table-wrapper {
-        transform: scale(0.98);
-        transform-origin: top center;
-        margin-bottom: 20px;
+        gap: 8px;
     }
 }
 
@@ -284,9 +269,6 @@ body {
         margin: 1.5cm;
     }
     .no-print {
-        display: none !important;
-    }
-    .sticky-header {
         display: none !important;
     }
     .table-wrapper {
