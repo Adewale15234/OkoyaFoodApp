@@ -265,16 +265,13 @@ def delete_order(order_id):
     db.session.commit()
     return redirect(url_for('orders_overview'))
 
-# Confirm order
 @app.route('/confirm_order/<int:order_id>', methods=['POST'])
 def confirm_order(order_id):
     order = Order.query.get_or_404(order_id)
-    order.status = "Confirmed"
+    order.status = 'Confirmed'
     db.session.commit()
+    flash('Order has been confirmed successfully!', 'success')
     return redirect(url_for('orders_overview'))
-
-if __name__ == "__main__":
-    app.run(debug=True)
 
 
 
