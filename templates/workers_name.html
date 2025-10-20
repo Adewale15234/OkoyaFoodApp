@@ -1,7 +1,13 @@
 {% extends 'base.html' %}
 {% block content %}
-<h1>Registered Workers</h1>
 
+<!-- PAGE HEADER -->
+<div class="page-header">
+    <h1>Registered Workers</h1>
+    <a href="{{ url_for('admin_dashboard') }}" class="back-link">← Back to Dashboard</a>
+</div>
+
+<!-- WORKERS TABLE -->
 <div class="workers-table-container">
     <table id="workers-table">
         <thead>
@@ -78,12 +84,43 @@
     </table>
 </div>
 
-<a href="{{ url_for('admin_dashboard') }}" class="back-link">← Back to Dashboard</a>
-
+<!-- CUSTOM STYLES -->
 <style>
+/* PAGE HEADER */
+.page-header {
+    text-align: center;
+    margin: 20px auto;
+    padding: 15px 10px;
+    background-color: #004080;
+    color: white;
+    border-radius: 8px;
+    position: relative;
+}
+.page-header h1 {
+    margin: 0 0 10px 0;
+    font-size: 28px;
+    font-weight: 700;
+}
+
+/* BACK LINK UNDER HEADER */
+.back-link {
+    display: inline-block;
+    margin-top: 5px;
+    color: #28a745;
+    font-weight: bold;
+    text-decoration: none;
+}
+.back-link:hover {
+    color: #ffffff;
+    background-color: #28a745;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+/* TABLE STYLING */
 .workers-table-container {
     width: 95%;
-    margin: 0 auto;
+    margin: 0 auto 30px auto;
     overflow-x: auto;
     max-height: 80vh;
     overflow-y: auto;
@@ -103,6 +140,7 @@ th {
     color: white;
 }
 tr:nth-child(even) { background-color: #f8f8f8; }
+
 .edit-button, .delete-button, button {
     padding: 6px 12px;
     border: none;
@@ -123,6 +161,8 @@ button {
     background-color: #28a745;
     color: white;
 }
+
+/* DETAILS ROW */
 .details-container {
     display: flex;
     flex-wrap: wrap;
@@ -135,29 +175,26 @@ button {
     flex: 1 1 250px;
     min-width: 250px;
 }
-.back-link {
-    display: inline-block;
-    margin: 20px auto;
-    text-decoration: none;
-    font-weight: bold;
-    color: #03492c;
-}
-.back-link:hover {
-    color: #28a745;
-}
 
-/* === Responsive & Landscape Fix === */
-@media screen and (orientation: landscape) {
+/* RESPONSIVE FIXES */
+@media screen and (max-width: 768px) {
     .workers-table-container {
-        max-height: 90vh;
+        max-height: 75vh;
         overflow-y: auto;
     }
     .details-container {
         flex-wrap: wrap;
     }
 }
+@media screen and (orientation: landscape) {
+    .workers-table-container {
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+}
 </style>
 
+<!-- DETAILS TOGGLE SCRIPT -->
 <script>
 function toggleDetails(id) {
     const row = document.getElementById('details-' + id);
@@ -179,4 +216,5 @@ function toggleDetails(id) {
     }
 }
 </script>
+
 {% endblock %}

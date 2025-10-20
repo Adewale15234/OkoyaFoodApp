@@ -17,6 +17,10 @@
             </div>
         </div>
 
+<div class="bottom-back-container">
+        <a href="{{ url_for('admin_dashboard') }}" class="bottom-back-btn">← Back to Dashboard</a>
+    </div>
+    
         <div class="side-filter-container sticky-filter">
             <h3>Filter by Product</h3>
             <div class="filter-buttons">
@@ -94,9 +98,6 @@
         {% endfor %}
     </div>
 
-    <div class="bottom-back-container">
-        <a href="{{ url_for('admin_dashboard') }}" class="bottom-back-btn">← Back to Dashboard</a>
-    </div>
 </div>
 
 <script>
