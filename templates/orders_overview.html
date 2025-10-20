@@ -9,9 +9,6 @@
         <!-- Sticky Header -->
         <div class="overview-header sticky-header">
             <div class="header-top">
-                <!-- ✅ Back to Dashboard Button (top-left) -->
-                <a href="{{ url_for('admin_dashboard') }}" class="top-back-btn">← Back to Dashboard</a>
-
                 <!-- ✅ Add New Order Button (center for non-admins) -->
                 {% if session.get('username') != 'admin' %}
                     <a href="{{ url_for('client_form') }}" class="back-btn center-btn">← Add New Order</a>
@@ -92,6 +89,11 @@
                 {{ order_card(order) }}
             {% endfor %}
         {% endfor %}
+    </div>
+
+    <!-- ✅ Back to Dashboard Button at Bottom -->
+    <div class="bottom-back-container">
+        <a href="{{ url_for('admin_dashboard') }}" class="bottom-back-btn">← Back to Dashboard</a>
     </div>
 
 </div>
@@ -175,22 +177,6 @@ document.addEventListener('DOMContentLoaded', () => {
     position: relative;
 }
 
-/* === Top Back Button === */
-.top-back-btn {
-    position: absolute;
-    top: 15px;
-    left: 20px;
-    background: #004080;
-    color: #fff;
-    padding: 8px 16px;
-    border-radius: 6px;
-    font-weight: 600;
-    text-decoration: none;
-    transition: all 0.3s ease;
-    z-index: 1100;
-}
-.top-back-btn:hover { background: #0066cc; transform: scale(1.05); }
-
 /* === Center Add Order Button === */
 .center-btn {
     margin: 0 auto;
@@ -262,6 +248,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
 .confirm-btn { margin-top: 10px; width: 100%; padding: 10px 0; border: none; border-radius: 8px; color: #fff; font-weight: 600; cursor: pointer; transition: all 0.3s; }
 .confirm-btn:hover { filter: brightness(1.1); }
+
+/* === Bottom Back Button === */
+.bottom-back-container {
+    margin-top: 30px;
+    display: flex;
+    justify-content: flex-start;
+}
+.bottom-back-btn {
+    background: #004080;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+.bottom-back-btn:hover { background: #0066cc; transform: scale(1.05); }
 
 /* === Responsive === */
 @media (max-width: 992px) {

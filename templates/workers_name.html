@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
 <h1>Registered Workers</h1>
-<a href="{{ url_for('admin_dashboard') }}" class="back-link">← Back to Dashboard</a>
 
 <div class="workers-table-container">
     <table id="workers-table">
@@ -79,11 +78,15 @@
     </table>
 </div>
 
+<a href="{{ url_for('admin_dashboard') }}" class="back-link">← Back to Dashboard</a>
+
 <style>
 .workers-table-container {
     width: 95%;
     margin: 0 auto;
     overflow-x: auto;
+    max-height: 80vh;
+    overflow-y: auto;
 }
 table {
     width: 100%;
@@ -133,12 +136,25 @@ button {
     min-width: 250px;
 }
 .back-link {
+    display: inline-block;
+    margin: 20px auto;
     text-decoration: none;
     font-weight: bold;
     color: #03492c;
 }
 .back-link:hover {
     color: #28a745;
+}
+
+/* === Responsive & Landscape Fix === */
+@media screen and (orientation: landscape) {
+    .workers-table-container {
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+    .details-container {
+        flex-wrap: wrap;
+    }
 }
 </style>
 
@@ -151,13 +167,13 @@ function toggleDetails(id) {
     if (isHidden) {
         row.style.display = 'table-row';
 
-        // Scroll offset to ensure <thead> remains visible
+        // Scroll smoothly to show expanded details without cutting off
         const table = document.getElementById('workers-table');
         const theadHeight = table.querySelector('thead').offsetHeight;
         const rowTop = row.getBoundingClientRect().top + window.pageYOffset;
 
         window.scrollTo({
-            top: rowTop - theadHeight - 20, // 20px extra padding
+            top: rowTop - theadHeight - 20,
             behavior: 'smooth'
         });
     }
