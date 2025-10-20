@@ -49,8 +49,8 @@
           <textarea id="description" name="description" rows="2"></textarea>
         </div>
         <div class="form-row">
-          <label for="number_of_bags">NUMBER OF BAGS</label>
-          <input id="number_of_bags" name="number_of_bags" type="number" min="0" step="1" onchange="recalcTotal()">
+          <label for="kilograms">Kilograms</label>
+          <input id="kilograms" name="kilograms" type="number" min="0" step="1" onchange="recalcTotal()">
         </div>
       </div>
 
@@ -98,9 +98,9 @@
 
 <script>
 function recalcTotal() {
-  const numberOfBags = parseFloat(document.getElementById('number_of_bags').value) || 0;
+  const kilograms = parseFloat(document.getElementById('kilograms').value) || 0;
   const unitPrice = parseFloat(document.getElementById('unit_price').value) || 0;
-  document.getElementById('total_amount').value = (numberOfBags * unitPrice).toFixed(2);
+  document.getElementById('total_amount').value = (kilograms * unitPrice).toFixed(2);
 }
 </script>
 

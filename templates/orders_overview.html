@@ -49,7 +49,7 @@
         </div>
 
         <div class="order-details">
-            <p><strong>Quantity:</strong> {{ order.number_of_bags or 0 }} bags</p>
+            <p><strong>Quantity:</strong> {{ order.kilograms or 0 }} bags</p>
             <p><strong>Unit Price:</strong> ₦{{ "%.2f"|format(order.unit_price or 0) }}</p>
             <p><strong>Total:</strong> ₦{{ "%.2f"|format(order.total_amount or 0) }}</p>
         </div>

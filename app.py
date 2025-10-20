@@ -106,7 +106,7 @@ class Order(db.Model):
     name = db.Column(db.String(150))
     email = db.Column(db.String(150))
     items = db.Column(db.String(50))
-    number_of_bags = db.Column(db.Integer, nullable=True)
+    kilograms = db.Column(db.Integer, nullable=True)
     unit_price = db.Column(db.Float, nullable=True)
     total_amount = db.Column(db.Float, nullable=True)
     date_needed = db.Column(db.String(50))
@@ -149,11 +149,11 @@ def register_worker():
         try:
             # Generate worker code
             last_worker = Worker.query.order_by(Worker.id.desc()).first()
-            if last_worker and last_worker.worker_code and last_worker.worker_code.startswith("WKD"):
+            if last_worker and last_worker.worker_code and last_worker.worker_code.startswith("OFCL"):
                 last_code = int(last_worker.worker_code[3:])
-                new_code = f"WKD{last_code + 1:03d}"
+                new_code = f"OFCL{last_code + 1:03d}"
             else:
-                new_code = "WKD001"
+                new_code = "OFCL001"
 
             # Safely parse numeric inputs
             amount_of_salary = float(request.form.get('amount_of_salary', '0') or 0)
@@ -209,9 +209,9 @@ def client_form():
         name = request.form.get('name')
         email = request.form.get('email')
         items = request.form.get('items')
-        number_of_bags = int(request.form.get('number_of_bags') or 0)
+        kilograms = int(request.form.get('kilograms') or 0)
         unit_price = float(request.form.get('unit_price') or 0)
-        total_amount = number_of_bags * unit_price
+        total_amount = kilograms * unit_price
         date_needed = request.form.get('date')
         driver_name = request.form.get('driver_name')
         vehicle_plate_number = request.form.get('vehicle_plate_number')
@@ -225,7 +225,7 @@ def client_form():
             name=name,
             email=email,
             items=items,
-            number_of_bags=number_of_bags,
+            kilograms=kilograms,
             unit_price=unit_price,
             total_amount=total_amount,
             date_needed=date_needed,
@@ -272,7 +272,6 @@ def confirm_order(order_id):
     db.session.commit()
     flash('Order has been confirmed successfully!', 'success')
     return redirect(url_for('orders_overview'))
-
 
 
 @app.route('/edit_worker/<int:worker_id>', methods=['GET', 'POST'])
