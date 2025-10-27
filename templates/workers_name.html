@@ -52,6 +52,19 @@
             <tr id="details-{{ worker.id }}" class="details-row" style="display:none;">
                 <td colspan="9">
                     <div class="details-container">
+
+                        <!-- PASSPORT DISPLAY ADDED -->
+                        <div class="details-section">
+                            <strong>Passport:</strong><br>
+                            {% if worker.passport %}
+                                <img src="{{ url_for('static', filename='passports/' ~ worker.passport) }}"
+                                     alt="Passport"
+                                     style="width:120px;height:150px;border:1px solid #000;margin-bottom:10px;object-fit:cover;">
+                            {% else %}
+                                No passport uploaded
+                            {% endif %}
+                        </div>
+
                         <div class="details-section">
                             <strong>DOB:</strong> {{ worker.date_of_birth.strftime('%Y-%m-%d') if worker.date_of_birth else '—' }}<br>
                             <strong>Gender:</strong> {{ worker.gender or '—' }}<br>
@@ -204,7 +217,7 @@ function toggleDetails(id) {
     if (isHidden) {
         row.style.display = 'table-row';
 
-        // Scroll smoothly to show expanded details without cutting off
+        // Scroll smoothly to show expanded details
         const table = document.getElementById('workers-table');
         const theadHeight = table.querySelector('thead').offsetHeight;
         const rowTop = row.getBoundingClientRect().top + window.pageYOffset;

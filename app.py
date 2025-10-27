@@ -159,6 +159,16 @@ def register_worker():
             # Safely parse numeric inputs
             amount_of_salary = float(request.form.get('amount_of_salary', 0) or 0)
 
+            # PASSPORT UPLOAD HANDLING
+            passport_file = request.files.get('passport')
+            passport_filename = None
+
+            if passport_file and passport_file.filename != "":
+                passport_filename = secure_filename(passport_file.filename)
+                passport_path = os.path.join(app.config['UPLOAD_FOLDER'], passport_filename)
+                passport_file.save(passport_path)
+
+            # Create Worker
             new_worker = Worker(
                 worker_code=new_code,
                 name=request.form['name'],
@@ -180,7 +190,10 @@ def register_worker():
                 bank_name=request.form.get('bank_name'),
                 bank_account=request.form.get('bank_account'),
                 guarantor=request.form.get('guarantor'),
-                bank_account_name=request.form.get('bank_account_name')
+                bank_account_name=request.form.get('bank_account_name'),
+
+                # ADD PASSPORT TO DATABASE
+                passport=passport_filename
             )
 
             db.session.add(new_worker)
@@ -196,14 +209,14 @@ def register_worker():
 
     return render_template('register_worker.html')
 
-
+    
 @app.route('/workers')
 def workers_name():
     if session.get('role') not in ['admin', 'secretary']:
         flash("Please login first", "warning")
         return redirect(url_for('login'))
 
-    workers = Worker.query.all()  # SHOW ALL WORKERS (FIXED)
+    workers = Worker.query.all()  # SHOW ALL WORKERS
     return render_template('workers_name.html', workers=workers)
 
 
