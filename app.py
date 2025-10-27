@@ -143,20 +143,21 @@ PASSWORD = os.environ.get('ADMIN_PASSWORD', 'Alayinde001')
 # Routes
 ...
 
-@app.route('/register', methods=['GET', 'POST']) 
+@app.route('/register', methods=['GET', 'POST'])
 def register_worker():
     if request.method == 'POST':
         try:
-            # Generate worker code
+            # Generate worker code safely
             last_worker = Worker.query.order_by(Worker.id.desc()).first()
+
             if last_worker and last_worker.worker_code and last_worker.worker_code.startswith("OFCL"):
-                last_code = int(last_worker.worker_code[3:])
+                last_code = int(last_worker.worker_code[4:])  # FIXED SLICE
                 new_code = f"OFCL{last_code + 1:03d}"
             else:
                 new_code = "OFCL001"
 
             # Safely parse numeric inputs
-            amount_of_salary = float(request.form.get('amount_of_salary', '0') or 0)
+            amount_of_salary = float(request.form.get('amount_of_salary', 0) or 0)
 
             new_worker = Worker(
                 worker_code=new_code,
@@ -187,19 +188,24 @@ def register_worker():
 
             flash(f"Worker {new_code} registered successfully.")
             return redirect(url_for('workers_name'))
+
         except Exception as e:
             db.session.rollback()
             logging.error(f"Error registering worker: {e}")
             flash("Error registering worker. Please check your input and try again.")
+
     return render_template('register_worker.html')
+
 
 @app.route('/workers')
 def workers_name():
     if session.get('role') not in ['admin', 'secretary']:
         flash("Please login first", "warning")
         return redirect(url_for('login'))
-    workers = Worker.query.all()
+
+    workers = Worker.query.all()  # SHOW ALL WORKERS (FIXED)
     return render_template('workers_name.html', workers=workers)
+
 
 # Client Form
 @app.route('/client_form', methods=['GET', 'POST'])
