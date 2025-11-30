@@ -152,67 +152,66 @@ PASSWORD = os.environ.get('ADMIN_PASSWORD', 'Alayinde001')
 # Routes
 ...
 
+
 @app.route('/register', methods=['GET', 'POST'])
 def register_worker():
-if request.method == 'POST':
-try:
-# Generate unique worker code
-last_worker = Worker.query.order_by(Worker.id.desc()).first()
-if last_worker and last_worker.worker_code and last_worker.worker_code.startswith("OFCL"):
-last_code = int(last_worker.worker_code[4:])
-new_code = f"OFCL{last_code + 1:03d}"
-else:
-new_code = "OFCL001"
+    if request.method == 'POST':
+        try:
+            # Generate unique worker code
+            last_worker = Worker.query.order_by(Worker.id.desc()).first()
+            if last_worker and last_worker.worker_code and last_worker.worker_code.startswith("OFCL"):
+                last_code = int(last_worker.worker_code[4:])
+                new_code = f"OFCL{last_code + 1:03d}"
+            else:
+                new_code = "OFCL001"
 
-```
-        # Parse numeric inputs safely
-        amount_of_salary = float(request.form.get('amount_of_salary', 0) or 0)
+            # Parse numeric inputs safely
+            amount_of_salary = float(request.form.get('amount_of_salary', 0) or 0)
 
-        # Handle passport upload
-        passport_file = request.files.get('passport')
-        passport_filename = None
-        if passport_file and passport_file.filename != "":
-            passport_filename = secure_filename(passport_file.filename)
-            passport_path = os.path.join(app.config['UPLOAD_FOLDER'], passport_filename)
-            passport_file.save(passport_path)
+            # Handle passport upload
+            passport_file = request.files.get('passport')
+            passport_filename = None
+            if passport_file and passport_file.filename != "":
+                passport_filename = secure_filename(passport_file.filename)
+                passport_path = os.path.join(app.config['UPLOAD_FOLDER'], passport_filename)
+                passport_file.save(passport_path)
 
-        # Create Worker record
-        new_worker = Worker(
-            worker_code=new_code,
-            name=request.form['name'],
-            phone_number=request.form['phone_number'],
-            date_of_birth=datetime.strptime(request.form['date_of_birth'], '%Y-%m-%d'),
-            gender=request.form['gender'],
-            qualifications=request.form['qualifications'],
-            position=request.form['position'],
-            national_id=request.form['national_id'],
-            nationality=request.form['nationality'],
-            home_address=request.form['home_address'],
-            ethnic_group=request.form['ethnic_group'],
-            place_of_residence=request.form['place_of_residence'],
-            disability=request.form.get('disability'),
-            email=request.form['email'],
-            date_of_employment=datetime.strptime(request.form['date_of_employment'], '%Y-%m-%d'),
-            amount_of_salary=amount_of_salary,
-            bank_name=request.form.get('bank_name'),
-            bank_account=request.form.get('bank_account'),
-            guarantor=request.form.get('guarantor'),
-            bank_account_name=request.form.get('bank_account_name'),
-            passport=passport_filename
-        )
+            # Create Worker record
+            new_worker = Worker(
+                worker_code=new_code,
+                name=request.form['name'],
+                phone_number=request.form['phone_number'],
+                date_of_birth=datetime.strptime(request.form['date_of_birth'], '%Y-%m-%d'),
+                gender=request.form['gender'],
+                qualifications=request.form['qualifications'],
+                position=request.form['position'],
+                national_id=request.form['national_id'],
+                nationality=request.form['nationality'],
+                home_address=request.form['home_address'],
+                ethnic_group=request.form['ethnic_group'],
+                place_of_residence=request.form['place_of_residence'],
+                disability=request.form.get('disability'),
+                email=request.form['email'],
+                date_of_employment=datetime.strptime(request.form['date_of_employment'], '%Y-%m-%d'),
+                amount_of_salary=amount_of_salary,
+                bank_name=request.form.get('bank_name'),
+                bank_account=request.form.get('bank_account'),
+                guarantor=request.form.get('guarantor'),
+                bank_account_name=request.form.get('bank_account_name'),
+                passport=passport_filename
+            )
 
-        db.session.add(new_worker)
-        db.session.commit()
-        flash(f"Worker {new_code} registered successfully.")
-        return redirect(url_for('workers_name'))
+            db.session.add(new_worker)
+            db.session.commit()
+            flash(f"Worker {new_code} registered successfully.")
+            return redirect(url_for('workers_name'))
 
-    except Exception as e:
-        db.session.rollback()
-        logging.error(f"Error registering worker: {e}")
-        flash("Error registering worker. Please check your input and try again.")
+        except Exception as e:
+            db.session.rollback()
+            logging.error(f"Error registering worker: {e}")
+            flash("Error registering worker. Please check your input and try again.")
 
-return render_template('register_worker.html')
-```
+    return render_template('register_worker.html')
 
 
 @app.route('/workers')
