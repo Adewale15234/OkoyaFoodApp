@@ -164,7 +164,7 @@ new_code = f"OFCL{last_code + 1:03d}"
 else:
 new_code = "OFCL001"
 
-```
+
         # Parse numeric inputs safely
         amount_of_salary = float(request.form.get('amount_of_salary', 0) or 0)
 
@@ -211,7 +211,8 @@ new_code = "OFCL001"
         logging.error(f"Error registering worker: {e}")
         flash("Error registering worker. Please check your input and try again.")
 
-return render_template('register_worker.html')
+    return render_template('register_worker.html')
+
 
 
 @app.route('/workers')
