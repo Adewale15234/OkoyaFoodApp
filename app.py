@@ -154,7 +154,7 @@ PASSWORD = os.environ.get('ADMIN_PASSWORD', 'Alayinde001')
 
 @app.route('/register', methods=['GET', 'POST'])
 def register_worker():
-if request.method == 'POST':
+    if request.method == 'POST':
 try:
 # Generate unique worker code
 last_worker = Worker.query.order_by(Worker.id.desc()).first()
