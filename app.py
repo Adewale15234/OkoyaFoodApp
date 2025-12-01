@@ -33,7 +33,6 @@ SECRETARY_PASSWORD = os.environ.get('SECRETARY_PASSWORD', 'secret123')
 # Logging setup
 logging.basicConfig(level=logging.INFO)
 
-app = Flask(__name__)
 
 app = Flask(__name__)
 
@@ -67,7 +66,6 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
-# Database models
 class Worker(db.Model):
     __tablename__ = 'workers'
     id = db.Column(db.Integer, primary_key=True)
@@ -83,7 +81,7 @@ class Worker(db.Model):
     home_address = db.Column(db.String(200), nullable=False)
     ethnic_group = db.Column(db.String(50), nullable=False)
     place_of_residence = db.Column(db.String(100), nullable=False)
-    disability = db.Column(db.String(100))
+    disability = db.Column(db.String(100), nullable=True)
     email = db.Column(db.String(100), nullable=False)
     date_of_employment = db.Column(db.Date, nullable=False)
 
@@ -92,6 +90,7 @@ class Worker(db.Model):
     bank_account = db.Column(db.String(50), nullable=True)
     bank_account_name = db.Column(db.String(100), nullable=False)
     guarantor = db.Column(db.String(100), nullable=False)
+    passport = db.Column(db.String(100), nullable=True)  # Added field for passport filename
 
     attendance_records = db.relationship(
         'Attendance',
@@ -155,111 +154,113 @@ PASSWORD = os.environ.get('ADMIN_PASSWORD', 'Alayinde001')
 @app.route('/register', methods=['GET', 'POST'])
 def register_worker():
     if request.method == 'POST':
-try:
-# Generate unique worker code
-last_worker = Worker.query.order_by(Worker.id.desc()).first()
-if last_worker and last_worker.worker_code and last_worker.worker_code.startswith("OFCL"):
-last_code = int(last_worker.worker_code[4:])
-new_code = f"OFCL{last_code + 1:03d}"
-else:
-new_code = "OFCL001"
+        try:
+            # Validate required fields
+            required_fields = [
+                'name', 'phone_number', 'date_of_birth', 'gender',
+                'qualifications', 'position', 'national_id', 'nationality',
+                'home_address', 'ethnic_group', 'place_of_residence',
+                'email', 'date_of_employment', 'bank_account_name', 'guarantor'
+            ]
+            for field in required_fields:
+                if not request.form.get(field):
+                    flash(f"{field.replace('_', ' ').title()} is required.", "error")
+                    return redirect(url_for('register_worker'))
 
-```
-        # Parse numeric inputs safely
-        amount_of_salary = float(request.form.get('amount_of_salary', 0) or 0)
+            # Check for existing email or national_id
+            if Worker.query.filter_by(email=request.form['email']).first():
+                flash("Email already exists.", "error")
+                return redirect(url_for('register_worker'))
+            if Worker.query.filter_by(national_id=request.form['national_id']).first():
+                flash("National ID already exists.", "error")
+                return redirect(url_for('register_worker'))
 
-        # Handle passport upload
-        passport_file = request.files.get('passport')
-        passport_filename = None
-        if passport_file and passport_file.filename != "":
-            passport_filename = secure_filename(passport_file.filename)
+            # Generate unique worker code
+            last_worker = Worker.query.order_by(Worker.id.desc()).first()
+            if last_worker and last_worker.worker_code and last_worker.worker_code.startswith("OFCL"):
+                last_code = int(last_worker.worker_code[4:])
+                new_code = f"OFCL{last_code + 1:03d}"
+            else:
+                new_code = "OFCL001"
 
-            # Ensure passport folder exists
-            passport_folder = os.path.join(app.root_path, 'static', 'passports')
-            os.makedirs(passport_folder, exist_ok=True)
+            # Parse numeric inputs safely
+            amount_of_salary = float(request.form.get('amount_of_salary', 0) or 0)
 
-            passport_path = os.path.join(passport_folder, passport_filename)
-            passport_file.save(passport_path)
+            # Handle passport upload
+            passport_file = request.files.get('passport')
+            passport_filename = None
+            if passport_file and passport_file.filename != "":
+                passport_filename = f"{uuid.uuid4().hex}_{secure_filename(passport_file.filename)}"
+                passport_folder = os.path.join(app.root_path, 'static', 'passports')
+                os.makedirs(passport_folder, exist_ok=True)
+                passport_path = os.path.join(passport_folder, passport_filename)
+                passport_file.save(passport_path)
 
-        # Create Worker record
-        new_worker = Worker(
-            worker_code=new_code,
-            name=request.form['name'],
-            phone_number=request.form['phone_number'],
-            date_of_birth=datetime.strptime(request.form['date_of_birth'], '%Y-%m-%d'),
-            gender=request.form['gender'],
-            qualifications=request.form['qualifications'],
-            position=request.form['position'],
-            national_id=request.form['national_id'],
-            nationality=request.form['nationality'],
-            home_address=request.form['home_address'],
-            ethnic_group=request.form['ethnic_group'],
-            place_of_residence=request.form['place_of_residence'],
-            disability=request.form.get('disability'),
-            email=request.form['email'],
-            date_of_employment=datetime.strptime(request.form['date_of_employment'], '%Y-%m-%d'),
-            amount_of_salary=amount_of_salary,
-            bank_name=request.form.get('bank_name'),
-            bank_account=request.form.get('bank_account'),
-            guarantor=request.form.get('guarantor'),
-            bank_account_name=request.form.get('bank_account_name'),
-            passport=passport_filename
-        )
+            # Parse dates safely
+            date_of_birth = datetime.strptime(request.form['date_of_birth'], '%Y-%m-%d')
+            date_of_employment = datetime.strptime(request.form['date_of_employment'], '%Y-%m-%d')
 
-        db.session.add(new_worker)
-        db.session.commit()
-        flash(f"Worker {new_code} registered successfully.")
+            # Create Worker record
+            new_worker = Worker(
+                worker_code=new_code,
+                name=request.form['name'],
+                phone_number=request.form['phone_number'],
+                date_of_birth=date_of_birth,
+                gender=request.form['gender'],
+                qualifications=request.form['qualifications'],
+                position=request.form['position'],
+                national_id=request.form['national_id'],
+                nationality=request.form['nationality'],
+                home_address=request.form['home_address'],
+                ethnic_group=request.form['ethnic_group'],
+                place_of_residence=request.form['place_of_residence'],
+                disability=request.form.get('disability'),
+                email=request.form['email'],
+                date_of_employment=date_of_employment,
+                amount_of_salary=amount_of_salary,
+                bank_name=request.form.get('bank_name'),
+                bank_account=request.form.get('bank_account'),
+                guarantor=request.form.get('guarantor'),
+                bank_account_name=request.form.get('bank_account_name'),
+                passport=passport_filename
+            )
 
-        # Redirect to workers page with query param to highlight latest
-        return redirect(url_for('workers_name', new_id=new_worker.id))
+            db.session.add(new_worker)
+            db.session.commit()
+            flash(f"Worker {new_code} registered successfully.", "success")
 
-    except Exception as e:
-        db.session.rollback()
-        logging.error(f"Error registering worker: {e}")
-        flash("Error registering worker. Please check your input and try again.")
+            # Redirect with highlight ID
+            return redirect(url_for('workers_name', new_id=new_worker.id))
 
-return render_template('register_worker.html')
-```
+        except ValueError as ve:
+            db.session.rollback()
+            logging.error(f"Date parsing error: {ve}")
+            flash("Invalid date format. Please use YYYY-MM-DD.", "error")
+        except Exception as e:
+            db.session.rollback()
+            logging.error(f"Error registering worker: {e}")
+            flash("Error registering worker. Please check your input and try again.", "error")
+
+    return render_template('register_worker.html')
+
 
 @app.route('/workers')
 def workers_name():
-if session.get('role') not in ['admin', 'secretary']:
-flash("Please login first", "warning")
-return redirect(url_for('login'))
+    if session.get('role') not in ['admin', 'secretary']:
+        flash("Please login first", "warning")
+        return redirect(url_for('login'))
 
-```
-# Show all workers, newest first
-workers = Worker.query.order_by(Worker.id.desc()).all()
+    # Get all workers
+    workers = Worker.query.order_by(Worker.id.desc()).all()
 
-# Optional: get newly registered worker ID to highlight or scroll
-new_worker_id = request.args.get('new_id', type=int)
+    # Get new worker ID for highlight
+    new_worker_id = request.args.get('new_id', type=int)
 
-return render_template(
-    'workers_name.html',
-    workers=workers,
-    new_worker_id=new_worker_id
-)
-```
-
-@app.route('/workers')
-def workers_name():
-if session.get('role') not in ['admin', 'secretary']:
-flash("Please login first", "warning")
-return redirect(url_for('login'))
-
-```
-# Show all workers, newest first
-workers = Worker.query.order_by(Worker.id.desc()).all()
-
-# Optional: get newly registered worker ID to highlight or scroll
-new_worker_id = request.args.get('new_id', type=int)
-
-return render_template(
-    'workers_name.html',
-    workers=workers,
-    new_worker_id=new_worker_id
-)
-```
+    return render_template(
+        'workers_name.html',
+        workers=workers,
+        new_worker_id=new_worker_id
+    )
 
 
 # Client Form
@@ -493,28 +494,40 @@ def salary():
 
 
 @app.route('/attendance_history')
+@login_required()  # admin or secretary
 def attendance_history():
+    """
+    Display attendance records with optional month filtering.
+    Admins and secretaries can view all attendance records.
+    """
     if session.get('role') not in ['admin', 'secretary']:
+        flash("Please login first.", "warning")
         return redirect(url_for('login'))
 
-    selected_month = request.args.get('month')
+    selected_month = request.args.get('month')  # Format: 'Month Year', e.g., 'December 2025'
 
-    # Query all attendance records
-    attendance_records = Attendance.query.order_by(Attendance.date.desc()).all()
+    # Base query: all attendance records
+    attendance_query = Attendance.query.join(Worker).order_by(Attendance.date.desc())
 
     # Generate available months dynamically
+    all_records = attendance_query.all()
     available_months = sorted(
-        list(set(record.date.strftime("%B %Y") for record in attendance_records)),
+        list({record.date.strftime("%B %Y") for record in all_records}),
         reverse=True
     )
 
-    # Filter by selected month using SQLAlchemy extract
+    # Filter records by selected month if provided
     if selected_month:
-        month_dt = datetime.strptime(selected_month, "%B %Y")
-        attendance_records = Attendance.query.filter(
-            extract('month', Attendance.date) == month_dt.month,
-            extract('year', Attendance.date) == month_dt.year
-        ).order_by(Attendance.date.desc()).all()
+        try:
+            month_dt = datetime.strptime(selected_month, "%B %Y")
+            attendance_query = attendance_query.filter(
+                extract('month', Attendance.date) == month_dt.month,
+                extract('year', Attendance.date) == month_dt.year
+            )
+        except ValueError:
+            flash("Invalid month format for filtering.", "error")
+
+    attendance_records = attendance_query.all()
 
     return render_template(
         "attendance_history.html",
@@ -644,8 +657,7 @@ def handle_exception(e):
     import traceback
     return f"<pre>{traceback.format_exc()}</pre>", 500
 
-
-# ✅ Ensure all tables exist (This runs BOTH locally and on Render)
+# Ensure all tables exist (runs both locally and on Render)
 with app.app_context():
     db.create_all()
     try:
@@ -656,9 +668,8 @@ with app.app_context():
 
 print("🚀 Okoya Co,. Food Staff Manager app is starting...")
 
-# For local development
+# Single run block for local development / Render
 if __name__ == '__main__':
     app.debug = True
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
-

@@ -239,7 +239,7 @@
     </div>
 
     <!-- Worker Registration Form -->
-    <form method="POST" enctype="multipart/form-data" class="register-form">
+    <form method="POST" action="{{ url_for('register_worker') }}" enctype="multipart/form-data" class="register-form">
         <div class="form-grid">
             <div><label>Name:</label><input type="text" name="name" class="green-input" required></div>
             <div><label>Phone:</label><input type="text" name="phone_number" class="green-input" required></div>
