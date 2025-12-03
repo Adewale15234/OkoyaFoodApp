@@ -121,7 +121,7 @@ class Worker(db.Model):
     bank_account = db.Column(db.String(50), nullable=True)
     bank_account_name = db.Column(db.String(100), nullable=False)
     guarantor = db.Column(db.String(100), nullable=False)
-    passport = db.Column(db.String(100))  # Added field for passport filename
+    #passport = db.Column(db.String(100))  # Added field for passport filename
 
     attendance_records = db.relationship(
         'Attendance',
