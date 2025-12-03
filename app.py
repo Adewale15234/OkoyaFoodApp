@@ -294,12 +294,14 @@ def workers_name():
     )
 
 
-@app.route('/fix_workers')
-def fix_workers():
-    from app import db
-    db.session.execute("ALTER TABLE workers ADD COLUMN passport VARCHAR(255);")
-    db.session.commit()
-    return "Passport column added!"
+@app.route('/fix_workers_table')
+def fix_workers_table():
+    try:
+        db.session.execute("ALTER TABLE workers ADD COLUMN passport VARCHAR(255);")
+        db.session.commit()
+        return "Passport column successfully added!"
+    except Exception as e:
+        return f"Error: {e}"
 
 
 # Client Form
