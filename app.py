@@ -99,6 +99,7 @@ else:
 
 class Worker(db.Model):
     __tablename__ = 'workers'
+
     id = db.Column(db.Integer, primary_key=True)
     worker_code = db.Column(db.String(10), unique=True, nullable=True)
     name = db.Column(db.String(100), nullable=False)
@@ -115,14 +116,14 @@ class Worker(db.Model):
     disability = db.Column(db.String(100), nullable=True)
     email = db.Column(db.String(100), nullable=False)
     date_of_employment = db.Column(db.Date, nullable=False)
-
     amount_of_salary = db.Column(db.Float, nullable=False)
     bank_name = db.Column(db.String(100), nullable=True)
     bank_account = db.Column(db.String(50), nullable=True)
     bank_account_name = db.Column(db.String(100), nullable=False)
     guarantor = db.Column(db.String(100), nullable=False)
-    #passport = db.Column(db.String(100))  # Added field for passport filename
+    passport = db.Column(db.String(100), nullable=True)  # Added field for passport filename
 
+    # Relationships
     attendance_records = db.relationship(
         'Attendance',
         backref='worker',
@@ -135,6 +136,9 @@ class Worker(db.Model):
         lazy=True,
         cascade="all, delete-orphan"
     )
+
+    def __repr__(self):
+        return f"<Worker {self.name}>"
 
 # --- Client Order Model ---
 class Order(db.Model):
@@ -182,97 +186,81 @@ PASSWORD = os.environ.get('ADMIN_PASSWORD', 'Alayinde001')
 # Routes
 ...
 
-@app.route('/register', methods=['GET', 'POST'])
+@app.route('/register_worker', methods=['GET', 'POST'])
 def register_worker():
     if request.method == 'POST':
+        # Collect form data
+        name = request.form.get('name')
+        phone_number = request.form.get('phone_number')
+        date_of_birth = request.form.get('date_of_birth')
+        gender = request.form.get('gender')
+        email = request.form.get('email')
+        qualifications = request.form.get('qualifications')
+        position = request.form.get('position')
+        amount_of_salary = request.form.get('amount_of_salary')
+        date_of_employment = request.form.get('date_of_employment')
+        guarantor = request.form.get('guarantor')
+        national_id = request.form.get('national_id')
+        nationality = request.form.get('nationality')
+        ethnic_group = request.form.get('ethnic_group')
+        disability = request.form.get('disability')
+        home_address = request.form.get('home_address')
+        place_of_residence = request.form.get('place_of_residence')
+        bank_account_name = request.form.get('bank_account_name')
+        bank_name = request.form.get('bank_name')
+        bank_account = request.form.get('bank_account')
+
+        # Passport upload handling
+        passport_file = request.files.get('passport')
+        passport_filename = None
+
+        if passport_file and passport_file.filename != "":
+            passport_filename = secure_filename(passport_file.filename)
+
+            # Ensure folder exists
+            passport_folder = os.path.join(app.static_folder, 'passports')
+            if not os.path.exists(passport_folder):
+                os.makedirs(passport_folder)
+
+            passport_file.save(os.path.join(passport_folder, passport_filename))
+
+        # Create Worker object
+        new_worker = Worker(
+            name=name,
+            phone_number=phone_number,
+            date_of_birth=date_of_birth,
+            gender=gender,
+            email=email,
+            qualifications=qualifications,
+            position=position,
+            amount_of_salary=amount_of_salary,
+            date_of_employment=date_of_employment,
+            guarantor=guarantor,
+            national_id=national_id,
+            nationality=nationality,
+            ethnic_group=ethnic_group,
+            disability=disability,
+            home_address=home_address,
+            place_of_residence=place_of_residence,
+            bank_account_name=bank_account_name,
+            bank_name=bank_name,
+            bank_account=bank_account,
+            passport=passport_filename
+        )
+
+        # Save to database
         try:
-            # Validate required fields
-            required_fields = [
-                'name', 'phone_number', 'date_of_birth', 'gender',
-                'qualifications', 'position', 'national_id', 'nationality',
-                'home_address', 'ethnic_group', 'place_of_residence',
-                'email', 'date_of_employment', 'bank_account_name', 'guarantor'
-            ]
-            for field in required_fields:
-                if not request.form.get(field):
-                    flash(f"{field.replace('_', ' ').title()} is required.", "error")
-                    return redirect(url_for('register_worker'))
-
-            # Check for existing email or national_id
-            if Worker.query.filter_by(email=request.form['email']).first():
-                flash("Email already exists.", "error")
-                return redirect(url_for('register_worker'))
-            if Worker.query.filter_by(national_id=request.form['national_id']).first():
-                flash("National ID already exists.", "error")
-                return redirect(url_for('register_worker'))
-
-            # Generate unique worker code
-            last_worker = Worker.query.order_by(Worker.id.desc()).first()
-            if last_worker and last_worker.worker_code and last_worker.worker_code.startswith("OFCL"):
-                last_code = int(last_worker.worker_code[4:])
-                new_code = f"OFCL{last_code + 1:03d}"
-            else:
-                new_code = "OFCL001"
-
-            # Parse numeric inputs safely
-            amount_of_salary = float(request.form.get('amount_of_salary', 0) or 0)
-
-            # Handle passport upload
-            passport_file = request.files.get('passport')
-            passport_filename = None
-            if passport_file and passport_file.filename != "":
-                passport_filename = f"{uuid.uuid4().hex}_{secure_filename(passport_file.filename)}"
-                passport_folder = os.path.join(app.root_path, 'static', 'passports')
-                os.makedirs(passport_folder, exist_ok=True)
-                passport_path = os.path.join(passport_folder, passport_filename)
-                passport_file.save(passport_path)
-
-            # Parse dates safely
-            date_of_birth = datetime.strptime(request.form['date_of_birth'], '%Y-%m-%d')
-            date_of_employment = datetime.strptime(request.form['date_of_employment'], '%Y-%m-%d')
-
-            # Create Worker record
-            new_worker = Worker(
-                worker_code=new_code,
-                name=request.form['name'],
-                phone_number=request.form['phone_number'],
-                date_of_birth=date_of_birth,
-                gender=request.form['gender'],
-                qualifications=request.form['qualifications'],
-                position=request.form['position'],
-                national_id=request.form['national_id'],
-                nationality=request.form['nationality'],
-                home_address=request.form['home_address'],
-                ethnic_group=request.form['ethnic_group'],
-                place_of_residence=request.form['place_of_residence'],
-                disability=request.form.get('disability'),
-                email=request.form['email'],
-                date_of_employment=date_of_employment,
-                amount_of_salary=amount_of_salary,
-                bank_name=request.form.get('bank_name'),
-                bank_account=request.form.get('bank_account'),
-                guarantor=request.form.get('guarantor'),
-                bank_account_name=request.form.get('bank_account_name'),
-                passport=passport_filename
-            )
-
             db.session.add(new_worker)
             db.session.commit()
-            flash(f"Worker {new_code} registered successfully.", "success")
-
-            # Redirect with highlight ID
-            return redirect(url_for('workers_name', new_id=new_worker.id))
-
-        except ValueError as ve:
-            db.session.rollback()
-            logging.error(f"Date parsing error: {ve}")
-            flash("Invalid date format. Please use YYYY-MM-DD.", "error")
+            flash('Worker registered successfully!', 'success')
         except Exception as e:
             db.session.rollback()
-            logging.error(f"Error registering worker: {e}")
-            flash("Error registering worker. Please check your input and try again.", "error")
+            flash(f"Error saving worker: {e}", 'danger')
+
+        return redirect(url_for('workers_name'))
 
     return render_template('register_worker.html')
+
 
 
 @app.route('/workers')
