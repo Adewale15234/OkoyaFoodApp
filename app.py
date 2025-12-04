@@ -658,7 +658,6 @@ def secretary_dashboard():
 def logout_admin():
     session.clear()
     return redirect(url_for('login'))
-
 @app.route('/logout')
 def logout():
     session.clear()
@@ -680,6 +679,23 @@ def favicon():
 def handle_exception(e):
     import traceback
     return f"<pre>{traceback.format_exc()}</pre>", 500
+
+# ------------------------------
+# Ensure 'passport' column exists
+# ------------------------------
+from sqlalchemy import text
+
+with app.app_context():
+    try:
+        db.session.execute(text("""
+            ALTER TABLE workers
+            ADD COLUMN IF NOT EXISTS passport VARCHAR(100);
+        """))
+        db.session.commit()
+        print("✅ 'passport' column exists in workers table")
+    except Exception as e:
+        db.session.rollback()
+        print(f"⚠️ Could not add passport column: {e}")
 
 # Ensure all tables exist (runs both locally and on Render)
 with app.app_context():
