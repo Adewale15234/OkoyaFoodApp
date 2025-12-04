@@ -52,49 +52,25 @@ UPLOAD_FOLDER = os.path.join(app.root_path, 'static/passports')
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-# ------------------------------
-# Main Database (primary)
-# ------------------------------
-if os.environ.get("DATABASE_URL"):
-    main_db_uri = os.environ["DATABASE_URL"].replace("postgres://", "postgresql://")
-    app.config['SQLALCHEMY_DATABASE_URI'] = main_db_uri
-    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
-        "pool_pre_ping": True,
-        "pool_recycle": 300,
-    }
-else:
-    db_path = os.path.join('/tmp', 'site.db')
-    os.makedirs(os.path.dirname(db_path), exist_ok=True)
-    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
-
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-# SQLAlchemy for main DB (existing ORM models)
-db = SQLAlchemy(app)
-migrate = Migrate(app, db)
+# Use Postgres on Render
+db_url = os.environ.get('DATABASE_URL')
+if db_url.startswith("postgres://"):
+    db_url = db_url.replace("postgres://", "postgresql://")
+app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 
 # ------------------------------
-# Second Database (optional)
+# Remove second database entirely if not needed
 # ------------------------------
-second_db_uri = os.environ.get("DATABASE_URL_2")
-second_engine = None
-SecondSession = None
-
-if second_db_uri:
-    # Convert if starts with old "postgres://"
-    second_db_uri = second_db_uri.replace("postgres://", "postgresql://")
-    second_engine = create_engine(second_db_uri, pool_pre_ping=True)
-    SecondSession = sessionmaker(bind=second_engine)
-    logging.info("✅ Second database connected successfully.")
-else:
-    logging.info("⚠️ No second database URL found.")
-
-# ------------------------------
-# Example usage of second DB:
-# session2 = SecondSession()
-# result = session2.execute("SELECT * FROM some_table").fetchall()
-# session2.close()
-# ------------------------------
+# second_db_uri = os.environ.get("DATABASE_URL_2")
+# second_engine = None
+# SecondSession = None
+# if second_db_uri:
+#     second_db_uri = second_db_uri.replace("postgres://", "postgresql://")
+#     second_engine = create_engine(second_db_uri, pool_pre_ping=True)
+#     SecondSession = sessionmaker(bind=second_engine)
+#     logging.info("✅ Second database connected successfully.")
+# else:
+#     logging.info("⚠️ No second database URL found.")
 
 
 class Worker(db.Model):
@@ -626,8 +602,9 @@ def login():
         password = request.form.get('password')
 
         # --- Admin credentials ---
-        ADMIN_USER = os.environ.get('ADMIN_USER', 'admin')
-        ADMIN_PASS = os.environ.get('ADMIN_PASS', 'Alayinde001')
+        ADMIN_USER = os.environ.get('ADMIN_USERNAME', 'admin')
+        ADMIN_PASS = os.environ.get('ADMIN_PASSWORD', 'Alayinde001')
+
 
         # --- Secretary credentials ---
         SECRETARY_USER = os.environ.get('SECRETARY_USER', 'secretary')
