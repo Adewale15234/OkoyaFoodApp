@@ -154,7 +154,6 @@ PASSWORD = os.environ.get('ADMIN_PASSWORD', 'Alayinde001')
 
 # Routes
 ...
-
 @app.route('/register_worker', methods=['GET', 'POST'])
 def register_worker():
     if request.method == 'POST':
@@ -201,9 +200,23 @@ def register_worker():
                 passport_file.save(os.path.join(passport_folder, passport_filename))
 
             # -------------------------
+            # Auto-generate worker code
+            # -------------------------
+            last_worker = Worker.query.order_by(Worker.id.desc()).first()
+            if last_worker and last_worker.worker_code:
+                # Extract number from code, e.g., OFCL005 -> 5
+                last_number = int(last_worker.worker_code.replace("OFCL", ""))
+                new_number = last_number + 1
+            else:
+                new_number = 1
+
+            worker_code = f"OFCL{new_number:03d}"  # Zero-padded to 3 digits
+
+            # -------------------------
             # Create Worker object
             # -------------------------
             new_worker = Worker(
+                worker_code=worker_code,
                 name=name,
                 phone_number=phone_number,
                 date_of_birth=date_of_birth,
@@ -231,7 +244,7 @@ def register_worker():
             # -------------------------
             db.session.add(new_worker)
             db.session.commit()
-            flash('Worker registered successfully!', 'success')
+            flash(f'Worker registered successfully! Worker Code: {worker_code}', 'success')
             return redirect(url_for('workers_name'))
 
         except Exception as e:
