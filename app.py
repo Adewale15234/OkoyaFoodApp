@@ -46,32 +46,25 @@ app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'your-secret-key')
 
 # ------------------------------
-# Passport upload folder
+# Passport upload folder (portable)
 # ------------------------------
-UPLOAD_FOLDER = os.path.join(app.root_path, 'static/passports')
+UPLOAD_FOLDER = os.path.join(app.static_folder, 'passports')
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-# Use Postgres on Render
-db_url = os.environ.get('DATABASE_URL')
+# ------------------------------
+# Database setup
+# ------------------------------
+db_url = os.environ.get('DATABASE_URL', 'sqlite:///okoya.db')  # fallback for local dev
 if db_url.startswith("postgres://"):
     db_url = db_url.replace("postgres://", "postgresql://")
+
 app.config['SQLALCHEMY_DATABASE_URI'] = db_url
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# ------------------------------
-# Remove second database entirely if not needed
-# ------------------------------
-# second_db_uri = os.environ.get("DATABASE_URL_2")
-# second_engine = None
-# SecondSession = None
-# if second_db_uri:
-#     second_db_uri = second_db_uri.replace("postgres://", "postgresql://")
-#     second_engine = create_engine(second_db_uri, pool_pre_ping=True)
-#     SecondSession = sessionmaker(bind=second_engine)
-#     logging.info("✅ Second database connected successfully.")
-# else:
-#     logging.info("⚠️ No second database URL found.")
-
+# Initialize SQLAlchemy and Migrate
+db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 
 class Worker(db.Model):
     __tablename__ = 'workers'
@@ -165,78 +158,89 @@ PASSWORD = os.environ.get('ADMIN_PASSWORD', 'Alayinde001')
 @app.route('/register_worker', methods=['GET', 'POST'])
 def register_worker():
     if request.method == 'POST':
-        # Collect form data
-        name = request.form.get('name')
-        phone_number = request.form.get('phone_number')
-        date_of_birth = request.form.get('date_of_birth')
-        gender = request.form.get('gender')
-        email = request.form.get('email')
-        qualifications = request.form.get('qualifications')
-        position = request.form.get('position')
-        amount_of_salary = request.form.get('amount_of_salary')
-        date_of_employment = request.form.get('date_of_employment')
-        guarantor = request.form.get('guarantor')
-        national_id = request.form.get('national_id')
-        nationality = request.form.get('nationality')
-        ethnic_group = request.form.get('ethnic_group')
-        disability = request.form.get('disability')
-        home_address = request.form.get('home_address')
-        place_of_residence = request.form.get('place_of_residence')
-        bank_account_name = request.form.get('bank_account_name')
-        bank_name = request.form.get('bank_name')
-        bank_account = request.form.get('bank_account')
-
-        # Passport upload handling
-        passport_file = request.files.get('passport')
-        passport_filename = None
-
-        if passport_file and passport_file.filename != "":
-            passport_filename = secure_filename(passport_file.filename)
-
-            # Ensure folder exists
-            passport_folder = os.path.join(app.static_folder, 'passports')
-            if not os.path.exists(passport_folder):
-                os.makedirs(passport_folder)
-
-            passport_file.save(os.path.join(passport_folder, passport_filename))
-
-        # Create Worker object
-        new_worker = Worker(
-            name=name,
-            phone_number=phone_number,
-            date_of_birth=date_of_birth,
-            gender=gender,
-            email=email,
-            qualifications=qualifications,
-            position=position,
-            amount_of_salary=amount_of_salary,
-            date_of_employment=date_of_employment,
-            guarantor=guarantor,
-            national_id=national_id,
-            nationality=nationality,
-            ethnic_group=ethnic_group,
-            disability=disability,
-            home_address=home_address,
-            place_of_residence=place_of_residence,
-            bank_account_name=bank_account_name,
-            bank_name=bank_name,
-            bank_account=bank_account,
-            passport=passport_filename
-        )
-
-        # Save to database
         try:
+            # -------------------------
+            # Collect form data
+            # -------------------------
+            name = request.form.get('name')
+            phone_number = request.form.get('phone_number')
+            date_of_birth_str = request.form.get('date_of_birth')
+            gender = request.form.get('gender')
+            email = request.form.get('email')
+            qualifications = request.form.get('qualifications')
+            position = request.form.get('position')
+            amount_of_salary = float(request.form.get('amount_of_salary', 0))
+            date_of_employment_str = request.form.get('date_of_employment')
+            guarantor = request.form.get('guarantor')
+            national_id = request.form.get('national_id')
+            nationality = request.form.get('nationality')
+            ethnic_group = request.form.get('ethnic_group')
+            disability = request.form.get('disability')
+            home_address = request.form.get('home_address')
+            place_of_residence = request.form.get('place_of_residence')
+            bank_account_name = request.form.get('bank_account_name')
+            bank_name = request.form.get('bank_name')
+            bank_account = request.form.get('bank_account')
+
+            # -------------------------
+            # Convert date strings to date objects
+            # -------------------------
+            date_of_birth = datetime.strptime(date_of_birth_str, '%Y-%m-%d').date()
+            date_of_employment = datetime.strptime(date_of_employment_str, '%Y-%m-%d').date()
+
+            # -------------------------
+            # Passport upload handling
+            # -------------------------
+            passport_file = request.files.get('passport')
+            passport_filename = None
+
+            if passport_file and passport_file.filename != "":
+                passport_filename = secure_filename(passport_file.filename)
+                passport_folder = app.config['UPLOAD_FOLDER']
+                os.makedirs(passport_folder, exist_ok=True)
+                passport_file.save(os.path.join(passport_folder, passport_filename))
+
+            # -------------------------
+            # Create Worker object
+            # -------------------------
+            new_worker = Worker(
+                name=name,
+                phone_number=phone_number,
+                date_of_birth=date_of_birth,
+                gender=gender,
+                email=email,
+                qualifications=qualifications,
+                position=position,
+                amount_of_salary=amount_of_salary,
+                date_of_employment=date_of_employment,
+                guarantor=guarantor,
+                national_id=national_id,
+                nationality=nationality,
+                ethnic_group=ethnic_group,
+                disability=disability,
+                home_address=home_address,
+                place_of_residence=place_of_residence,
+                bank_account_name=bank_account_name,
+                bank_name=bank_name,
+                bank_account=bank_account,
+                passport=passport_filename
+            )
+
+            # -------------------------
+            # Save to database
+            # -------------------------
             db.session.add(new_worker)
             db.session.commit()
             flash('Worker registered successfully!', 'success')
+            return redirect(url_for('workers_name'))
+
         except Exception as e:
             db.session.rollback()
             flash(f"Error saving worker: {e}", 'danger')
+            return redirect(url_for('register_worker'))
 
-        return redirect(url_for('workers_name'))
-
+    # GET request: show form
     return render_template('register_worker.html')
-
 
 
 @app.route('/workers')
@@ -348,7 +352,9 @@ def edit_worker(worker_id):
 
     if request.method == 'POST':
         try:
+            # -------------------------
             # Update worker fields from form
+            # -------------------------
             worker.name = request.form['name']
             worker.phone_number = request.form['phone_number']
             worker.date_of_birth = datetime.strptime(request.form['date_of_birth'], '%Y-%m-%d')
@@ -369,12 +375,24 @@ def edit_worker(worker_id):
             worker.guarantor = request.form.get('guarantor')
             worker.bank_account_name = request.form.get('bank_account_name')
 
+            # -------------------------
+            # Handle passport update
+            # -------------------------
+            passport_file = request.files.get('passport')
+            if passport_file and passport_file.filename != "":
+                passport_filename = secure_filename(passport_file.filename)
+                passport_folder = app.config['UPLOAD_FOLDER']
+                os.makedirs(passport_folder, exist_ok=True)
+                passport_file.save(os.path.join(passport_folder, passport_filename))
+                worker.passport = passport_filename  # update database field
+
             db.session.commit()
-            flash('Worker details updated successfully.')
+            flash('Worker details updated successfully.', 'success')
             return redirect(url_for('workers_name'))
+
         except Exception as e:
             db.session.rollback()
-            flash(f"Error updating worker: {e}", "error")
+            flash(f"Error updating worker: {e}", "danger")
 
     return render_template('edit_worker.html', worker=worker)
 
