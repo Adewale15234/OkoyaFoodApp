@@ -288,14 +288,20 @@ def fix_workers_table():
 # Client Form
 @app.route('/client_form', methods=['GET', 'POST'])
 def client_form():
+    if 'role' not in session:
+        return redirect(url_for('login'))
+
     products = ["Soya Beans", "Cashew Nut", "Maize", "Rice"]
+
     if request.method == 'POST':
         name = request.form.get('name')
         email = request.form.get('email')
         items = request.form.get('items')
-        kilograms = int(request.form.get('kilograms') or 0)
+
+        kilograms = float(request.form.get('kilograms') or 0)
         unit_price = float(request.form.get('unit_price') or 0)
         total_amount = kilograms * unit_price
+
         date_needed = request.form.get('date')
         driver_name = request.form.get('driver_name')
         vehicle_plate_number = request.form.get('vehicle_plate_number')
@@ -319,42 +325,63 @@ def client_form():
             account_number=account_number,
             account_bank_name=account_bank_name,
             description=description,
-            phone_number=phone_number
+            phone_number=phone_number,
+            status="Pending"
         )
+
         db.session.add(order)
         db.session.commit()
-        return redirect(url_for('orders_overview'))
+
+        # 🔐 ROLE BASED REDIRECT
+        if session['role'] == 'admin':
+            return redirect(url_for('orders_overview'))
+        else:
+            return redirect(url_for('secretary_dashboard'))
 
     return render_template('client_form.html', products=products)
 
-# Orders Overview
+# Orders Overview (Admin)
 @app.route('/orders_overview')
 def orders_overview():
+    if session.get('role') != 'admin':
+        return redirect(url_for('login'))
+
     all_orders = Order.query.order_by(Order.created_at.desc()).all()
+
     soya_orders = [o for o in all_orders if o.items.lower() == 'soya beans']
     cashew_orders = [o for o in all_orders if o.items.lower() == 'cashew nut']
     maize_orders = [o for o in all_orders if o.items.lower() == 'maize']
     rice_orders = [o for o in all_orders if o.items.lower() == 'rice']
-    return render_template('orders_overview.html',
-                           soya_orders=soya_orders,
-                           cashew_orders=cashew_orders,
-                           maize_orders=maize_orders,
-                           rice_orders=rice_orders)
 
-# Delete order
-@app.route('/delete_order/<int:order_id>', methods=['POST'])
-def delete_order(order_id):
-    order = Order.query.get_or_404(order_id)
-    db.session.delete(order)
-    db.session.commit()
-    return redirect(url_for('orders_overview'))
+    return render_template(
+        'orders_overview.html',
+        soya_orders=soya_orders,
+        cashew_orders=cashew_orders,
+        maize_orders=maize_orders,
+        rice_orders=rice_orders
+    )
 
 @app.route('/confirm_order/<int:order_id>', methods=['POST'])
 def confirm_order(order_id):
+    if session.get('role') != 'admin':
+        return redirect(url_for('login'))
+
     order = Order.query.get_or_404(order_id)
-    order.status = 'Confirmed'
+    order.status = "Confirmed"
+    order.confirmed_at = datetime.utcnow()
+
     db.session.commit()
-    flash('Order has been confirmed successfully!', 'success')
+    return redirect(url_for('orders_overview'))
+
+@app.route('/delete_order/<int:order_id>', methods=['POST'])
+def delete_order(order_id):
+    if session.get('role') != 'admin':
+        return redirect(url_for('login'))
+
+    order = Order.query.get_or_404(order_id)
+    db.session.delete(order)
+    db.session.commit()
+
     return redirect(url_for('orders_overview'))
 
 

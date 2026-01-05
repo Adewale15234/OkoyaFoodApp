@@ -2,327 +2,276 @@
 {% block content %}
 
 <section class="hero">
-  <div class="card a4-portrait">
-    <!-- Header -->
-    <div class="company-header sticky-header">
-      <div class="company-text">
+  <div class="a4-sheet">
+
+    <!-- ================= HEADER ================= -->
+    <header class="header sticky-header">
+      <div class="header-left">
+        <!-- LOGO -->
+        <img src="{{ url_for('static', filename='images/logo.png') }}"
+             alt="Okoya Food Logo" class="company-logo">
+      </div>
+
+      <div class="header-center">
         <h1 class="company-name">OKOYA FOOD COMPANY LIMITED</h1>
-        <h2 class="company-motto">POVERTY ERADICATION, REDUCE INEQUALITY AND LEAVE NO ONE BEHIND</h2>
+        <h2 class="company-motto">
+          Poverty Eradication, Reduce Inequality & Leave No One Behind
+        </h2>
         <p class="company-address">
-          KM 7 idi APA community, along Ilesha Ibaruba express way, Shaki, Oyo State, Nigeria
+          KM 7 Idi APA Community, Along Ilesha–Ibaruba Expressway, Shaki, Oyo State, Nigeria
         </p>
       </div>
 
-      <!-- Back Button -->
-      <a href="{{ url_for('admin_dashboard') }}" class="back-btn">← Back to Dashboard</a>
-    </div>
+      <div class="header-right">
+        {% if session.get('role') == 'admin' %}
+          <a href="{{ url_for('admin_dashboard') }}" class="back-btn">← Dashboard</a>
+        {% else %}
+          <a href="{{ url_for('secretary_dashboard') }}" class="back-btn">← Dashboard</a>
+        {% endif %}
+      </div>
+    </header>
 
-    <!-- Order Form -->
-    <form action="{{ url_for('client_form') }}" method="post" class="order-form two-column-form" id="orderForm">
-      <div class="form-column left-column">
-        <div class="form-row">
-          <label for="name">NAME</label>
-          <input id="name" name="name" required>
+    <!-- ================= FORM ================= -->
+    <form method="post" action="{{ url_for('client_form') }}" class="order-form">
+
+      <div class="form-grid">
+
+        <!-- LEFT COLUMN -->
+        <div class="form-column">
+          <div class="form-group">
+            <label>Client Name</label>
+            <input name="name" required>
+          </div>
+
+          <div class="form-group">
+            <label>Email</label>
+            <input name="email" type="email">
+          </div>
+
+          <div class="form-group">
+            <label>Date</label>
+            <input name="date" type="date">
+          </div>
+
+          <div class="form-group">
+            <label>Bank Name (Payer)</label>
+            <input name="bank_name">
+          </div>
+
+          <div class="form-group">
+            <label>Item</label>
+            <select name="items" required>
+              {% for p in products %}
+                <option value="{{ p }}">{{ p }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Description</label>
+            <textarea name="description" rows="2"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Kilograms</label>
+            <input id="kilograms" name="kilograms" type="number" min="0" onchange="recalcTotal()">
+          </div>
         </div>
-        <div class="form-row">
-          <label for="email">EMAIL</label>
-          <input id="email" name="email" type="email">
-        </div>
-        <div class="form-row">
-          <label for="date">DATE (needed)</label>
-          <input id="date" name="date" type="date">
-        </div>
-        <div class="form-row">
-          <label for="bank_name">BANK NAME (payer)</label>
-          <input id="bank_name" name="bank_name">
-        </div>
-        <div class="form-row">
-          <label for="items">ITEMS</label>
-          <select id="items" name="items" required>
-            {% for p in products %}
-              <option value="{{ p }}">{{ p }}</option>
-            {% endfor %}
-          </select>
-        </div>
-        <div class="form-row description-row">
-          <label for="description">DESCRIPTION</label>
-          <textarea id="description" name="description" rows="2"></textarea>
-        </div>
-        <div class="form-row">
-          <label for="kilograms">Kilograms</label>
-          <input id="kilograms" name="kilograms" type="number" min="0" step="1" onchange="recalcTotal()">
+
+        <!-- RIGHT COLUMN -->
+        <div class="form-column">
+          <div class="form-group">
+            <label>Unit Price (₦ / kg)</label>
+            <input id="unit_price" name="unit_price" type="number" step="0.01" onchange="recalcTotal()">
+          </div>
+
+          <div class="form-group highlight">
+            <label>Total Amount (₦)</label>
+            <input id="total_amount" name="total_amount" readonly>
+          </div>
+
+          <div class="form-group">
+            <label>Driver Name</label>
+            <input name="driver_name">
+          </div>
+
+          <div class="form-group">
+            <label>Vehicle Plate Number</label>
+            <input name="vehicle_plate_number">
+          </div>
+
+          <div class="form-group">
+            <label>Phone Number</label>
+            <input name="phone_number">
+          </div>
+
+          <div class="form-group">
+            <label>Account Number</label>
+            <input name="account_number">
+          </div>
+
+          <div class="form-group">
+            <label>Account Bank Name</label>
+            <input name="account_bank_name">
+          </div>
         </div>
       </div>
 
-      <div class="form-column right-column">
-        <div class="form-row">
-          <label for="unit_price">UNIT PRICE (per kg)</label>
-          <input id="unit_price" name="unit_price" type="number" step="0.01" min="0" onchange="recalcTotal()">
-        </div>
-        <div class="form-row">
-          <label for="total_amount">TOTAL AMOUNT</label>
-          <input id="total_amount" name="total_amount" type="number" step="0.01" min="0" readonly>
-        </div>
-        <div class="form-row">
-          <label for="driver_name">DRIVER' NAME</label>
-          <input id="driver_name" name="driver_name">
-        </div>
-        <div class="form-row">
-          <label for="vehicle_plate_number">VEHICLE PLATE NUMBER</label>
-          <input id="vehicle_plate_number" name="vehicle_plate_number">
-        </div>
-        <div class="form-row">
-          <label for="phone_number">PHONE NUMBER</label>
-          <input id="phone_number" name="phone_number">
-        </div>
-        <div class="form-row">
-          <label for="account_number">ACCOUNT NUMBER</label>
-          <input id="account_number" name="account_number">
-        </div>
-        <div class="form-row">
-          <label for="account_bank_name">ACCOUNT BANK NAME</label>
-          <input id="account_bank_name" name="account_bank_name">
-        </div>
+      <!-- ================= ACTIONS ================= -->
+      <div class="actions">
+        <button type="button" class="btn-print" onclick="window.print()">🖨 Print</button>
+        <button type="submit" class="btn-submit">Submit Order</button>
       </div>
 
-      <!-- Submit and Print Buttons -->
-      <div class="submit-center">
-        <button type="button" class="btn-secondary" onclick="window.print()">🖨️ Print Form</button>
-        <button type="submit" class="btn-primary">Submit Order</button>
-      </div>
     </form>
 
-    <div class="footer">© OKOYA FOOD COMPANY</div>
+    <!-- ================= FOOTER ================= -->
+    <footer class="footer">
+      © {{ current_year | default(2026) }} OKOYA FOOD COMPANY LIMITED
+    </footer>
+
   </div>
 </section>
 
 <script>
 function recalcTotal() {
-  const kilograms = parseFloat(document.getElementById('kilograms').value) || 0;
-  const unitPrice = parseFloat(document.getElementById('unit_price').value) || 0;
-  document.getElementById('total_amount').value = (kilograms * unitPrice).toFixed(2);
+  const kg = parseFloat(document.getElementById('kilograms').value) || 0;
+  const price = parseFloat(document.getElementById('unit_price').value) || 0;
+  document.getElementById('total_amount').value = (kg * price).toFixed(2);
 }
 </script>
 
 <style>
-/* ===== Page Background ===== */
+/* ===== PAGE ===== */
 body {
-  background: linear-gradient(135deg, #cce7ff, #99ccff);
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
+  background: #eef3f8;
   margin: 0;
-  padding: 0;
-  overflow: auto;
+  padding: 20px;
 }
 
-/* ===== A4 Card ===== */
-.a4-portrait {
+/* ===== A4 SHEET ===== */
+.a4-sheet {
   width: 210mm;
   min-height: 297mm;
   background: #fff;
-  padding: 40px;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: stretch;
-  box-shadow: 0 0 20px rgba(0,0,0,0.1);
-  overflow-y: auto;
-  scroll-behavior: smooth;
+  margin: auto;
+  padding: 35px;
+  box-shadow: 0 15px 40px rgba(0,0,0,.15);
 }
 
-/* ===== Sticky Header ===== */
-.sticky-header {
-  position: sticky;
-  top: 0;
-  background: #fff;
-  z-index: 1000;
-  padding-bottom: 20px;
-  margin-bottom: 20px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
-
-/* ===== Company Header ===== */
-.company-header {
-  display: flex;
-  flex-direction: column;
+/* ===== HEADER ===== */
+.header {
+  display: grid;
+  grid-template-columns: 1fr 3fr 1fr;
   align-items: center;
-  text-align: center;
-  gap: 10px;
+  border-bottom: 4px solid #1e7e34;
+  padding-bottom: 15px;
+  margin-bottom: 25px;
 }
 
-/* ✅ Updated Text Colors */
-.company-name,
+.company-logo {
+  width: 90px;
+}
+
+.company-name {
+  color: #1e7e34;
+  font-size: 26px;
+  margin: 0;
+}
+
 .company-motto {
-  color: green;
+  font-size: 14px;
+  color: #444;
+  margin: 5px 0;
 }
 
 .company-address {
-  color: white;
+  font-size: 12px;
+  color: #666;
 }
 
-/* ===== Back Button ===== */
+/* ===== BACK BUTTON ===== */
 .back-btn {
-  display: inline-block;
-  margin-top: 10px;
   text-decoration: none;
+  font-weight: bold;
   color: #007bff;
-  font-weight: 700;
-  font-size: 0.95rem;
-  transition: color 0.2s, transform 0.2s;
-}
-.back-btn:hover {
-  color: #0056b3;
-  transform: scale(1.05);
 }
 
-/* ===== Two-Column Layout ===== */
-.two-column-form {
-  display: flex;
-  gap: 20px;
-  flex-wrap: wrap;
-  width: 100%;
-  margin-top: 10px;
+/* ===== FORM ===== */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 25px;
 }
 
-.two-column-form .form-column {
-  flex: 1;
-  min-width: 200px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-/* ===== Form Fields ===== */
-.order-form .form-row {
-  margin-bottom: 12px;
+.form-group {
   display: flex;
   flex-direction: column;
 }
-.order-form label {
+
+.form-group label {
   font-weight: 700;
-  margin-bottom: 4px;
-  color: #333;
+  margin-bottom: 5px;
 }
-.order-form input,
-.order-form select,
-.order-form textarea {
+
+.form-group input,
+.form-group select,
+.form-group textarea {
   border: none;
-  border-bottom: 3px solid #28a745;
-  background: transparent;
-  padding: 6px 4px;
-  font-size: 15px;
-  font-weight: 600;
-  width: 100%;
-  color: #000;
-  transition: all 0.2s ease;
-}
-.order-form input:focus,
-.order-form select:focus,
-.order-form textarea:focus {
-  border-bottom-color: #28a745;
-  outline: none;
-  background: transparent;
-  color: #000;
+  border-bottom: 2px solid #1e7e34;
+  padding: 6px;
+  font-size: 14px;
 }
 
-/* ===== Buttons ===== */
-.submit-center {
+.form-group.highlight input {
+  font-size: 18px;
+  font-weight: bold;
+  color: #1e7e34;
+}
+
+/* ===== ACTIONS ===== */
+.actions {
+  margin-top: 30px;
   display: flex;
   justify-content: center;
-  align-items: center;
-  gap: 15px;
-  width: 100%;
-  margin-top: 25px;
+  gap: 20px;
 }
-.btn-primary {
-  background: #007bff;
-  color: #fff;
-  padding: 12px 25px;
-  font-size: 16px;
-  font-weight: 700;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: transform 0.2s, background 0.2s;
-}
-.btn-primary:hover {
-  background: #0056b3;
-  transform: scale(1.05);
-}
-.btn-secondary {
+
+.btn-print {
   background: #28a745;
   color: #fff;
   padding: 12px 25px;
-  font-size: 16px;
-  font-weight: 700;
   border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: transform 0.2s, background 0.2s;
-}
-.btn-secondary:hover {
-  background: #218838;
-  transform: scale(1.05);
+  font-weight: bold;
 }
 
-/* ===== Footer ===== */
+.btn-submit {
+  background: #007bff;
+  color: #fff;
+  padding: 12px 25px;
+  border: none;
+  font-weight: bold;
+}
+
+/* ===== FOOTER ===== */
 .footer {
+  margin-top: 30px;
   text-align: center;
-  font-size: 14px;
-  font-weight: 500;
-  margin-top: 20px;
-  align-self: center;
+  font-size: 12px;
+  color: #666;
 }
 
-/* ===== Responsive Fixes ===== */
-@media screen and (orientation: landscape) {
-  .a4-portrait {
-    width: 100%;
-    min-height: auto;
-    max-height: 100vh;
-    padding: 25px;
-    overflow-y: auto;
-    transform: scale(0.95);
-    transform-origin: top center;
-  }
-  .sticky-header {
-    position: sticky;
-  }
-  body {
-    overflow-y: auto;
-  }
-}
-
-@media screen and (orientation: portrait) {
-  .a4-portrait {
-    width: 100%;
-    min-height: auto;
-    padding: 20px;
-    overflow-y: auto;
-  }
-}
-
-/* ===== Print Mode ===== */
+/* ===== PRINT ===== */
 @media print {
   body {
     background: none;
-    display: block;
   }
-  .a4-portrait {
-    width: 100%;
-    min-height: auto;
+  .back-btn,
+  .actions {
+    display: none;
+  }
+  .a4-sheet {
     box-shadow: none;
-    padding: 20px;
-    page-break-inside: avoid;
-  }
-  .sticky-header {
-    position: static;
-    box-shadow: none;
-  }
-  .submit-center, .back-btn {
-    display: none !important; /* hide buttons during print */
   }
 }
 </style>
