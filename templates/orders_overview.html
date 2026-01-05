@@ -1,38 +1,37 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<div class="enterprise-wrapper">
+<div class="orders-wrapper">
 
-    <!-- ===== TOP BAR ===== -->
-    <header class="top-bar sticky-header">
-        <div class="title-group">
+    <!-- ===== HEADER ===== -->
+    <header class="orders-header sticky-header">
+        <div class="header-left">
             <h1>📦 Orders Overview</h1>
-            <p>Professional summary of all client goods orders</p>
+            <p>Comprehensive summary of all client orders</p>
         </div>
-
-        <div class="top-actions">
+        <div class="header-right">
             {% if session.get('username') != 'admin' %}
-                <a href="{{ url_for('client_form') }}" class="btn primary">＋ New Order</a>
+                <a href="{{ url_for('client_form') }}" class="btn primary-btn">＋ New Order</a>
             {% endif %}
-            <a href="{{ url_for('admin_dashboard') }}" class="btn secondary">← Dashboard</a>
-            <button onclick="window.print()" class="btn print">🖨 Print</button>
+            <a href="{{ url_for('admin_dashboard') }}" class="btn secondary-btn">← Dashboard</a>
+            <button onclick="window.print()" class="btn print-btn">🖨 Print</button>
         </div>
     </header>
 
-    <!-- ===== SUMMARY BAR ===== -->
-    <section class="summary-bar">
+    <!-- ===== SUMMARY ===== -->
+    <section class="orders-summary">
         <div class="summary-card">
-            <h3>Total Records</h3>
+            <h3>Total Orders</h3>
             <span>{{ soya_orders|length + cashew_orders|length + maize_orders|length + rice_orders|length }}</span>
         </div>
     </section>
 
-    <!-- ===== MAIN LAYOUT ===== -->
-    <div class="main-layout">
+    <!-- ===== MAIN CONTENT ===== -->
+    <div class="orders-main">
 
-        <!-- FILTER -->
+        <!-- ===== FILTER PANEL ===== -->
         <aside class="filter-panel">
-            <h3>Filter Goods</h3>
+            <h3>Filter by Product</h3>
             <button class="filter-btn active" data-category="all">All</button>
             <button class="filter-btn" data-category="soya">Soya Beans</button>
             <button class="filter-btn" data-category="cashew">Cashew Nut</button>
@@ -40,53 +39,71 @@
             <button class="filter-btn" data-category="rice">Rice</button>
         </aside>
 
-        <!-- ORDERS -->
+        <!-- ===== ORDERS GRID ===== -->
         <section class="orders-grid">
+
             {% macro order_card(order, sn) %}
             <article class="order-card" data-category="{{ order.items|lower|replace(' ', '') }}">
                 
-                <div class="card-top">
+                <!-- Card Header -->
+                <div class="card-header">
                     <span class="sn">#{{ sn }}</span>
                     <span class="status {{ order.status|lower }}">{{ order.status }}</span>
                 </div>
 
-                <h2 class="product">{{ order.items }}</h2>
+                <!-- Product Name -->
+                <h2 class="product-name">{{ order.items }}</h2>
 
-                <div class="info-block">
-                    <p><strong>Client:</strong> {{ order.name }}</p>
-                    <p><strong>Email:</strong> {{ order.email }}</p>
-                    <p><strong>Phone:</strong> {{ order.phone_number }}</p>
+                <!-- Client Info -->
+                <div class="card-section client-info">
+                    <h4>Client Info</h4>
+                    <p><strong>Name:</strong> {{ order.name }}</p>
+                    <p><strong>Email:</strong> {{ order.email or "—" }}</p>
+                    <p><strong>Phone:</strong> {{ order.phone_number or "—" }}</p>
+                    <p><strong>Date:</strong> {{ order.date.strftime('%d %b %Y') if order.date else "—" }}</p>
+                    <p><strong>Bank Name:</strong> {{ order.bank_name or "—" }}</p>
                 </div>
 
-                <div class="info-block highlight">
+                <!-- Order Details -->
+                <div class="card-section order-details">
+                    <h4>Order Details</h4>
+                    <p><strong>Description:</strong> {{ order.description or "—" }}</p>
                     <p><strong>Quantity:</strong> {{ order.kilograms or 0 }} kg</p>
-                    <p><strong>Unit Price:</strong> ₦{{ "%.2f"|format(order.unit_price or 0) }}</p>
-                    <p><strong>Total:</strong> ₦{{ "%.2f"|format(order.total_amount or 0) }}</p>
+                    <p><strong>Unit Price:</strong> <span class="currency">₦</span>{{ "%.2f"|format(order.unit_price or 0) }}</p>
+                    <p><strong>Total Amount:</strong> <span class="currency">₦</span>{{ "%.2f"|format(order.total_amount or 0) }}</p>
                 </div>
 
-                <div class="info-block">
-                    <p><strong>Driver:</strong> {{ order.driver_name or "—" }}</p>
-                    <p><strong>Vehicle:</strong> {{ order.vehicle_plate_number or "—" }}</p>
+                <!-- Delivery Info -->
+                <div class="card-section delivery-info">
+                    <h4>Delivery Info</h4>
+                    <p><strong>Driver Name:</strong> {{ order.driver_name or "—" }}</p>
+                    <p><strong>Vehicle Plate:</strong> {{ order.vehicle_plate_number or "—" }}</p>
+                    <p><strong>Account Number:</strong> {{ order.account_number or "—" }}</p>
+                    <p><strong>Account Bank:</strong> {{ order.account_bank_name or "—" }}</p>
                 </div>
 
-                <div class="info-block">
-                    <p><strong>Created:</strong> {{ order.created_at.strftime('%d %b %Y, %I:%M %p') if order.created_at else '—' }}</p>
-                    <p><strong>Confirmed:</strong> {{ order.confirmed_at.strftime('%d %b %Y, %I:%M %p') if order.confirmed_at else 'Pending' }}</p>
+                <!-- Timestamps -->
+                <div class="card-section timestamps">
+                    <h4>Timestamps</h4>
+                    <p><strong>Created At:</strong> {{ order.created_at.strftime('%d %b %Y, %I:%M %p') if order.created_at else '—' }}</p>
+                    <p><strong>Confirmed At:</strong> {{ order.confirmed_at.strftime('%d %b %Y, %I:%M %p') if order.confirmed_at else 'Pending' }}</p>
                 </div>
 
-                <div class="actions">
+                <!-- Actions -->
+                <div class="card-actions">
                     {% if order.status != 'Confirmed' %}
                         <form method="POST" action="{{ url_for('confirm_order', order_id=order.id) }}">
-                            <button class="btn success">✔ Confirm</button>
+                            <button class="btn success-btn">✔ Confirm</button>
                         </form>
                     {% else %}
-                        <button class="btn success disabled">✅ Confirmed</button>
+                        <button class="btn success-btn disabled">✅ Confirmed</button>
                     {% endif %}
                     <form method="POST" action="{{ url_for('delete_order', order_id=order.id) }}"
                           onsubmit="return confirm('Delete this order?');">
-                        <button class="btn danger">🗑 Delete</button>
+                        <button class="btn danger-btn">🗑 Delete</button>
                     </form>
                 </div>
+
             </article>
             {% endmacro %}
 
@@ -109,6 +126,7 @@
     </div>
 </div>
 
+<!-- ===== FILTER SCRIPT ===== -->
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     const buttons = document.querySelectorAll('.filter-btn');
@@ -118,189 +136,133 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.addEventListener('click', () => {
             buttons.forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            const cat = btn.dataset.category;
+            const category = btn.dataset.category;
 
             cards.forEach(card => {
                 card.style.display =
-                    cat === 'all' || card.dataset.category.includes(cat)
-                    ? 'block' : 'none';
+                    category === 'all' || card.dataset.category.includes(category)
+                    ? 'grid' : 'none';
             });
         });
     });
 });
 </script>
 
+<!-- ===== STYLES ===== -->
 <style>
 /* ===== GLOBAL ===== */
-.enterprise-wrapper {
+.orders-wrapper {
     font-family: 'Poppins', sans-serif;
-    background: #f5f7fb;
+    background: #f3f6f9;
     min-height: 100vh;
     padding: 30px;
-    margin-top: 60px; /* ✅ ensures top content visible */
 }
 
-/* ===== TOP BAR ===== */
-.top-bar {
-    background: #ffffff;
-    padding: 25px;
-    border-radius: 16px;
-    box-shadow: 0 10px 30px rgba(0,0,0,.08);
+/* ===== HEADER ===== */
+.orders-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    background: #fff;
+    padding: 25px 30px;
+    border-radius: 14px;
+    box-shadow: 0 10px 25px rgba(0,0,0,.08);
     position: sticky;
     top: 0;
     z-index: 1000;
 }
-.title-group h1 {
-    margin: 0;
-    color: #0a2540;
-}
-.title-group p {
-    margin-top: 6px;
-    color: #0a2540; /* ✅ better visibility */
-}
-.top-actions {
-    display: flex;
-    gap: 10px;
-}
+.orders-header h1 { margin: 0; color: #0b3d91; }
+.orders-header p { margin-top: 6px; color: #444; font-size: 0.95rem; }
+.header-right .btn { margin-left: 12px; }
 
 /* ===== SUMMARY ===== */
-.summary-bar {
-    margin-top: 20px;
-}
+.orders-summary { margin-top: 25px; }
 .summary-card {
-    background: linear-gradient(135deg, #0a2540, #003566);
-    color: #fff;
+    display: inline-block;
     padding: 18px 25px;
-    border-radius: 14px;
-    width: fit-content;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #0b3d91, #0f5bb5);
+    color: #fff;
+    font-weight: 600;
+    font-size: 1.1rem;
 }
 
-/* ===== LAYOUT ===== */
-.main-layout {
-    display: grid;
-    grid-template-columns: 240px 1fr;
-    gap: 25px;
-    margin-top: 30px;
-}
+/* ===== MAIN LAYOUT ===== */
+.orders-main { display: grid; grid-template-columns: 250px 1fr; gap: 25px; margin-top: 30px; }
 
-/* ===== FILTER ===== */
+/* ===== FILTER PANEL ===== */
 .filter-panel {
     background: #fff;
     padding: 20px;
-    border-radius: 14px;
+    border-radius: 12px;
     box-shadow: 0 8px 24px rgba(0,0,0,.08);
 }
+.filter-panel h3 { margin-bottom: 15px; font-size: 1.1rem; color: #0b3d91; }
 .filter-btn {
     width: 100%;
     margin-bottom: 10px;
-    padding: 10px;
+    padding: 12px;
     border-radius: 8px;
     border: none;
-    background: #e8eef5;
+    background: #e2e8f0;
     font-weight: 600;
     cursor: pointer;
+    transition: all 0.3s ease;
 }
 .filter-btn.active,
 .filter-btn:hover {
-    background: #0a2540;
+    background: #0b3d91;
     color: #fff;
 }
 
-/* ===== GRID ===== */
+/* ===== ORDERS GRID ===== */
 .orders-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
     gap: 25px;
 }
 
-/* ===== CARD ===== */
+/* ===== ORDER CARD ===== */
 .order-card {
     background: #fff;
-    padding: 22px;
-    border-radius: 18px;
-    box-shadow: 0 12px 32px rgba(0,0,0,.12);
+    border-radius: 16px;
+    box-shadow: 0 12px 28px rgba(0,0,0,.12);
+    padding: 20px;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
 }
-.card-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-.sn {
-    font-weight: 700;
-    color: #999;
-}
-.product {
-    margin: 10px 0;
-    color: #0a2540;
-}
-.status {
-    padding: 6px 14px;
-    border-radius: 20px;
-    color: #fff;
-    font-size: .8rem;
-}
+.card-header { display: flex; justify-content: space-between; align-items: center; }
+.sn { font-weight: 600; color: #999; }
+.product-name { margin: 10px 0 15px; color: #0b3d91; font-size: 1.2rem; font-weight: 600; }
+.status { padding: 6px 16px; border-radius: 20px; color: #fff; font-size: 0.8rem; }
 .status.confirmed { background: #28a745; }
 .status.pending { background: #f0ad4e; }
 
-/* ===== INFO ===== */
-.info-block {
-    margin-top: 10px;
-    font-size: .9rem;
-    color: #0a2540;
-}
-.info-block.highlight {
-    background: #e6f2ff;
-    padding: 10px;
-    border-radius: 10px;
-}
+/* ===== CARD SECTIONS ===== */
+.card-section { margin-top: 12px; font-size: 0.92rem; color: #333; }
+.card-section h4 { font-weight: 600; color: #0b3d91; margin-bottom: 6px; }
+.card-section p { margin: 3px 0; }
+.order-details { background: #eaf2ff; padding: 10px; border-radius: 10px; }
 
-/* ===== ACTIONS ===== */
-.actions {
-    margin-top: 15px;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-}
+/* ===== CARD ACTIONS ===== */
+.card-actions { margin-top: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.btn { padding: 10px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; text-align: center; }
+.primary-btn { background: #0b3d91; color: #fff; }
+.secondary-btn { background: #6c757d; color: #fff; }
+.success-btn { background: #28a745; color: #fff; }
+.danger-btn { background: #dc3545; color: #fff; }
+.print-btn { background: #495057; color: #fff; }
+.disabled { opacity: 0.6; cursor: not-allowed; }
 
-/* ===== BUTTONS ===== */
-.btn {
-    padding: 10px;
-    border-radius: 8px;
-    border: none;
-    font-weight: 600;
-    cursor: pointer;
-    text-decoration: none;
-    text-align: center;
-}
-.primary { background: #0a2540; color: #fff; }
-.secondary { background: #6c757d; color: #fff; }
-.success { background: #28a745; color: #fff; }
-.danger { background: #dc3545; color: #fff; }
-.print { background: #495057; color: #fff; }
-.disabled { opacity: .6; cursor: default; }
-
-/* ===== PRINT ===== */
+/* ===== PRINT STYLING ===== */
 @media print {
-    .top-actions, .filter-panel, .actions {
-        display: none !important;
-    }
-    body {
-        background: #fff;
-    }
+    .header-right, .filter-panel, .card-actions { display: none !important; }
+    body { background: #fff; }
 }
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 1200px) {
-    .main-layout {
-        grid-template-columns: 1fr;
-    }
-    .enterprise-wrapper {
-        padding: 20px;
-        margin-top: 60px;
-    }
+    .orders-main { grid-template-columns: 1fr; }
 }
 </style>
 
