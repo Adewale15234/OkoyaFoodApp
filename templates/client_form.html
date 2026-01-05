@@ -4,6 +4,7 @@
 <section class="hero">
   <div class="a4-sheet">
 
+    <!-- ================= HEADER ================= -->
     <header class="header sticky-header">
       <div class="header-left">
         <img src="{{ url_for('static', filename='images/logo.png') }}"
@@ -29,9 +30,10 @@
       </div>
     </header>
 
-    <!-- FIX: spacer stays, but now works correctly -->
+    <!-- Spacer controls header offset -->
     <div class="header-spacer"></div>
 
+    <!-- ================= FORM ================= -->
     <form method="post" action="{{ url_for('client_form') }}" class="order-form" onsubmit="showSuccessNotification()">
       <div class="form-grid">
 
@@ -146,33 +148,63 @@ body {
   font-family: 'Poppins', sans-serif;
 }
 
-/* FIX: spacer equals header height */
+/* HEADER SPACER — single source of truth */
 .header-spacer {
-  height: 220px;
+  height: 210px;
 }
 
-/* A4 */
+/* A4 SHEET — true A4 fit, no scaling */
 .a4-sheet {
-  max-width: 1000px;
-  margin: auto 0 50px;
-  padding: 50px;
+  width: 210mm;
+  min-height: 297mm;
+  margin: 0 auto 20px;
+  padding: 20mm;
   background: #fff;
-  min-height: 1600px;
   box-shadow: 0 15px 40px rgba(0,0,0,.15);
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 8px;
 }
 
-/* FIX: no margin-bottom */
+/* HEADER — no margin-bottom */
 .header {
   position: sticky;
-  top: 0; /* FIX */
+  top: 0;
   display: grid;
   grid-template-columns: 160px 1fr 160px;
   align-items: center;
   gap: 20px;
   border-bottom: 4px solid #1e7e34;
-  padding: 20px 0;
+  padding: 15px 0;
   background: #fff;
   z-index: 10;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+/* FORM */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  border-bottom: 2px solid #1e7e34;
+  color: #000;
+}
+
+/* PRINT — perfect A4 */
+@media print {
+  body { background: #fff; }
+  .actions, .back-btn { display: none; }
+  .a4-sheet {
+    margin: 0;
+    padding: 20mm;
+    box-shadow: none;
+    border: none;
+  }
 }
 </style>
 
