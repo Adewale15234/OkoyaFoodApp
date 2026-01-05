@@ -152,12 +152,14 @@ body {
 /* ===== A4 SHEET ===== */
 .a4-sheet {
   max-width: 1000px;
-  margin: 320px auto 50px;      /* Pulled way down so header never cuts off */
+  margin: 380px auto 50px;   /* Pulled down further to avoid cutting top */
   padding: 60px;
   background: #fff;
   box-shadow: 0 15px 40px rgba(0,0,0,.15);
   box-sizing: border-box;
-  min-height: 1500px;           /* Tall sheet for full content */
+  min-height: 1600px;        /* Increased height for full content */
+  border: 1px solid #ccc;    /* Visible A4 edge */
+  border-radius: 8px;
 }
 
 /* ===== HEADER ===== */
@@ -286,18 +288,19 @@ body {
   }
   .a4-sheet {
     box-shadow: none;
-    margin: 15mm auto;
+    margin: 20mm auto;
     padding: 25mm;
     width: 200mm;
     max-width: 200mm;
     min-height: 280mm;
+    border: 1px solid #000;  /* Keep visible A4 border in print */
   }
 }
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 1200px) {
   .a4-sheet {
-    margin: 300px 10px 30px;
+    margin: 350px 10px 30px;
     padding: 50px;
   }
   .form-grid {
