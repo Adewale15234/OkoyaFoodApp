@@ -67,13 +67,22 @@
             <button class="filter-btn" data-category="maize">Maize</button>
             <button class="filter-btn" data-category="rice">Rice</button>
         </div>
+        <div class="filter-time" style="margin-top:12px;">
+            <label for="time-filter">Time:</label>
+            <select id="time-filter">
+                <option value="all">All</option>
+                <option value="day">Today</option>
+                <option value="month">This Month</option>
+                <option value="year">This Year</option>
+            </select>
+        </div>
     </aside>
 
     <!-- ===== ORDERS GRID ===== -->
     <section class="orders-grid">
 
         {% macro order_row(order, sn) %}
-        <div class="order-row" data-category="{{ order.items|lower|replace(' ', '') }}">
+        <div class="order-row" data-category="{{ order.items|lower|replace(' ', '') }}" data-date="{{ order.date.strftime('%Y-%m-%d') if order.date else '' }}">
             <div class="row-header">
                 <span class="sn">#{{ sn }}</span>
                 <span class="product">{{ order.items }}</span>
@@ -141,17 +150,40 @@
 document.addEventListener('DOMContentLoaded', () => {
     const buttons = document.querySelectorAll('.filter-btn');
     const rows = document.querySelectorAll('.order-row');
+    const timeFilter = document.getElementById('time-filter');
+
+    function filterOrders() {
+        const activeCategory = document.querySelector('.filter-btn.active').dataset.category;
+        const timeValue = timeFilter.value;
+        const today = new Date();
+        const thisDay = today.toISOString().slice(0,10);
+        const thisMonth = today.toISOString().slice(0,7);
+        const thisYear = today.getFullYear();
+
+        rows.forEach(row => {
+            const rowCategory = row.dataset.category;
+            const rowDate = row.dataset.date;
+            let show = (activeCategory === 'all' || rowCategory.includes(activeCategory));
+
+            if(show && rowDate) {
+                if(timeValue === 'day' && !rowDate.startsWith(thisDay)) show = false;
+                if(timeValue === 'month' && !rowDate.startsWith(thisMonth)) show = false;
+                if(timeValue === 'year' && !rowDate.startsWith(thisYear)) show = false;
+            }
+
+            row.style.display = show ? 'block' : 'none';
+        });
+    }
 
     buttons.forEach(btn => {
         btn.addEventListener('click', () => {
             buttons.forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            const cat = btn.dataset.category;
-            rows.forEach(row => {
-                row.style.display = (cat === 'all' || row.dataset.category.includes(cat)) ? 'block' : 'none';
-            });
+            filterOrders();
         });
     });
+
+    timeFilter.addEventListener('change', filterOrders);
 
     const toggles = document.querySelectorAll('.toggle-btn');
     toggles.forEach(btn => {
@@ -184,7 +216,7 @@ function printOrder(button) {
 <style>
 .orders-wrapper { font-family: 'Poppins', sans-serif; background: #f0f2f5; padding: 30px; min-height: 100vh; }
 .orders-header { display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 25px 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); position: sticky; top:10px; z-index:1000; }
-.orders-header h1 { margin:0; font-size:1.6rem; color:OFCL e3a8a; } 
+.orders-header h1 { margin:0; font-size:1.6rem; color: #1e3a8a; } 
 .orders-header p { margin-top:6px; color:#4b5563; }
 .header-right .btn { margin-left:12px; }
 
@@ -193,9 +225,10 @@ function printOrder(button) {
 .summary-icon { font-size:1.8rem; }
 
 .filter-panel { margin-top:25px; background:#fff; padding:15px 20px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.08); }
-.filter-buttons { display:flex; flex-wrap:wrap; gap:10px; }
+.filter-buttons { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:10px; }
 .filter-btn { flex:1; padding:10px; border:none; border-radius:8px; background:#e5e7eb; cursor:pointer; font-weight:600; transition:all .3s; color:#1e3a8a; }
 .filter-btn.active, .filter-btn:hover { background:#1e3a8a; color:#fff; }
+.filter-time select { padding:6px 10px; border-radius:6px; border:1px solid #d1d5db; }
 
 .orders-grid { margin-top:25px; display:grid; gap:15px; }
 
