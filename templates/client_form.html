@@ -31,6 +31,9 @@
       </div>
     </header>
 
+    <!-- Spacer to prevent sticky header overlap -->
+    <div class="header-spacer"></div>
+
     <!-- ================= FORM ================= -->
     <form method="post" action="{{ url_for('client_form') }}" class="order-form" onsubmit="showSuccessNotification()">
       <div class="form-grid">
@@ -154,10 +157,15 @@ body {
   font-family: 'Poppins', sans-serif;
 }
 
+/* ===== HEADER SPACER ===== */
+.header-spacer {
+  height: 180px; /* big top space to pull content down */
+}
+
 /* ===== A4 SHEET ===== */
 .a4-sheet {
   max-width: 1000px;
-  margin: 100px auto 50px;    /* top space pulled down to prevent cut off */
+  margin: 0 auto 50px;
   padding: 50px;
   background: #fff;
   box-shadow: 0 15px 40px rgba(0,0,0,.15);
@@ -169,6 +177,8 @@ body {
 
 /* ===== HEADER ===== */
 .header {
+  position: sticky;
+  top: 20px;  /* sticky header */
   display: grid;
   grid-template-columns: 160px 1fr 160px;
   align-items: center;
@@ -176,6 +186,9 @@ body {
   border-bottom: 4px solid #1e7e34;
   padding-bottom: 20px;
   margin-bottom: 40px;
+  background: #fff;
+  z-index: 10;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
 }
 
 .company-logo {
@@ -243,7 +256,7 @@ body {
   border-bottom: 2px solid #1e7e34;
   padding: 8px;
   font-size: 14px;
-  color: #000;   /* make text black */
+  color: #000;  /* black text for all inputs */
 }
 
 .form-group.highlight input {
@@ -288,14 +301,8 @@ body {
 
 /* ===== PRINT ===== */
 @media print {
-  body {
-    background: #fff;
-    margin: 0;
-  }
-  .back-btn,
-  .actions {
-    display: none;
-  }
+  body { background: #fff; margin: 0; }
+  .back-btn, .actions { display: none; }
   .a4-sheet {
     box-shadow: none;
     margin: 20mm auto;
@@ -309,7 +316,7 @@ body {
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 1200px) {
-  .a4-sheet { margin: 80px 10px 30px; padding: 40px; }
+  .a4-sheet { margin: 0 auto 30px; padding: 40px; }
   .form-grid { grid-template-columns: 1fr; }
   .header { grid-template-columns: 120px 1fr 130px; gap: 10px; }
   .company-logo { width: 120px; }
