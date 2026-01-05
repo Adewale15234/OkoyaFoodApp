@@ -151,34 +151,34 @@ body {
 
 /* ===== A4 SHEET ===== */
 .a4-sheet {
-  max-width: 1000px;              /* Larger paper width */
-  margin: 250px auto 50px;        /* Pull top margin down fully */
-  padding: 60px;                   /* Extra padding for spacing */
+  max-width: 1000px;
+  margin: 280px auto 50px;      /* Top margin pulled way down */
+  padding: 60px;
   background: #fff;
   box-shadow: 0 15px 40px rgba(0,0,0,.15);
   box-sizing: border-box;
-  min-height: 1300px;             /* Taller sheet for big content */
+  min-height: 1400px;           /* Ensure full content fits */
 }
 
 /* ===== HEADER ===== */
 .header {
   display: grid;
-  grid-template-columns: 150px 1fr 160px;
+  grid-template-columns: 160px 1fr 160px;
   align-items: center;
   gap: 20px;
   border-bottom: 4px solid #1e7e34;
   padding-bottom: 25px;
-  margin-bottom: 35px;
+  margin-bottom: 40px;
 }
 
 .company-logo {
-  width: 150px;        /* Bigger logo */
+  width: 160px;   /* Bigger logo */
   height: auto;
 }
 
 .company-name {
   color: #1e7e34;
-  font-size: 34px;
+  font-size: 36px;
   font-weight: bold;
   margin: 0;
 }
@@ -191,12 +191,13 @@ body {
 
 .company-address {
   font-size: 14px;
-  color: white;         /* White text */
-  background-color: black;
+  color: white;            /* White text */
+  background-color: black; /* Black box */
   font-weight: bold;
   padding: 6px 12px;
   display: inline-block;
   border-radius: 5px;
+  margin-top: 5px;
 }
 
 /* Back Button */
@@ -285,18 +286,18 @@ body {
   }
   .a4-sheet {
     box-shadow: none;
-    margin: 15mm auto;
+    margin: 20mm auto;
     padding: 25mm;
     width: 200mm;
     max-width: 200mm;
-    min-height: 280mm;   /* Ensure full A4 height */
+    min-height: 280mm;
   }
 }
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 1200px) {
   .a4-sheet {
-    margin: 220px 10px 30px;
+    margin: 250px 10px 30px;
     padding: 50px;
   }
   .form-grid {
@@ -310,7 +311,7 @@ body {
     width: 120px;
   }
   .company-name {
-    font-size: 30px;
+    font-size: 32px;
   }
 }
 </style>
