@@ -33,7 +33,6 @@
 
     <!-- ================= FORM ================= -->
     <form method="post" action="{{ url_for('client_form') }}" class="order-form">
-
       <div class="form-grid">
 
         <!-- LEFT COLUMN -->
@@ -115,6 +114,7 @@
             <input name="account_bank_name">
           </div>
         </div>
+
       </div>
 
       <!-- ================= ACTIONS ================= -->
@@ -152,8 +152,8 @@ body {
 /* ===== A4 SHEET ===== */
 .a4-sheet {
   max-width: 900px;
-  margin: 150px auto 40px;   /* Increased top margin to 150px */
-  padding: 40px;             /* more padding for spacing */
+  margin: 180px auto 50px;   /* FINAL top margin: 180px */
+  padding: 40px;
   background: #fff;
   box-shadow: 0 15px 40px rgba(0,0,0,.15);
   box-sizing: border-box;
@@ -286,7 +286,7 @@ body {
 /* ===== RESPONSIVE ===== */
 @media (max-width: 1200px) {
   .a4-sheet {
-    margin: 100px 10px 30px;
+    margin: 150px 10px 30px;
     padding: 30px;
   }
   .form-grid {
