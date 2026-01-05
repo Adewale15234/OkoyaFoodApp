@@ -4,7 +4,7 @@
 <div class="enterprise-wrapper">
 
     <!-- ===== TOP BAR ===== -->
-    <header class="top-bar">
+    <header class="top-bar sticky-header">
         <div class="title-group">
             <h1>📦 Orders Overview</h1>
             <p>Professional summary of all client goods orders</p>
@@ -137,6 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
     background: #f5f7fb;
     min-height: 100vh;
     padding: 30px;
+    margin-top: 60px; /* ✅ ensures top content visible */
 }
 
 /* ===== TOP BAR ===== */
@@ -148,6 +149,9 @@ document.addEventListener('DOMContentLoaded', () => {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 }
 .title-group h1 {
     margin: 0;
@@ -155,7 +159,7 @@ document.addEventListener('DOMContentLoaded', () => {
 }
 .title-group p {
     margin-top: 6px;
-    color: #0a2540; /* Darker for visibility */
+    color: #0a2540; /* ✅ better visibility */
 }
 .top-actions {
     display: flex;
@@ -245,7 +249,7 @@ document.addEventListener('DOMContentLoaded', () => {
 .info-block {
     margin-top: 10px;
     font-size: .9rem;
-    color: #0a2540; /* dark for visibility */
+    color: #0a2540;
 }
 .info-block.highlight {
     background: #e6f2ff;
@@ -289,9 +293,13 @@ document.addEventListener('DOMContentLoaded', () => {
 }
 
 /* ===== RESPONSIVE ===== */
-@media (max-width: 900px) {
+@media (max-width: 1200px) {
     .main-layout {
         grid-template-columns: 1fr;
+    }
+    .enterprise-wrapper {
+        padding: 20px;
+        margin-top: 60px;
     }
 }
 </style>
