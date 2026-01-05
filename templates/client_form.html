@@ -152,12 +152,12 @@ body {
 /* ===== A4 SHEET ===== */
 .a4-sheet {
   max-width: 1000px;
-  margin: 280px auto 50px;      /* Top margin pulled way down */
+  margin: 320px auto 50px;      /* Pulled way down so header never cuts off */
   padding: 60px;
   background: #fff;
   box-shadow: 0 15px 40px rgba(0,0,0,.15);
   box-sizing: border-box;
-  min-height: 1400px;           /* Ensure full content fits */
+  min-height: 1500px;           /* Tall sheet for full content */
 }
 
 /* ===== HEADER ===== */
@@ -172,7 +172,7 @@ body {
 }
 
 .company-logo {
-  width: 160px;   /* Bigger logo */
+  width: 160px;
   height: auto;
 }
 
@@ -191,8 +191,8 @@ body {
 
 .company-address {
   font-size: 14px;
-  color: white;            /* White text */
-  background-color: black; /* Black box */
+  color: white;
+  background-color: black;
   font-weight: bold;
   padding: 6px 12px;
   display: inline-block;
@@ -286,7 +286,7 @@ body {
   }
   .a4-sheet {
     box-shadow: none;
-    margin: 20mm auto;
+    margin: 15mm auto;
     padding: 25mm;
     width: 200mm;
     max-width: 200mm;
@@ -297,7 +297,7 @@ body {
 /* ===== RESPONSIVE ===== */
 @media (max-width: 1200px) {
   .a4-sheet {
-    margin: 250px 10px 30px;
+    margin: 300px 10px 30px;
     padding: 50px;
   }
   .form-grid {
