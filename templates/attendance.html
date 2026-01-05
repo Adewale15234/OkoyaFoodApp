@@ -4,10 +4,11 @@
     <h1 class="attendance-title">📋 Attendance</h1>
 
     {% if secretary %}
-        <!-- Secretary sees only Logout -->
+        <!-- Secretary sees Back to Secretary Dashboard and Logout -->
+        <a href="{{ url_for('secretary_dashboard') }}" class="btn back-btn">← Back to Dashboard</a>
         <a href="{{ url_for('logout') }}" class="btn logout-btn">Logout</a>
     {% else %}
-        <!-- Admin sees Back to Dashboard and Logout -->
+        <!-- Admin sees Back to Admin Dashboard and Logout -->
         <a href="{{ url_for('admin_dashboard') }}" class="btn back-btn">← Back to Dashboard</a>
         <a href="{{ url_for('logout') }}" class="btn logout-btn">Logout</a>
     {% endif %}
@@ -95,9 +96,9 @@
     background: #046a3a;
 }
 
-/* Table Wrapper for scrollable area */
+/* Table Wrapper */
 .attendance-table-wrapper {
-    max-height: 60vh; /* Set max height for scroll */
+    max-height: 60vh;
     overflow-y: auto;
     border-radius: 14px;
 }
@@ -118,10 +119,9 @@
     border-radius: 14px;
     overflow: hidden;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-    transition: all 0.3s ease;
 }
 
-/* Table header - sticky fix */
+/* Sticky header */
 .attendance-table th {
     background: linear-gradient(135deg, #00b894, #00cec9);
     color: #fff;
@@ -130,7 +130,7 @@
     text-align: center;
     position: sticky;
     top: 0;
-    z-index: 10; /* Ensure above table rows */
+    z-index: 10;
 }
 
 /* Table cells */
@@ -139,21 +139,20 @@
     text-align: center;
     font-size: 0.95rem;
     color: #333;
-    transition: all 0.3s ease;
 }
 
-/* Alternate row colors */
+/* Alternate rows */
 .attendance-table tr:nth-child(even) td {
     background: #f5f6fa;
 }
 
-/* Hover effect */
+/* Hover */
 .attendance-table tr:hover td {
     background: #dff9fb;
     transform: scale(1.01);
 }
 
-/* Form & select styling */
+/* Select */
 .attendance-select {
     padding: 6px 10px;
     border-radius: 6px;
@@ -171,7 +170,6 @@
     font-weight: 600;
     border: none;
     cursor: pointer;
-    transition: all 0.3s ease, transform 0.2s ease;
 }
 .submit-btn:hover {
     background: linear-gradient(135deg, #218838, #28a745);
@@ -185,14 +183,6 @@
     }
     .attendance-table {
         min-width: 100%;
-        font-size: 0.9rem;
-    }
-    .attendance-table th, .attendance-table td {
-        padding: 10px 12px;
-    }
-    .submit-btn, .btn {
-        padding: 6px 14px;
-        font-size: 0.9rem;
     }
 }
 </style>
