@@ -4,7 +4,6 @@
 <section class="hero">
   <div class="a4-sheet">
 
-    <!-- ================= HEADER ================= -->
     <header class="header sticky-header">
       <div class="header-left">
         <img src="{{ url_for('static', filename='images/logo.png') }}"
@@ -30,15 +29,12 @@
       </div>
     </header>
 
-    <!-- ================= FORM ================= -->
-    <form method="post"
-          action="{{ url_for('client_form') }}"
-          class="order-form"
-          onsubmit="showSuccessNotification()">
+    <!-- FIX: spacer stays, but now works correctly -->
+    <div class="header-spacer"></div>
 
+    <form method="post" action="{{ url_for('client_form') }}" class="order-form" onsubmit="showSuccessNotification()">
       <div class="form-grid">
 
-        <!-- LEFT COLUMN -->
         <div class="form-column">
           <div class="form-group">
             <label>Client Name</label>
@@ -76,17 +72,14 @@
 
           <div class="form-group">
             <label>Kilograms</label>
-            <input id="kilograms" name="kilograms" type="number"
-                   min="0" onchange="recalcTotal()">
+            <input id="kilograms" name="kilograms" type="number" min="0" onchange="recalcTotal()">
           </div>
         </div>
 
-        <!-- RIGHT COLUMN -->
         <div class="form-column">
           <div class="form-group">
             <label>Unit Price (₦ / kg)</label>
-            <input id="unit_price" name="unit_price" type="number"
-                   step="0.01" onchange="recalcTotal()">
+            <input id="unit_price" name="unit_price" type="number" step="0.01" onchange="recalcTotal()">
           </div>
 
           <div class="form-group highlight">
@@ -126,7 +119,6 @@
         <button type="button" class="btn-print" onclick="window.print()">🖨 Print</button>
         <button type="submit" class="btn-submit">Submit Order</button>
       </div>
-
     </form>
 
     <footer class="footer">
@@ -142,75 +134,45 @@ function recalcTotal() {
   const price = parseFloat(document.getElementById('unit_price').value) || 0;
   document.getElementById('total_amount').value = (kg * price).toFixed(2);
 }
-
 function showSuccessNotification() {
   alert('Form submitted successfully!');
 }
 </script>
 
 <style>
-:root {
-  --header-height: 190px;
-}
-
 body {
   background: #eef3f8;
   margin: 0;
   font-family: 'Poppins', sans-serif;
 }
 
-/* ===== A4 SHEET ===== */
-.a4-sheet {
-  max-width: 1000px;
-  margin: 80px auto 50px;
-  padding: calc(var(--header-height) + 30px) 50px 50px;
-  background: #fff;
-  box-shadow: 0 15px 40px rgba(0,0,0,.15);
-  min-height: 1600px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  position: relative;
+/* FIX: spacer equals header height */
+.header-spacer {
+  height: 220px;
 }
 
-/* ===== HEADER ===== */
+/* A4 */
+.a4-sheet {
+  max-width: 1000px;
+  margin: auto 0 50px;
+  padding: 50px;
+  background: #fff;
+  min-height: 1600px;
+  box-shadow: 0 15px 40px rgba(0,0,0,.15);
+}
+
+/* FIX: no margin-bottom */
 .header {
   position: sticky;
-  top: 0;
-  height: var(--header-height);
+  top: 0; /* FIX */
   display: grid;
   grid-template-columns: 160px 1fr 160px;
   align-items: center;
-  background: #fff;
+  gap: 20px;
   border-bottom: 4px solid #1e7e34;
+  padding: 20px 0;
+  background: #fff;
   z-index: 10;
-  padding-bottom: 15px;
-}
-
-/* ===== FORM ===== */
-.form-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 30px;
-}
-
-.form-group input,
-.form-group select,
-.form-group textarea {
-  border: none;
-  border-bottom: 2px solid #1e7e34;
-  padding: 8px;
-  color: #000;
-}
-
-/* ===== PRINT ===== */
-@media print {
-  body { background: #fff; }
-  .header, .actions { display: none; }
-  .a4-sheet {
-    box-shadow: none;
-    padding: 25mm;
-    margin: 0;
-  }
 }
 </style>
 
