@@ -6,10 +6,6 @@
 
     <!-- ================= HEADER ================= -->
     <header class="header">
-      <div class="header-left">
-        <!-- logo removed -->
-      </div>
-
       <div class="header-center">
         <h1 class="company-name">OKOYA FOOD COMPANY LIMITED</h1>
         <h2 class="company-motto">
@@ -153,7 +149,7 @@ body {
   width: 210mm;
   min-height: 297mm;
   margin: 30px auto;
-  padding: 200px 20mm 20mm; /* top padding reduced slightly */
+  padding: 40px 20mm 20mm; /* form starts just below header */
   background: #fff;
   box-shadow: 0 15px 40px rgba(0,0,0,.15);
   box-sizing: border-box;
@@ -162,22 +158,22 @@ body {
 
 /* HEADER */
 .header {
-  position: sticky;
-  top: 0;
-  margin: -200px -20mm 30px; /* match top padding */
-  padding: 20px 20mm;
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 20px;
+  display: flex;
+  justify-content: space-between;
   align-items: center;
   background: #fff;
-  border-bottom: 4px solid #000; /* changed to black */
-  z-index: 10;
+  border-bottom: 4px solid #000;
+  padding: 20px 20mm;
+}
+
+.header-center {
+  text-align: center;
+  flex: 1;
 }
 
 .company-name {
-  font-size: 28px; /* reduced size */
-  color: #000;     /* black color */
+  font-size: 28px;
+  color: #000;
   font-weight: bold;
   margin: 0;
 }
@@ -186,6 +182,12 @@ body {
   font-size: 16px;
   color: #444;
   margin: 5px 0;
+}
+
+.company-address {
+  font-size: 14px;
+  color: #000;
+  margin: 0;
 }
 
 /* FORM */
@@ -200,6 +202,40 @@ body {
 .form-group textarea {
   border-bottom: 2px solid #1e7e34;
   color: #000;
+}
+
+/* ACTION BUTTONS */
+.actions {
+  margin-top: 30px;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.btn-print {
+  background: #28a745;
+  color: #fff;
+  padding: 12px 25px;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.btn-submit {
+  background: #007bff;
+  color: #fff;
+  padding: 12px 25px;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* FOOTER */
+.footer {
+  margin-top: 30px;
+  text-align: center;
+  font-size: 12px;
+  color: #666;
 }
 
 /* PRINT */
