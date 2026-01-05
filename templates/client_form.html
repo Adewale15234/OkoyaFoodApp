@@ -179,11 +179,8 @@ body {
   align-items: center;
   background: #fff;
   border-bottom: 4px solid #000;
-  padding: 180px 20mm 20px 20mm; /* ↑ top padding increased from 120px to 180px for full visibility */
+  padding: 180px 20mm 20px 20mm; /* ↑ top padding for full visibility */
   box-sizing: border-box;
-}
-
-
 }
 
 .header-center {
@@ -206,10 +203,9 @@ body {
 
 .company-address {
   font-size: 14px;
-  color: #000;
+  color: #fff; /* <-- changed color to white */
   margin: 0;
 }
-
 
 /* FORM */
 .form-grid {
@@ -270,31 +266,4 @@ body {
 }
 </style>
 
-{% endblock %}  but all this:  <!-- ================= HEADER ================= -->
-    <header class="header">
-      <div class="header-center">
-        <h1 class="company-name">OKOYA FOOD COMPANY LIMITED</h1>
-        <h2 class="company-motto">
-          Poverty Eradication, Reduce Inequality & Leave No One Behind
-        </h2>
-        <p class="company-address">
-          KM 7 Idi APA Community, Along Ilesha–Ibaruba Expressway, Shaki, Oyo State, Nigeria
-        </p>
-      </div>
-
-      <div class="header-right">
-        {% if session.get('role') == 'admin' %}
-          <a href="{{ url_for('admin_dashboard') }}" class="back-btn">← Dashboard</a>
-        {% else %}
-          <a href="{{ url_for('secretary_dashboard') }}" class="back-btn">← Dashboard</a>
-        {% endif %}
-      </div>
-    </header>
-
-    <!-- ================= FORM ================= -->
-    <form method="post"
-          action="{{ url_for('client_form') }}"
-          class="order-form"
-          onsubmit="showSuccessNotification()">
-
-      <div class="form-grid">
+{% endblock %}
