@@ -151,19 +151,19 @@ body {
 
 /* ===== A4 SHEET ===== */
 .a4-sheet {
-  max-width: 950px;
-  margin: 220px auto 50px;  /* Increased top margin to pull down */
-  padding: 50px;
+  max-width: 1000px;              /* Larger paper width */
+  margin: 250px auto 50px;        /* Pull top margin down fully */
+  padding: 60px;                   /* Extra padding for spacing */
   background: #fff;
   box-shadow: 0 15px 40px rgba(0,0,0,.15);
   box-sizing: border-box;
-  min-height: 1200px;      /* Ensure paper height enough for print */
+  min-height: 1300px;             /* Taller sheet for big content */
 }
 
 /* ===== HEADER ===== */
 .header {
   display: grid;
-  grid-template-columns: 130px 1fr 150px;
+  grid-template-columns: 150px 1fr 160px;
   align-items: center;
   gap: 20px;
   border-bottom: 4px solid #1e7e34;
@@ -172,29 +172,29 @@ body {
 }
 
 .company-logo {
-  width: 130px;       /* Increased logo size */
+  width: 150px;        /* Bigger logo */
   height: auto;
 }
 
 .company-name {
   color: #1e7e34;
-  font-size: 32px;
+  font-size: 34px;
   font-weight: bold;
   margin: 0;
 }
 
 .company-motto {
-  font-size: 16px;
+  font-size: 17px;
   color: #444;
   margin: 5px 0;
 }
 
 .company-address {
   font-size: 14px;
-  color: white;         /* White text for company address */
+  color: white;         /* White text */
   background-color: black;
   font-weight: bold;
-  padding: 5px 10px;
+  padding: 6px 12px;
   display: inline-block;
   border-radius: 5px;
 }
@@ -285,32 +285,32 @@ body {
   }
   .a4-sheet {
     box-shadow: none;
-    margin: 10mm auto;
-    padding: 20mm;
-    width: 190mm;
-    max-width: 190mm;
-    min-height: 270mm;   /* Approx A4 height */
+    margin: 15mm auto;
+    padding: 25mm;
+    width: 200mm;
+    max-width: 200mm;
+    min-height: 280mm;   /* Ensure full A4 height */
   }
 }
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 1200px) {
   .a4-sheet {
-    margin: 180px 10px 30px;
-    padding: 40px;
+    margin: 220px 10px 30px;
+    padding: 50px;
   }
   .form-grid {
     grid-template-columns: 1fr;
   }
   .header {
-    grid-template-columns: 100px 1fr 120px;
+    grid-template-columns: 120px 1fr 130px;
     gap: 10px;
   }
   .company-logo {
-    width: 100px;
+    width: 120px;
   }
   .company-name {
-    font-size: 28px;
+    font-size: 30px;
   }
 }
 </style>
