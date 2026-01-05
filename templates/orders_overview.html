@@ -6,91 +6,109 @@
     <!-- ===== HEADER ===== -->
     <header class="orders-header sticky-header">
         <div class="header-left">
-            <h1>📦 Orders Overview</h1>
-            <p>Comprehensive summary of all client orders</p>
+            <h1>📦 Orders Dashboard</h1>
+            <p>Monitor all client orders in one place</p>
         </div>
         <div class="header-right">
             {% if session.get('username') != 'admin' %}
                 <a href="{{ url_for('client_form') }}" class="btn primary-btn">＋ New Order</a>
             {% endif %}
             <a href="{{ url_for('admin_dashboard') }}" class="btn secondary-btn">← Dashboard</a>
-            <button onclick="window.print()" class="btn print-btn">🖨 Print</button>
+            <button onclick="window.print()" class="btn print-btn">🖨 Print All</button>
         </div>
     </header>
 
-    <!-- ===== SUMMARY ===== -->
+    <!-- ===== SUMMARY PANELS ===== -->
     <section class="orders-summary">
-        <div class="summary-card">
-            <h3>Total Orders</h3>
-            <span>{{ soya_orders|length + cashew_orders|length + maize_orders|length + rice_orders|length }}</span>
+        <div class="summary-panel">
+            <div class="summary-icon">📦</div>
+            <div class="summary-content">
+                <h3>Total Orders</h3>
+                <span>{{ soya_orders|length + cashew_orders|length + maize_orders|length + rice_orders|length }}</span>
+            </div>
+        </div>
+        <div class="summary-panel">
+            <div class="summary-icon">🫘</div>
+            <div class="summary-content">
+                <h3>Soya Orders</h3>
+                <span>{{ soya_orders|length }}</span>
+            </div>
+        </div>
+        <div class="summary-panel">
+            <div class="summary-icon">🥜</div>
+            <div class="summary-content">
+                <h3>Cashew Orders</h3>
+                <span>{{ cashew_orders|length }}</span>
+            </div>
+        </div>
+        <div class="summary-panel">
+            <div class="summary-icon">🌽</div>
+            <div class="summary-content">
+                <h3>Maize Orders</h3>
+                <span>{{ maize_orders|length }}</span>
+            </div>
+        </div>
+        <div class="summary-panel">
+            <div class="summary-icon">🍚</div>
+            <div class="summary-content">
+                <h3>Rice Orders</h3>
+                <span>{{ rice_orders|length }}</span>
+            </div>
         </div>
     </section>
 
-    <!-- ===== MAIN CONTENT ===== -->
-    <div class="orders-main">
-
-        <!-- ===== FILTER PANEL ===== -->
-        <aside class="filter-panel">
-            <h3>Filter by Product</h3>
+    <!-- ===== FILTER PANEL ===== -->
+    <aside class="filter-panel">
+        <h3>Filter Orders</h3>
+        <div class="filter-buttons">
             <button class="filter-btn active" data-category="all">All</button>
             <button class="filter-btn" data-category="soya">Soya Beans</button>
             <button class="filter-btn" data-category="cashew">Cashew Nut</button>
             <button class="filter-btn" data-category="maize">Maize</button>
             <button class="filter-btn" data-category="rice">Rice</button>
-        </aside>
+        </div>
+    </aside>
 
-        <!-- ===== ORDERS GRID ===== -->
-        <section class="orders-grid">
+    <!-- ===== ORDERS GRID ===== -->
+    <section class="orders-grid">
 
-            {% macro order_card(order, sn) %}
-            <article class="order-card" data-category="{{ order.items|lower|replace(' ', '') }}">
-                
-                <!-- Card Header -->
-                <div class="card-header">
-                    <span class="sn">#{{ sn }}</span>
-                    <span class="status {{ order.status|lower }}">{{ order.status }}</span>
-                </div>
-
-                <!-- Product Name -->
-                <h2 class="product-name">{{ order.items }}</h2>
-
-                <!-- Client Info -->
-                <div class="card-section client-info">
+        {% macro order_row(order, sn) %}
+        <div class="order-row" data-category="{{ order.items|lower|replace(' ', '') }}">
+            <div class="row-header">
+                <span class="sn">#{{ sn }}</span>
+                <span class="product">{{ order.items }}</span>
+                <span class="status {{ order.status|lower }}">{{ order.status }}</span>
+                <button class="toggle-btn">Details ▼</button>
+            </div>
+            <div class="row-details">
+                <div class="details-section">
                     <h4>Client Info</h4>
                     <p><strong>Name:</strong> {{ order.name }}</p>
                     <p><strong>Email:</strong> {{ order.email or "—" }}</p>
                     <p><strong>Phone:</strong> {{ order.phone_number or "—" }}</p>
+                    <p><strong>Bank:</strong> {{ order.bank_name or "—" }}</p>
                     <p><strong>Date:</strong> {{ order.date.strftime('%d %b %Y') if order.date else "—" }}</p>
-                    <p><strong>Bank Name:</strong> {{ order.bank_name or "—" }}</p>
                 </div>
-
-                <!-- Order Details -->
-                <div class="card-section order-details">
+                <div class="details-section">
                     <h4>Order Details</h4>
                     <p><strong>Description:</strong> {{ order.description or "—" }}</p>
                     <p><strong>Quantity:</strong> {{ order.kilograms or 0 }} kg</p>
-                    <p><strong>Unit Price:</strong> <span class="currency">₦</span>{{ "%.2f"|format(order.unit_price or 0) }}</p>
-                    <p><strong>Total Amount:</strong> <span class="currency">₦</span>{{ "%.2f"|format(order.total_amount or 0) }}</p>
+                    <p><strong>Unit Price:</strong> ₦{{ "%.2f"|format(order.unit_price or 0) }}</p>
+                    <p><strong>Total:</strong> ₦{{ "%.2f"|format(order.total_amount or 0) }}</p>
                 </div>
-
-                <!-- Delivery Info -->
-                <div class="card-section delivery-info">
+                <div class="details-section">
                     <h4>Delivery Info</h4>
-                    <p><strong>Driver Name:</strong> {{ order.driver_name or "—" }}</p>
-                    <p><strong>Vehicle Plate:</strong> {{ order.vehicle_plate_number or "—" }}</p>
-                    <p><strong>Account Number:</strong> {{ order.account_number or "—" }}</p>
-                    <p><strong>Account Bank:</strong> {{ order.account_bank_name or "—" }}</p>
+                    <p><strong>Driver:</strong> {{ order.driver_name or "—" }}</p>
+                    <p><strong>Vehicle:</strong> {{ order.vehicle_plate_number or "—" }}</p>
+                    <p><strong>Account:</strong> {{ order.account_number or "—" }}</p>
+                    <p><strong>Bank:</strong> {{ order.account_bank_name or "—" }}</p>
                 </div>
-
-                <!-- Timestamps -->
-                <div class="card-section timestamps">
+                <div class="details-section">
                     <h4>Timestamps</h4>
-                    <p><strong>Created At:</strong> {{ order.created_at.strftime('%d %b %Y, %I:%M %p') if order.created_at else '—' }}</p>
-                    <p><strong>Confirmed At:</strong> {{ order.confirmed_at.strftime('%d %b %Y, %I:%M %p') if order.confirmed_at else 'Pending' }}</p>
+                    <p><strong>Created:</strong> {{ order.created_at.strftime('%d %b %Y, %I:%M %p') if order.created_at else '—' }}</p>
+                    <p><strong>Confirmed:</strong> {{ order.confirmed_at.strftime('%d %b %Y, %I:%M %p') if order.confirmed_at else 'Pending' }}</p>
                 </div>
-
-                <!-- Actions -->
-                <div class="card-actions">
+                <div class="row-actions">
                     {% if order.status != 'Confirmed' %}
                         <form method="POST" action="{{ url_for('confirm_order', order_id=order.id) }}">
                             <button class="btn success-btn">✔ Confirm</button>
@@ -98,171 +116,121 @@
                     {% else %}
                         <button class="btn success-btn disabled">✅ Confirmed</button>
                     {% endif %}
-                    <form method="POST" action="{{ url_for('delete_order', order_id=order.id) }}"
-                          onsubmit="return confirm('Delete this order?');">
+                    <form method="POST" action="{{ url_for('delete_order', order_id=order.id) }}" onsubmit="return confirm('Delete this order?');">
                         <button class="btn danger-btn">🗑 Delete</button>
                     </form>
+                    <button class="btn print-btn" onclick="printOrder(this)">🖨 Print This Order</button>
                 </div>
+            </div>
+        </div>
+        {% endmacro %}
 
-            </article>
-            {% endmacro %}
-
-            {% set categories = {
-                "soya": soya_orders,
-                "cashew": cashew_orders,
-                "maize": maize_orders,
-                "rice": rice_orders
-            } %}
-
-            {% set sn = 1 %}
-            {% for cat, orders in categories.items() %}
-                {% for order in orders %}
-                    {{ order_card(order, sn) }}
-                    {% set sn = sn + 1 %}
-                {% endfor %}
+        {% set categories = {"soya": soya_orders, "cashew": cashew_orders, "maize": maize_orders, "rice": rice_orders} %}
+        {% set sn = 1 %}
+        {% for cat, orders in categories.items() %}
+            {% for order in orders %}
+                {{ order_row(order, sn) }}
+                {% set sn = sn + 1 %}
             {% endfor %}
-
-        </section>
-    </div>
+        {% endfor %}
+    </section>
 </div>
 
-<!-- ===== FILTER SCRIPT ===== -->
+<!-- ===== FILTER & TOGGLE SCRIPT ===== -->
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     const buttons = document.querySelectorAll('.filter-btn');
-    const cards = document.querySelectorAll('.order-card');
+    const rows = document.querySelectorAll('.order-row');
 
+    // Filter
     buttons.forEach(btn => {
         btn.addEventListener('click', () => {
             buttons.forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            const category = btn.dataset.category;
-
-            cards.forEach(card => {
-                card.style.display =
-                    category === 'all' || card.dataset.category.includes(category)
-                    ? 'grid' : 'none';
+            const cat = btn.dataset.category;
+            rows.forEach(row => {
+                row.style.display = (cat === 'all' || row.dataset.category.includes(cat)) ? 'block' : 'none';
             });
         });
     });
+
+    // Toggle details
+    const toggles = document.querySelectorAll('.toggle-btn');
+    toggles.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const details = btn.closest('.order-row').querySelector('.row-details');
+            details.style.display = details.style.display === 'grid' ? 'none' : 'grid';
+            btn.textContent = details.style.display === 'grid' ? 'Details ▲' : 'Details ▼';
+        });
+    });
 });
+
+// Print specific order
+function printOrder(button) {
+    const order = button.closest('.order-row');
+    const printContent = order.cloneNode(true);
+
+    // Hide actions for printing
+    printContent.querySelector('.row-actions').style.display = 'none';
+    printContent.style.boxShadow = 'none';
+
+    const printWindow = window.open('', '', 'height=600,width=800');
+    printWindow.document.write('<html><head><title>Print Order</title>');
+    printWindow.document.write('<style>body{font-family:Poppins,sans-serif;padding:20px;} .details-section{margin-bottom:12px;}</style>');
+    printWindow.document.write('</head><body >');
+    printWindow.document.write(printContent.innerHTML);
+    printWindow.document.write('</body></html>');
+    printWindow.document.close();
+    printWindow.print();
+}
 </script>
 
 <!-- ===== STYLES ===== -->
 <style>
-/* ===== GLOBAL ===== */
-.orders-wrapper {
-    font-family: 'Poppins', sans-serif;
-    background: #f3f6f9;
-    min-height: 100vh;
-    padding: 30px;
-}
+.orders-wrapper { font-family: 'Poppins', sans-serif; background: #f6f8fb; padding: 30px; min-height: 100vh; }
+.orders-header { display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 25px 30px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); position: sticky; top:0; z-index:1000; }
+.orders-header h1 { margin:0; font-size:1.6rem; color:#1a237e; } 
+.orders-header p { margin-top:6px; color:#555; }
+.header-right .btn { margin-left:12px; }
 
-/* ===== HEADER ===== */
-.orders-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #fff;
-    padding: 25px 30px;
-    border-radius: 14px;
-    box-shadow: 0 10px 25px rgba(0,0,0,.08);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-}
-.orders-header h1 { margin: 0; color: #0b3d91; }
-.orders-header p { margin-top: 6px; color: #444; font-size: 0.95rem; }
-.header-right .btn { margin-left: 12px; }
+.orders-summary { display:flex; flex-wrap:wrap; gap:15px; margin-top:25px; }
+.summary-panel { display:flex; align-items:center; gap:12px; padding:15px 20px; background:#1a237e; color:#fff; border-radius:10px; min-width:140px; flex:1; box-shadow:0 6px 18px rgba(0,0,0,.08); }
+.summary-icon { font-size:1.8rem; }
 
-/* ===== SUMMARY ===== */
-.orders-summary { margin-top: 25px; }
-.summary-card {
-    display: inline-block;
-    padding: 18px 25px;
-    border-radius: 12px;
-    background: linear-gradient(135deg, #0b3d91, #0f5bb5);
-    color: #fff;
-    font-weight: 600;
-    font-size: 1.1rem;
-}
+.filter-panel { margin-top:25px; background:#fff; padding:15px 20px; border-radius:12px; box-shadow:0 6px 18px rgba(0,0,0,.08); }
+.filter-buttons { display:flex; flex-wrap:wrap; gap:10px; }
+.filter-btn { flex:1; padding:10px; border:none; border-radius:8px; background:#e3eaf6; cursor:pointer; font-weight:600; transition:all .3s; }
+.filter-btn.active, .filter-btn:hover { background:#1a237e; color:#fff; }
 
-/* ===== MAIN LAYOUT ===== */
-.orders-main { display: grid; grid-template-columns: 250px 1fr; gap: 25px; margin-top: 30px; }
+.orders-grid { margin-top:25px; display:grid; gap:15px; }
 
-/* ===== FILTER PANEL ===== */
-.filter-panel {
-    background: #fff;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 8px 24px rgba(0,0,0,.08);
-}
-.filter-panel h3 { margin-bottom: 15px; font-size: 1.1rem; color: #0b3d91; }
-.filter-btn {
-    width: 100%;
-    margin-bottom: 10px;
-    padding: 12px;
-    border-radius: 8px;
-    border: none;
-    background: #e2e8f0;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-.filter-btn.active,
-.filter-btn:hover {
-    background: #0b3d91;
-    color: #fff;
-}
+.order-row { background:#fff; border-radius:12px; box-shadow:0 8px 20px rgba(0,0,0,.08); overflow:hidden; }
+.row-header { display:flex; justify-content:space-between; align-items:center; padding:12px 15px; cursor:pointer; }
+.row-header .sn { font-weight:600; color:#555; }
+.row-header .product { font-weight:600; color:#1a237e; }
+.status { padding:5px 12px; border-radius:20px; color:#fff; font-size:.85rem; text-transform:uppercase; }
+.status.confirmed { background:#28a745; } 
+.status.pending { background:#f0ad4e; }
 
-/* ===== ORDERS GRID ===== */
-.orders-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-    gap: 25px;
-}
+.row-details { display:none; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap:12px; padding:12px 15px; border-top:1px solid #e1e5eb; }
+.details-section { background:#f4f6fa; padding:10px; border-radius:8px; }
+.details-section h4 { font-weight:600; color:#1a237e; margin-bottom:6px; font-size:.95rem; }
+.details-section p { margin:3px 0; font-size:.88rem; }
 
-/* ===== ORDER CARD ===== */
-.order-card {
-    background: #fff;
-    border-radius: 16px;
-    box-shadow: 0 12px 28px rgba(0,0,0,.12);
-    padding: 20px;
-    display: grid;
-    grid-template-rows: auto 1fr auto;
-}
-.card-header { display: flex; justify-content: space-between; align-items: center; }
-.sn { font-weight: 600; color: #999; }
-.product-name { margin: 10px 0 15px; color: #0b3d91; font-size: 1.2rem; font-weight: 600; }
-.status { padding: 6px 16px; border-radius: 20px; color: #fff; font-size: 0.8rem; }
-.status.confirmed { background: #28a745; }
-.status.pending { background: #f0ad4e; }
+.row-actions { display:flex; gap:10px; margin-top:10px; }
 
-/* ===== CARD SECTIONS ===== */
-.card-section { margin-top: 12px; font-size: 0.92rem; color: #333; }
-.card-section h4 { font-weight: 600; color: #0b3d91; margin-bottom: 6px; }
-.card-section p { margin: 3px 0; }
-.order-details { background: #eaf2ff; padding: 10px; border-radius: 10px; }
+.btn { padding:8px 10px; border-radius:6px; font-weight:600; border:none; cursor:pointer; }
+.success-btn { background:#28a745; color:#fff; }
+.danger-btn { background:#dc3545; color:#fff; }
+.primary-btn { background:#1a237e; color:#fff; }
+.secondary-btn { background:#6c757d; color:#fff; }
+.print-btn { background:#495057; color:#fff; }
+.disabled { opacity:.6; cursor:not-allowed; }
 
-/* ===== CARD ACTIONS ===== */
-.card-actions { margin-top: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.btn { padding: 10px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; text-align: center; }
-.primary-btn { background: #0b3d91; color: #fff; }
-.secondary-btn { background: #6c757d; color: #fff; }
-.success-btn { background: #28a745; color: #fff; }
-.danger-btn { background: #dc3545; color: #fff; }
-.print-btn { background: #495057; color: #fff; }
-.disabled { opacity: 0.6; cursor: not-allowed; }
-
-/* ===== PRINT STYLING ===== */
-@media print {
-    .header-right, .filter-panel, .card-actions { display: none !important; }
-    body { background: #fff; }
-}
-
-/* ===== RESPONSIVE ===== */
-@media (max-width: 1200px) {
-    .orders-main { grid-template-columns: 1fr; }
+@media (max-width:768px) {
+    .row-details { grid-template-columns:1fr; }
+    .orders-summary { flex-direction:column; }
+    .filter-buttons { flex-direction:column; }
 }
 </style>
 

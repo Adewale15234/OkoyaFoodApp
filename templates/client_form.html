@@ -151,11 +151,10 @@ body {
 
 /* ===== A4 SHEET ===== */
 .a4-sheet {
-  width: 210mm;
-  min-height: 297mm;
+  max-width: 900px;         /* Prevent overflow on laptops */
+  margin: 50px auto 40px;   /* Top margin is safe, centered horizontally */
+  padding: 30px;
   background: #fff;
-  margin: 60px auto 40px;
-  padding: 35px;
   box-shadow: 0 15px 40px rgba(0,0,0,.15);
   box-sizing: border-box;
 }
@@ -276,14 +275,16 @@ body {
   }
   .a4-sheet {
     box-shadow: none;
-    margin: 0;
+    margin: 0 auto;
+    max-width: 210mm;
+    width: 100%;
   }
 }
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 1200px) {
   .a4-sheet {
-    margin: 40px 10px;
+    margin: 30px 10px 30px;  /* Keep margin safe on smaller screens */
   }
   .form-grid {
     grid-template-columns: 1fr;
