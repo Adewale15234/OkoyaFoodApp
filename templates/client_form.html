@@ -7,7 +7,6 @@
     <!-- ================= HEADER ================= -->
     <header class="header sticky-header">
       <div class="header-left">
-        <!-- LOGO -->
         <img src="{{ url_for('static', filename='images/logo.png') }}"
              alt="Okoya Food Logo" class="company-logo">
       </div>
@@ -31,11 +30,12 @@
       </div>
     </header>
 
-    <!-- Spacer to prevent sticky header overlap -->
-    <div class="header-spacer"></div>
-
     <!-- ================= FORM ================= -->
-    <form method="post" action="{{ url_for('client_form') }}" class="order-form" onsubmit="showSuccessNotification()">
+    <form method="post"
+          action="{{ url_for('client_form') }}"
+          class="order-form"
+          onsubmit="showSuccessNotification()">
+
       <div class="form-grid">
 
         <!-- LEFT COLUMN -->
@@ -76,7 +76,8 @@
 
           <div class="form-group">
             <label>Kilograms</label>
-            <input id="kilograms" name="kilograms" type="number" min="0" onchange="recalcTotal()">
+            <input id="kilograms" name="kilograms" type="number"
+                   min="0" onchange="recalcTotal()">
           </div>
         </div>
 
@@ -84,7 +85,8 @@
         <div class="form-column">
           <div class="form-group">
             <label>Unit Price (₦ / kg)</label>
-            <input id="unit_price" name="unit_price" type="number" step="0.01" onchange="recalcTotal()">
+            <input id="unit_price" name="unit_price" type="number"
+                   step="0.01" onchange="recalcTotal()">
           </div>
 
           <div class="form-group highlight">
@@ -120,7 +122,6 @@
 
       </div>
 
-      <!-- ================= ACTIONS ================= -->
       <div class="actions">
         <button type="button" class="btn-print" onclick="window.print()">🖨 Print</button>
         <button type="submit" class="btn-submit">Submit Order</button>
@@ -128,7 +129,6 @@
 
     </form>
 
-    <!-- ================= FOOTER ================= -->
     <footer class="footer">
       © {{ current_year | default(2026) }} OKOYA FOOD COMPANY LIMITED
     </footer>
@@ -143,87 +143,47 @@ function recalcTotal() {
   document.getElementById('total_amount').value = (kg * price).toFixed(2);
 }
 
-// Popup notification on form submit
 function showSuccessNotification() {
   alert('Form submitted successfully!');
 }
 </script>
 
 <style>
+:root {
+  --header-height: 190px;
+}
+
 body {
   background: #eef3f8;
   margin: 0;
-  padding: 0;
   font-family: 'Poppins', sans-serif;
-}
-
-/* ===== HEADER SPACER ===== */
-.header-spacer {
-  height: 180px; /* big top space to pull content down */
 }
 
 /* ===== A4 SHEET ===== */
 .a4-sheet {
   max-width: 1000px;
-  margin: 0 auto 50px;
-  padding: 50px;
+  margin: 80px auto 50px;
+  padding: calc(var(--header-height) + 30px) 50px 50px;
   background: #fff;
   box-shadow: 0 15px 40px rgba(0,0,0,.15);
-  box-sizing: border-box;
   min-height: 1600px;
   border: 1px solid #ccc;
   border-radius: 8px;
+  position: relative;
 }
 
 /* ===== HEADER ===== */
 .header {
   position: sticky;
-  top: 20px;  /* sticky header */
+  top: 0;
+  height: var(--header-height);
   display: grid;
   grid-template-columns: 160px 1fr 160px;
   align-items: center;
-  gap: 20px;
-  border-bottom: 4px solid #1e7e34;
-  padding-bottom: 20px;
-  margin-bottom: 40px;
   background: #fff;
+  border-bottom: 4px solid #1e7e34;
   z-index: 10;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-}
-
-.company-logo {
-  width: 160px;
-  height: auto;
-}
-
-.company-name {
-  color: #1e7e34;
-  font-size: 36px;
-  font-weight: bold;
-  margin: 0;
-}
-
-.company-motto {
-  font-size: 17px;
-  color: #444;
-  margin: 5px 0;
-}
-
-.company-address {
-  font-size: 14px;
-  color: white;
-  background-color: black;
-  font-weight: bold;
-  padding: 6px 12px;
-  display: inline-block;
-  border-radius: 5px;
-  margin-top: 5px;
-}
-
-.back-btn {
-  text-decoration: none;
-  font-weight: bold;
-  color: #007bff;
+  padding-bottom: 15px;
 }
 
 /* ===== FORM ===== */
@@ -233,103 +193,24 @@ body {
   gap: 30px;
 }
 
-.form-column {
-  display: flex;
-  flex-direction: column;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 15px;
-}
-
-.form-group label {
-  font-weight: 700;
-  margin-bottom: 5px;
-}
-
 .form-group input,
 .form-group select,
 .form-group textarea {
   border: none;
   border-bottom: 2px solid #1e7e34;
   padding: 8px;
-  font-size: 14px;
-  color: #000;  /* black text for all inputs */
-}
-
-.form-group.highlight input {
-  font-size: 18px;
-  font-weight: bold;
-  color: #1e7e34;
-}
-
-/* ===== ACTIONS ===== */
-.actions {
-  margin-top: 30px;
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-}
-
-.btn-print {
-  background: #28a745;
-  color: #fff;
-  padding: 12px 25px;
-  border: none;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.btn-submit {
-  background: #007bff;
-  color: #fff;
-  padding: 12px 25px;
-  border: none;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-/* ===== FOOTER ===== */
-.footer {
-  margin-top: 30px;
-  text-align: center;
-  font-size: 12px;
-  color: #666;
+  color: #000;
 }
 
 /* ===== PRINT ===== */
 @media print {
-  body { background: #fff; margin: 0; }
-  .back-btn, .actions { display: none; }
+  body { background: #fff; }
+  .header, .actions { display: none; }
   .a4-sheet {
     box-shadow: none;
-    margin: 20mm auto;
     padding: 25mm;
-    width: 200mm;
-    max-width: 200mm;
-    min-height: 280mm;
-    border: 1px solid #000;
+    margin: 0;
   }
-}
-
-/* ===== RESPONSIVE ===== */
-@media (max-width: 1200px) {
-  .a4-sheet { margin: 0 auto 30px; padding: 40px; }
-  .form-grid { grid-template-columns: 1fr; }
-  .header { grid-template-columns: 120px 1fr 130px; gap: 10px; }
-  .company-logo { width: 120px; }
-  .company-name { font-size: 32px; }
-}
-
-@media (max-width: 768px) {
-  .a4-sheet { padding: 30px; }
-  .company-name { font-size: 28px; }
-  .company-motto { font-size: 14px; }
-  .form-group input,
-  .form-group select,
-  .form-group textarea { font-size: 14px; }
 }
 </style>
 
