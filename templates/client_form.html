@@ -145,7 +145,7 @@ function recalcTotal() {
 body {
   background: #eef3f8;
   margin: 0;
-  padding: 20px;
+  padding: 0;
   font-family: 'Poppins', sans-serif;
 }
 
@@ -154,9 +154,10 @@ body {
   width: 210mm;
   min-height: 297mm;
   background: #fff;
-  margin: auto;
-  padding: 40px;
+  margin: 60px auto 40px; /* ✅ top margin added */
+  padding: 35px;
   box-shadow: 0 15px 40px rgba(0,0,0,.15);
+  box-sizing: border-box;
 }
 
 /* ===== HEADER ===== */
@@ -176,7 +177,7 @@ body {
 
 .company-name {
   color: #1e7e34;
-  font-size: 28px;
+  font-size: 26px;
   margin: 0;
 }
 
@@ -275,6 +276,24 @@ body {
   }
   .a4-sheet {
     box-shadow: none;
+    margin: 0;
+  }
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1200px) {
+  .a4-sheet {
+    margin: 40px 10px; /* reduces overflow on smaller laptops */
+  }
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  .header {
+    grid-template-columns: 60px 1fr 80px;
+    gap: 10px;
+  }
+  .company-name {
+    font-size: 22px;
   }
 }
 </style>
