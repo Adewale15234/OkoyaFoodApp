@@ -144,12 +144,12 @@ body {
   font-family: 'Poppins', sans-serif;
 }
 
-/* A4 SHEET */
+/* A4 SHEET — starts at top */
 .a4-sheet {
   width: 210mm;
   min-height: 297mm;
-  margin: 30px auto;
-  padding: 40px 20mm 20mm; /* form starts just below header */
+  margin: 10px auto; /* minimal margin */
+  padding: 20px 20mm; /* removed extra top padding */
   background: #fff;
   box-shadow: 0 15px 40px rgba(0,0,0,.15);
   box-sizing: border-box;
@@ -160,10 +160,10 @@ body {
 .header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   background: #fff;
   border-bottom: 4px solid #000;
-  padding: 20px 20mm;
+  padding: 10px 20mm;
 }
 
 .header-center {
@@ -195,6 +195,7 @@ body {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 24px;
+  margin-top: 20px; /* space between header and form */
 }
 
 .form-group input,
