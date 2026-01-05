@@ -32,7 +32,7 @@
     </header>
 
     <!-- ================= FORM ================= -->
-    <form method="post" action="{{ url_for('client_form') }}" class="order-form">
+    <form method="post" action="{{ url_for('client_form') }}" class="order-form" onsubmit="showSuccessNotification()">
       <div class="form-grid">
 
         <!-- LEFT COLUMN -->
@@ -139,6 +139,11 @@ function recalcTotal() {
   const price = parseFloat(document.getElementById('unit_price').value) || 0;
   document.getElementById('total_amount').value = (kg * price).toFixed(2);
 }
+
+// Popup notification on form submit
+function showSuccessNotification() {
+  alert('Form submitted successfully!');
+}
 </script>
 
 <style>
@@ -152,13 +157,13 @@ body {
 /* ===== A4 SHEET ===== */
 .a4-sheet {
   max-width: 1000px;
-  margin: 380px auto 50px;   /* Pulled down further to avoid cutting top */
-  padding: 60px;
+  margin: 100px auto 50px;    /* top space pulled down to prevent cut off */
+  padding: 50px;
   background: #fff;
   box-shadow: 0 15px 40px rgba(0,0,0,.15);
   box-sizing: border-box;
-  min-height: 1600px;        /* Increased height for full content */
-  border: 1px solid #ccc;    /* Visible A4 edge */
+  min-height: 1600px;
+  border: 1px solid #ccc;
   border-radius: 8px;
 }
 
@@ -169,7 +174,7 @@ body {
   align-items: center;
   gap: 20px;
   border-bottom: 4px solid #1e7e34;
-  padding-bottom: 25px;
+  padding-bottom: 20px;
   margin-bottom: 40px;
 }
 
@@ -202,7 +207,6 @@ body {
   margin-top: 5px;
 }
 
-/* Back Button */
 .back-btn {
   text-decoration: none;
   font-weight: bold;
@@ -214,6 +218,11 @@ body {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 30px;
+}
+
+.form-column {
+  display: flex;
+  flex-direction: column;
 }
 
 .form-group {
@@ -234,6 +243,7 @@ body {
   border-bottom: 2px solid #1e7e34;
   padding: 8px;
   font-size: 14px;
+  color: #000;   /* make text black */
 }
 
 .form-group.highlight input {
@@ -293,29 +303,26 @@ body {
     width: 200mm;
     max-width: 200mm;
     min-height: 280mm;
-    border: 1px solid #000;  /* Keep visible A4 border in print */
+    border: 1px solid #000;
   }
 }
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 1200px) {
-  .a4-sheet {
-    margin: 350px 10px 30px;
-    padding: 50px;
-  }
-  .form-grid {
-    grid-template-columns: 1fr;
-  }
-  .header {
-    grid-template-columns: 120px 1fr 130px;
-    gap: 10px;
-  }
-  .company-logo {
-    width: 120px;
-  }
-  .company-name {
-    font-size: 32px;
-  }
+  .a4-sheet { margin: 80px 10px 30px; padding: 40px; }
+  .form-grid { grid-template-columns: 1fr; }
+  .header { grid-template-columns: 120px 1fr 130px; gap: 10px; }
+  .company-logo { width: 120px; }
+  .company-name { font-size: 32px; }
+}
+
+@media (max-width: 768px) {
+  .a4-sheet { padding: 30px; }
+  .company-name { font-size: 28px; }
+  .company-motto { font-size: 14px; }
+  .form-group input,
+  .form-group select,
+  .form-group textarea { font-size: 14px; }
 }
 </style>
 
