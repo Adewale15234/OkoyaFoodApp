@@ -5,10 +5,9 @@
   <div class="a4-sheet">
 
     <!-- ================= HEADER ================= -->
-    <header class="header sticky-header">
+    <header class="header">
       <div class="header-left">
-        <img src="{{ url_for('static', filename='images/logo.png') }}"
-             alt="Okoya Food Logo" class="company-logo">
+        <!-- logo removed -->
       </div>
 
       <div class="header-center">
@@ -30,11 +29,12 @@
       </div>
     </header>
 
-    <!-- Spacer controls header offset -->
-    <div class="header-spacer"></div>
-
     <!-- ================= FORM ================= -->
-    <form method="post" action="{{ url_for('client_form') }}" class="order-form" onsubmit="showSuccessNotification()">
+    <form method="post"
+          action="{{ url_for('client_form') }}"
+          class="order-form"
+          onsubmit="showSuccessNotification()">
+
       <div class="form-grid">
 
         <div class="form-column">
@@ -74,14 +74,14 @@
 
           <div class="form-group">
             <label>Kilograms</label>
-            <input id="kilograms" name="kilograms" type="number" min="0" onchange="recalcTotal()">
+            <input id="kilograms" name="kilograms" type="number" min="0" oninput="recalcTotal()">
           </div>
         </div>
 
         <div class="form-column">
           <div class="form-group">
             <label>Unit Price (₦ / kg)</label>
-            <input id="unit_price" name="unit_price" type="number" step="0.01" onchange="recalcTotal()">
+            <input id="unit_price" name="unit_price" type="number" step="0.01" oninput="recalcTotal()">
           </div>
 
           <div class="form-group highlight">
@@ -148,37 +148,44 @@ body {
   font-family: 'Poppins', sans-serif;
 }
 
-/* HEADER SPACER — single source of truth */
-.header-spacer {
-  height: 210px;
-}
-
-/* A4 SHEET — true A4 fit, no scaling */
+/* A4 SHEET */
 .a4-sheet {
   width: 210mm;
   min-height: 297mm;
-  margin: 0 auto 20px;
-  padding: 20mm;
+  margin: 30px auto;
+  padding: 200px 20mm 20mm; /* top padding reduced slightly */
   background: #fff;
   box-shadow: 0 15px 40px rgba(0,0,0,.15);
   box-sizing: border-box;
-  border: 1px solid #ccc;
   border-radius: 8px;
 }
 
-/* HEADER — no margin-bottom */
+/* HEADER */
 .header {
   position: sticky;
   top: 0;
+  margin: -200px -20mm 30px; /* match top padding */
+  padding: 20px 20mm;
   display: grid;
-  grid-template-columns: 160px 1fr 160px;
-  align-items: center;
+  grid-template-columns: 1fr 1fr 1fr;
   gap: 20px;
-  border-bottom: 4px solid #1e7e34;
-  padding: 15px 0;
+  align-items: center;
   background: #fff;
+  border-bottom: 4px solid #000; /* changed to black */
   z-index: 10;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.company-name {
+  font-size: 28px; /* reduced size */
+  color: #000;     /* black color */
+  font-weight: bold;
+  margin: 0;
+}
+
+.company-motto {
+  font-size: 16px;
+  color: #444;
+  margin: 5px 0;
 }
 
 /* FORM */
@@ -195,15 +202,13 @@ body {
   color: #000;
 }
 
-/* PRINT — perfect A4 */
+/* PRINT */
 @media print {
   body { background: #fff; }
   .actions, .back-btn { display: none; }
   .a4-sheet {
     margin: 0;
-    padding: 20mm;
     box-shadow: none;
-    border: none;
   }
 }
 </style>
