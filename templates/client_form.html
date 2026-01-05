@@ -152,8 +152,8 @@ body {
 /* ===== A4 SHEET ===== */
 .a4-sheet {
   max-width: 900px;
-  margin: 180px auto 50px;   /* FINAL top margin: 180px */
-  padding: 40px;
+  margin: 200px auto 50px;   /* Top margin increased to 200px */
+  padding: 50px;             /* Extra padding for spacing */
   background: #fff;
   box-shadow: 0 15px 40px rgba(0,0,0,.15);
   box-sizing: border-box;
@@ -162,33 +162,33 @@ body {
 /* ===== HEADER ===== */
 .header {
   display: grid;
-  grid-template-columns: 100px 1fr 140px;
+  grid-template-columns: 120px 1fr 150px;
   align-items: center;
-  gap: 15px;
+  gap: 20px;
   border-bottom: 4px solid #1e7e34;
-  padding-bottom: 20px;
-  margin-bottom: 30px;
+  padding-bottom: 25px;
+  margin-bottom: 35px;
 }
 
 .company-logo {
-  width: 100px;
+  width: 120px;      /* Increased logo width */
   margin-top: 0;
 }
 
 .company-name {
   color: #1e7e34;
-  font-size: 28px;
+  font-size: 30px;
   margin: 0;
 }
 
 .company-motto {
-  font-size: 15px;
+  font-size: 16px;
   color: #444;
   margin: 5px 0;
 }
 
 .company-address {
-  font-size: 13px;
+  font-size: 14px;
   color: #666;
 }
 
@@ -279,7 +279,7 @@ body {
     margin: 0 auto;
     max-width: 210mm;
     width: 100%;
-    padding: 20px;
+    padding: 30px;   /* Adjusted for print */
   }
 }
 
@@ -287,17 +287,20 @@ body {
 @media (max-width: 1200px) {
   .a4-sheet {
     margin: 150px 10px 30px;
-    padding: 30px;
+    padding: 35px;
   }
   .form-grid {
     grid-template-columns: 1fr;
   }
   .header {
-    grid-template-columns: 70px 1fr 100px;
+    grid-template-columns: 80px 1fr 120px;
     gap: 10px;
   }
+  .company-logo {
+    width: 100px;
+  }
   .company-name {
-    font-size: 24px;
+    font-size: 26px;
   }
 }
 </style>
