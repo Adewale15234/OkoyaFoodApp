@@ -42,7 +42,6 @@
 
         <!-- ORDERS -->
         <section class="orders-grid">
-
             {% macro order_card(order, sn) %}
             <article class="order-card" data-category="{{ order.items|lower|replace(' ', '') }}">
                 
@@ -83,7 +82,6 @@
                     {% else %}
                         <button class="btn success disabled">✅ Confirmed</button>
                     {% endif %}
-
                     <form method="POST" action="{{ url_for('delete_order', order_id=order.id) }}"
                           onsubmit="return confirm('Delete this order?');">
                         <button class="btn danger">🗑 Delete</button>
@@ -135,7 +133,7 @@ document.addEventListener('DOMContentLoaded', () => {
 <style>
 /* ===== GLOBAL ===== */
 .enterprise-wrapper {
-    font-family: 'Inter', 'Poppins', sans-serif;
+    font-family: 'Poppins', sans-serif;
     background: #f5f7fb;
     min-height: 100vh;
     padding: 30px;
@@ -157,7 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
 }
 .title-group p {
     margin-top: 6px;
-    color: #555;
+    color: #0a2540; /* Darker for visibility */
 }
 .top-actions {
     display: flex;
@@ -247,9 +245,10 @@ document.addEventListener('DOMContentLoaded', () => {
 .info-block {
     margin-top: 10px;
     font-size: .9rem;
+    color: #0a2540; /* dark for visibility */
 }
 .info-block.highlight {
-    background: #f2f6fb;
+    background: #e6f2ff;
     padding: 10px;
     border-radius: 10px;
 }

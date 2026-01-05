@@ -142,11 +142,11 @@ function recalcTotal() {
 </script>
 
 <style>
-/* ===== PAGE ===== */
 body {
   background: #eef3f8;
   margin: 0;
   padding: 20px;
+  font-family: 'Poppins', sans-serif;
 }
 
 /* ===== A4 SHEET ===== */
@@ -155,15 +155,16 @@ body {
   min-height: 297mm;
   background: #fff;
   margin: auto;
-  padding: 35px;
+  padding: 40px;
   box-shadow: 0 15px 40px rgba(0,0,0,.15);
 }
 
 /* ===== HEADER ===== */
 .header {
   display: grid;
-  grid-template-columns: 1fr 3fr 1fr;
+  grid-template-columns: 90px 1fr 120px;
   align-items: center;
+  gap: 15px;
   border-bottom: 4px solid #1e7e34;
   padding-bottom: 15px;
   margin-bottom: 25px;
@@ -175,7 +176,7 @@ body {
 
 .company-name {
   color: #1e7e34;
-  font-size: 26px;
+  font-size: 28px;
   margin: 0;
 }
 
@@ -190,7 +191,6 @@ body {
   color: #666;
 }
 
-/* ===== BACK BUTTON ===== */
 .back-btn {
   text-decoration: none;
   font-weight: bold;
@@ -201,12 +201,13 @@ body {
 .form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 25px;
+  gap: 30px;
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
+  margin-bottom: 15px;
 }
 
 .form-group label {
@@ -219,7 +220,7 @@ body {
 .form-group textarea {
   border: none;
   border-bottom: 2px solid #1e7e34;
-  padding: 6px;
+  padding: 8px;
   font-size: 14px;
 }
 
@@ -243,6 +244,7 @@ body {
   padding: 12px 25px;
   border: none;
   font-weight: bold;
+  cursor: pointer;
 }
 
 .btn-submit {
@@ -251,6 +253,7 @@ body {
   padding: 12px 25px;
   border: none;
   font-weight: bold;
+  cursor: pointer;
 }
 
 /* ===== FOOTER ===== */
@@ -264,7 +267,7 @@ body {
 /* ===== PRINT ===== */
 @media print {
   body {
-    background: none;
+    background: #fff;
   }
   .back-btn,
   .actions {
