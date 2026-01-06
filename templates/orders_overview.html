@@ -79,35 +79,34 @@
     </aside>
 
     <div class="filter-time" style="margin-top:12px;">
-    <label for="date-search">Search by Date:</label>
-    <input
-    type="date"
-    id="date-search"
-    style="
-        padding:6px 10px;
-        border-radius:6px;
-        border:1px solid #d1d5db;
-        width:100%;
-        color:#000;
-        background:#fff;
-    "
->
+        <label for="date-search">Search by Date:</label>
+        <input
+            type="date"
+            id="date-search"
+            style="
+                padding:6px 10px;
+                border-radius:6px;
+                border:1px solid #d1d5db;
+                width:100%;
+                color:#000;
+                background:#fff;
+            "
+        >
+    </div>
 
-</div>
-
-<div style="margin-top:10px;">
-    <button id="reset-filters" class="filter-btn" style="background:#6b7280;color:#fff;">
-        Reset Filters
-    </button>
-</div>
+    <div style="margin-top:10px;">
+        <button id="reset-filters" class="filter-btn" style="background:#6b7280;color:#fff;">
+            Reset Filters
+        </button>
+    </div>
 
     <!-- ===== ORDERS GRID ===== -->
     <section class="orders-grid">
 
         {% macro order_row(order, sn) %}
         <div class="order-row"
-     data-category="{{ order.items|lower }}"
-     data-date="{{ order.date.strftime('%Y-%m-%d') if order.date else '' }}">
+             data-category="{{ order.items|lower }}"
+             data-date="{{ order.date.strftime('%Y-%m-%d') if order.date else '' }}">
 
             <div class="row-header">
                 <span class="sn">#{{ sn }}</span>
@@ -181,8 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const resetBtn = document.getElementById('reset-filters');
 
     function filterOrders() {
-        const activeCategory =
-            document.querySelector('.filter-btn.active')?.dataset.category || 'all';
+        const activeCategory = document.querySelector('.filter-btn.active')?.dataset.category || 'all';
         const timeValue = timeFilter.value;
         const selectedDate = dateSearch.value;
 
@@ -197,23 +195,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
             let show = true;
 
-            /* CATEGORY */
-            if (activeCategory !== 'all') {
-                if (!rowCategory.includes(activeCategory)) {
-                    show = false;
-                }
+            /* CATEGORY FILTER */
+            if (activeCategory !== 'all' && !rowCategory.includes(activeCategory)) {
+                show = false;
             }
 
-            /* TIME */
+            /* TIME FILTER */
             if (show && timeValue !== 'all' && rowDate) {
                 if (timeValue === 'day' && rowDate !== todayStr) show = false;
                 if (timeValue === 'month' && !rowDate.startsWith(monthStr)) show = false;
                 if (timeValue === 'year' && !rowDate.startsWith(yearStr)) show = false;
             }
 
-            /* DATE SEARCH */
-            if (show && selectedDate && rowDate !== selectedDate) {
-                show = false;
+            /* DATE SEARCH FILTER */
+            if (show && selectedDate) {
+                show = rowDate === selectedDate;
             }
 
             row.style.display = show ? '' : 'none';
