@@ -179,6 +179,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const dateSearch = document.getElementById('date-search');
     const resetBtn = document.getElementById('reset-filters');
 
+    /* ===== FILTER FUNCTION ===== */
     function filterOrders() {
         const activeCategory = document.querySelector('.filter-btn.active')?.dataset.category || 'all';
         const timeValue = timeFilter.value;
@@ -216,6 +217,23 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    /* ===== TOGGLE DETAILS FUNCTION ===== */
+    rows.forEach(row => {
+        const toggleBtn = row.querySelector('.toggle-btn');
+        const details = row.querySelector('.row-details');
+
+        toggleBtn.addEventListener('click', () => {
+            if (details.style.display === 'grid' || details.style.display === 'block') {
+                details.style.display = 'none';
+                toggleBtn.textContent = 'Details ▼';
+            } else {
+                details.style.display = 'grid';
+                toggleBtn.textContent = 'Hide ▲';
+            }
+        });
+    });
+
+    /* ===== FILTER BUTTON CLICK ===== */
     buttons.forEach(btn => {
         btn.addEventListener('click', () => {
             buttons.forEach(b => b.classList.remove('active'));
