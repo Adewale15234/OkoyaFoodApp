@@ -80,7 +80,19 @@
 
     <div class="filter-time" style="margin-top:12px;">
     <label for="date-search">Search by Date:</label>
-    <input type="date" id="date-search" style="padding:6px 10px;border-radius:6px;border:1px solid #d1d5db;width:100%;">
+    <input
+    type="date"
+    id="date-search"
+    style="
+        padding:6px 10px;
+        border-radius:6px;
+        border:1px solid #d1d5db;
+        width:100%;
+        color:#000;
+        background:#fff;
+    "
+>
+
 </div>
 
 <div style="margin-top:10px;">
@@ -93,7 +105,10 @@
     <section class="orders-grid">
 
         {% macro order_row(order, sn) %}
-        <div class="order-row" data-category="{{ order.items|lower|replace(' ', '') }}" data-date="{{ order.date.strftime('%Y-%m-%d') if order.date else '' }}">
+        <div class="order-row"
+     data-category="{{ order.items|lower }}"
+     data-date="{{ order.date.strftime('%Y-%m-%d') if order.date else '' }}">
+
             <div class="row-header">
                 <span class="sn">#{{ sn }}</span>
                 <span class="product">{{ order.items }}</span>
@@ -166,9 +181,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const resetBtn = document.getElementById('reset-filters');
 
     function filterOrders() {
-        const activeCategory = document.querySelector('.filter-btn.active')?.dataset.category || 'all';
+        const activeCategory =
+            document.querySelector('.filter-btn.active')?.dataset.category || 'all';
         const timeValue = timeFilter.value;
-        const selectedDate = dateSearch.value; // yyyy-mm-dd
+        const selectedDate = dateSearch.value;
 
         const today = new Date();
         const todayStr = today.toISOString().slice(0, 10);
@@ -176,33 +192,34 @@ document.addEventListener('DOMContentLoaded', () => {
         const yearStr = today.getFullYear().toString();
 
         rows.forEach(row => {
-            const rowCategory = row.dataset.category;
-            const rowDate = row.dataset.date;
+            const rowCategory = row.dataset.category || '';
+            const rowDate = row.dataset.date || '';
 
             let show = true;
 
-            // CATEGORY FILTER
-            if (activeCategory !== 'all' && !rowCategory.includes(activeCategory)) {
-                show = false;
+            /* CATEGORY */
+            if (activeCategory !== 'all') {
+                if (!rowCategory.includes(activeCategory)) {
+                    show = false;
+                }
             }
 
-            // TIME FILTER
+            /* TIME */
             if (show && timeValue !== 'all' && rowDate) {
                 if (timeValue === 'day' && rowDate !== todayStr) show = false;
                 if (timeValue === 'month' && !rowDate.startsWith(monthStr)) show = false;
                 if (timeValue === 'year' && !rowDate.startsWith(yearStr)) show = false;
             }
 
-            // MANUAL DATE SEARCH
+            /* DATE SEARCH */
             if (show && selectedDate && rowDate !== selectedDate) {
                 show = false;
             }
 
-            row.style.display = show ? 'block' : 'none';
+            row.style.display = show ? '' : 'none';
         });
     }
 
-    // Category buttons
     buttons.forEach(btn => {
         btn.addEventListener('click', () => {
             buttons.forEach(b => b.classList.remove('active'));
@@ -211,13 +228,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Time filter
     timeFilter.addEventListener('change', filterOrders);
-
-    // Date search
     dateSearch.addEventListener('change', filterOrders);
 
-    // Reset
     resetBtn.addEventListener('click', () => {
         buttons.forEach(b => b.classList.remove('active'));
         document.querySelector('.filter-btn[data-category="all"]').classList.add('active');
@@ -225,32 +238,7 @@ document.addEventListener('DOMContentLoaded', () => {
         dateSearch.value = '';
         filterOrders();
     });
-
-    // Toggle details
-    document.querySelectorAll('.toggle-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const details = btn.closest('.order-row').querySelector('.row-details');
-            details.style.display = details.style.display === 'grid' ? 'none' : 'grid';
-            btn.textContent = details.style.display === 'grid' ? 'Details ▲' : 'Details ▼';
-        });
-    });
 });
-
-function printOrder(button) {
-    const order = button.closest('.order-row');
-    const printContent = order.cloneNode(true);
-    printContent.querySelector('.row-actions').style.display = 'none';
-    printContent.style.boxShadow = 'none';
-
-    const printWindow = window.open('', '', 'height=600,width=800');
-    printWindow.document.write('<html><head><title>Print Order</title>');
-    printWindow.document.write('<style>body{font-family:Poppins,sans-serif;padding:20px;background:#fff;} .details-section{margin-bottom:12px;}</style>');
-    printWindow.document.write('</head><body>');
-    printWindow.document.write(printContent.innerHTML);
-    printWindow.document.write('</body></html>');
-    printWindow.document.close();
-    printWindow.print();
-}
 </script>
 
 <!-- ===== STYLES ===== -->
