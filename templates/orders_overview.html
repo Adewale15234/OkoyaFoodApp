@@ -60,7 +60,6 @@
     <!-- ===== FILTER PANEL ===== -->
     <aside class="filter-panel">
         <h3>Filter Orders</h3>
-
         <div class="filter-buttons">
             <button class="filter-btn active" data-category="all">All</button>
             <button class="filter-btn" data-category="soya">Soya Beans</button>
@@ -68,7 +67,6 @@
             <button class="filter-btn" data-category="maize">Maize</button>
             <button class="filter-btn" data-category="rice">Rice</button>
         </div>
-
         <div class="filter-time" style="margin-top:12px;">
             <label for="time-filter">Time:</label>
             <select id="time-filter">
@@ -78,22 +76,24 @@
                 <option value="year">This Year</option>
             </select>
         </div>
-
-        <!-- ✅ ADDED MODERN DATE SEARCH -->
-        <div style="margin-top:12px;">
-            <label for="date-search">Search Date:</label>
-            <input type="date" id="date-search"
-                   style="width:100%;padding:8px;border-radius:6px;border:1px solid #d1d5db;">
-        </div>
     </aside>
+
+    <div class="filter-time" style="margin-top:12px;">
+    <label for="date-search">Search by Date:</label>
+    <input type="date" id="date-search" style="padding:6px 10px;border-radius:6px;border:1px solid #d1d5db;width:100%;">
+</div>
+
+<div style="margin-top:10px;">
+    <button id="reset-filters" class="filter-btn" style="background:#6b7280;color:#fff;">
+        Reset Filters
+    </button>
+</div>
 
     <!-- ===== ORDERS GRID ===== -->
     <section class="orders-grid">
 
         {% macro order_row(order, sn) %}
-        <div class="order-row"
-             data-category="{{ order.items|lower|replace(' ', '') }}"
-             data-date="{{ order.date.strftime('%Y-%m-%d') if order.date else '' }}">
+        <div class="order-row" data-category="{{ order.items|lower|replace(' ', '') }}" data-date="{{ order.date.strftime('%Y-%m-%d') if order.date else '' }}">
             <div class="row-header">
                 <span class="sn">#{{ sn }}</span>
                 <span class="product">{{ order.items }}</span>
@@ -156,41 +156,45 @@
     </section>
 </div>
 
-<!-- ===== FIXED FILTER SCRIPT ===== -->
+<!-- ===== FILTER & TOGGLE SCRIPT ===== -->
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-
-    const buttons = document.querySelectorAll('.filter-btn');
+    const buttons = document.querySelectorAll('.filter-btn[data-category]');
     const rows = document.querySelectorAll('.order-row');
     const timeFilter = document.getElementById('time-filter');
     const dateSearch = document.getElementById('date-search');
+    const resetBtn = document.getElementById('reset-filters');
 
     function filterOrders() {
-        const activeCategory = document.querySelector('.filter-btn.active').dataset.category;
+        const activeCategory = document.querySelector('.filter-btn.active')?.dataset.category || 'all';
         const timeValue = timeFilter.value;
-        const searchDate = dateSearch.value;
+        const selectedDate = dateSearch.value; // yyyy-mm-dd
 
         const today = new Date();
-        const todayStr = today.toISOString().split('T')[0];
-        const monthStr = todayStr.slice(0,7);
-        const yearStr = todayStr.slice(0,4);
+        const todayStr = today.toISOString().slice(0, 10);
+        const monthStr = today.toISOString().slice(0, 7);
+        const yearStr = today.getFullYear().toString();
 
         rows.forEach(row => {
             const rowCategory = row.dataset.category;
             const rowDate = row.dataset.date;
+
             let show = true;
 
+            // CATEGORY FILTER
             if (activeCategory !== 'all' && !rowCategory.includes(activeCategory)) {
                 show = false;
             }
 
-            if (show && timeValue !== 'all') {
+            // TIME FILTER
+            if (show && timeValue !== 'all' && rowDate) {
                 if (timeValue === 'day' && rowDate !== todayStr) show = false;
                 if (timeValue === 'month' && !rowDate.startsWith(monthStr)) show = false;
                 if (timeValue === 'year' && !rowDate.startsWith(yearStr)) show = false;
             }
 
-            if (show && searchDate && rowDate !== searchDate) {
+            // MANUAL DATE SEARCH
+            if (show && selectedDate && rowDate !== selectedDate) {
                 show = false;
             }
 
@@ -198,6 +202,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Category buttons
     buttons.forEach(btn => {
         btn.addEventListener('click', () => {
             buttons.forEach(b => b.classList.remove('active'));
@@ -206,9 +211,96 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // Time filter
     timeFilter.addEventListener('change', filterOrders);
+
+    // Date search
     dateSearch.addEventListener('change', filterOrders);
+
+    // Reset
+    resetBtn.addEventListener('click', () => {
+        buttons.forEach(b => b.classList.remove('active'));
+        document.querySelector('.filter-btn[data-category="all"]').classList.add('active');
+        timeFilter.value = 'all';
+        dateSearch.value = '';
+        filterOrders();
+    });
+
+    // Toggle details
+    document.querySelectorAll('.toggle-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const details = btn.closest('.order-row').querySelector('.row-details');
+            details.style.display = details.style.display === 'grid' ? 'none' : 'grid';
+            btn.textContent = details.style.display === 'grid' ? 'Details ▲' : 'Details ▼';
+        });
+    });
 });
+
+function printOrder(button) {
+    const order = button.closest('.order-row');
+    const printContent = order.cloneNode(true);
+    printContent.querySelector('.row-actions').style.display = 'none';
+    printContent.style.boxShadow = 'none';
+
+    const printWindow = window.open('', '', 'height=600,width=800');
+    printWindow.document.write('<html><head><title>Print Order</title>');
+    printWindow.document.write('<style>body{font-family:Poppins,sans-serif;padding:20px;background:#fff;} .details-section{margin-bottom:12px;}</style>');
+    printWindow.document.write('</head><body>');
+    printWindow.document.write(printContent.innerHTML);
+    printWindow.document.write('</body></html>');
+    printWindow.document.close();
+    printWindow.print();
+}
 </script>
+
+<!-- ===== STYLES ===== -->
+<style>
+.orders-wrapper { font-family: 'Poppins', sans-serif; background: #f0f2f5; padding: 30px; min-height: 100vh; }
+.orders-header { display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 25px 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); position: sticky; top:10px; z-index:1000; }
+.orders-header h1 { margin:0; font-size:1.6rem; color: #1e3a8a; } 
+.orders-header p { margin-top:6px; color:#4b5563; }
+.header-right .btn { margin-left:12px; }
+
+.orders-summary { display:flex; flex-wrap:wrap; gap:15px; margin-top:25px; }
+.summary-panel { display:flex; align-items:center; gap:12px; padding:15px 20px; background:#fff; color:#1e3a8a; border-radius:10px; min-width:140px; flex:1; box-shadow:0 4px 12px rgba(0,0,0,0.08); }
+.summary-icon { font-size:1.8rem; }
+
+.filter-panel { margin-top:25px; background:#fff; padding:15px 20px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.08); }
+.filter-buttons { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:10px; }
+.filter-btn { flex:1; padding:10px; border:none; border-radius:8px; background:#e5e7eb; cursor:pointer; font-weight:600; transition:all .3s; color:#1e3a8a; }
+.filter-btn.active, .filter-btn:hover { background:#1e3a8a; color:#fff; }
+.filter-time select { padding:6px 10px; border-radius:6px; border:1px solid #d1d5db; }
+
+.orders-grid { margin-top:25px; display:grid; gap:15px; }
+
+.order-row { background:#fff; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.08); overflow:hidden; }
+.row-header { display:flex; justify-content:space-between; align-items:center; padding:12px 15px; cursor:pointer; }
+.row-header .sn { font-weight:600; color:#4b5563; }
+.row-header .product { font-weight:600; color:#1e3a8a; }
+.status { padding:5px 12px; border-radius:20px; color:#fff; font-size:.85rem; text-transform:uppercase; }
+.status.confirmed { background:#10b981; } 
+.status.pending { background:#f59e0b; }
+
+.row-details { display:none; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap:12px; padding:12px 15px; border-top:1px solid #e5e7eb; }
+.details-section { background:#f9fafb; padding:10px; border-radius:8px; }
+.details-section h4 { font-weight:600; color:#1e3a8a; margin-bottom:6px; font-size:.95rem; }
+.details-section p { margin:3px 0; font-size:.88rem; color:#374151; }
+
+.row-actions { display:flex; gap:10px; margin-top:10px; }
+
+.btn { padding:8px 10px; border-radius:6px; font-weight:600; border:none; cursor:pointer; }
+.success-btn { background:#10b981; color:#fff; }
+.danger-btn { background:#ef4444; color:#fff; }
+.primary-btn { background:#1e3a8a; color:#fff; }
+.secondary-btn { background:#6b7280; color:#fff; }
+.print-btn { background:#374151; color:#fff; }
+.disabled { opacity:.6; cursor:not-allowed; }
+
+@media (max-width:768px) {
+    .row-details { grid-template-columns:1fr; }
+    .orders-summary { flex-direction:column; }
+    .filter-buttons { flex-direction:column; }
+}
+</style>
 
 {% endblock %}
