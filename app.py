@@ -44,27 +44,24 @@ logging.basicConfig(level=logging.INFO)
 # ------------------------------
 # Flask app & secret key
 # ------------------------------
+import os
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
+
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'your-secret-key')
 
 # ------------------------------
-# Passport upload folder (portable)
+# Database config FIRST
 # ------------------------------
-UPLOAD_FOLDER = os.path.join(app.static_folder, 'passports')
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
-import os
-
 db_url = os.environ.get('DATABASE_URL')
 
-# Force use of external DB (Neon)
 if not db_url:
-    raise ValueError("DATABASE_URL is not set!")
+    db_url = "sqlite:///okoya.db"
 
-# Fix for postgres prefix issue
 if db_url.startswith("postgres://"):
-    db_url = db_url.replace("postgres://", "postgresql://", 1)
+    db_url = db_url.replace("postgres://", "postgresql+psycopg2://", 1)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -303,6 +300,9 @@ def fix_workers_table():
         if "duplicate column" in str(e).lower():
             return "Column already exists"
         return f"Error: {e}"
+
+        with app.app_context():
+            db.create_all()
 
 
 @app.route('/toggle_worker_status/<int:worker_id>', methods=['POST'])
@@ -596,8 +596,6 @@ def secretary_attendance():
 @app.route('/attendance', methods=['GET', 'POST'])
 @login_required()
 def attendance():
-    ...    # no manual role check needed
-
 
     workers = Worker.query.all()
     secretary = session.get('role') == 'secretary'  # detect if secretary
@@ -692,7 +690,7 @@ def salary():
             logging.error(f"Error recording salary: {e}")
             flash("There was an error recording the salary. Please try again.", "error")
 
-    return render_template('salary.html', salary_data=salary_data)
+    return render_template('salary.html', workers=salary_data)
 
 
 @app.route('/attendance_history')
