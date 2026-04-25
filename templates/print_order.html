@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<section class="hero">
+
+  <!-- A4 PRINT CONTAINER -->
+  <div class="register-container print-area">
+
+    <!-- HEADER -->
+    <div class="official-header-row sticky-header">
+
+      <div class="official-header">
+        <h1 class="company-name">OKOYA FOOD COMPANY LIMITED</h1>
+        <h3 class="company-motto">
+          POVERTY ERADICATION, REDUCE INEQUALITY AND LEAVE NO ONE BEHIND
+        </h3>
+        <p class="company-address">
+          KM 7 Idi APA community, along Ilesha Ibaruba express way, Shaki, Oyo State, Nigeria
+        </p>
+        <h3 class="form-title">CLIENT ORDER FORM</h3>
+        <p class="form-note">(PRE-FILLED DATA)</p>
+      </div>
+
+      <div style="width:100px;"></div>
+    </div>
+
+    <!-- FORM FIELDS -->
+    <div class="form-grid">
+
+      <div>
+        <label>Client Name:</label>
+        <input value="{{ order.name }}" readonly>
+      </div>
+      <div>
+        <label>Email:</label>
+        <input value="{{ order.email or '—' }}" readonly>
+      </div>
+
+      <div>
+        <label>Date:</label>
+        <input value="{{ order.date_needed.strftime('%Y-%m-%d') if order.date_needed else '—' }}" readonly>
+      </div>
+      <div>
+        <label>Item:</label>
+        <input value="{{ order.items }}" readonly>
+      </div>
+
+      <div>
+        <label>Description:</label>
+        <textarea rows="2" readonly>{{ order.description or '—' }}</textarea>
+      </div>
+      <div>
+        <label>Kilograms:</label>
+        <input value="{{ order.kilograms or 0 }}" readonly>
+      </div>
+
+      <div>
+        <label>Unit Price (₦ / kg):</label>
+        <input value="{{ '%.2f'|format(order.unit_price or 0) }}" readonly>
+      </div>
+      <div>
+        <label>Total Amount (₦):</label>
+        <input value="{{ '%.2f'|format(order.total_amount or 0) }}" readonly>
+      </div>
+
+      <div>
+        <label>Driver Name:</label>
+        <input value="{{ order.driver_name or '—' }}" readonly>
+      </div>
+      <div>
+        <label>Vehicle Plate Number:</label>
+        <input value="{{ order.vehicle_plate_number or '—' }}" readonly>
+      </div>
+
+      <div>
+        <label>Phone Number:</label>
+        <input value="{{ order.phone_number or '—' }}" readonly>
+      </div>
+      <div>
+        <label>Account Number:</label>
+        <input value="{{ order.account_number or '—' }}" readonly>
+      </div>
+
+      <div>
+        <label>Account Bank Name:</label>
+        <input value="{{ order.account_bank_name or '—' }}" readonly>
+      </div>
+      <div>
+        <label>Bank Name (Payer):</label>
+        <input value="{{ order.bank_name or '—' }}" readonly>
+      </div>
+
+    </div>
+
+    <a href="{{ url_for('admin_dashboard') }}" class="btn secondary-btn">← Dashboard</a>
+    <!-- PRINT BUTTON -->
+    <div class="form-submit no-print">
+      <button onclick="window.print()">🖨 Print</button>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+      © {{ current_year | default(2026) }} OKOYA FOOD COMPANY LIMITED
+    </div>
+
+  </div>
+
+</section>
+
+<!-- STYLE -->
+<style>
+/* ===========================
+   PRINT STYLING
+=========================== */
+@media print {
+  @page {
+    size: A4;
+    margin: 10mm;
+  }
+
+  body {
+    background: #fff;
+    margin: 0;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .register-container {
+    width: 210mm;
+    min-height: 297mm;
+    margin: 0 auto;
+    padding: 15mm;
+    border: none;
+    box-shadow: none;
+  }
+
+  input, textarea {
+    border: none;
+    border-bottom: 1px solid #000;
+    background: transparent;
+    font-size: 12pt;
+    color: #000;
+    width: 100%;
+  }
+
+  textarea {
+    resize: none;
+  }
+}
+</style>
+
+{% endblock %}

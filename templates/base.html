@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Staff Management{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul class="flash-messages">
+                {% for msg in messages %}
+                    <li>{{ msg }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Main Content -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <script>
+        function setTheme(theme) {
+            const body = document.body;
+            body.classList.remove("light-theme", "dark-theme", "blue-theme", "red-theme");
+            body.classList.add(`${theme}-theme`);
+            localStorage.setItem("selectedTheme", theme);
+        }
+
+        window.onload = function () {
+            const savedTheme = localStorage.getItem("selectedTheme");
+            if (savedTheme) setTheme(savedTheme);
+        };
+    </script>
+</body>
+</html>

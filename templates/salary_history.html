@@ -1,0 +1,290 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<!-- HEADER CONTAINER -->
+<header class="page-header no-print">
+    <h1>Salary History</h1>
+</header>
+
+<!-- FLOATING ACTION NAV (TOP-RIGHT CORNER) -->
+<nav class="floating-nav no-print">
+    <a href="{{ url_for('admin_dashboard') }}" class="nav-link">← Dashboard</a>
+    <a href="#" onclick="window.print()" class="nav-link">🖨️ Print</a>
+    <a href="{{ url_for('logout') }}" class="nav-link logout">Logout</a>
+</nav>
+
+<!-- Month Filter -->
+<div class="filter-section no-print">
+    <form method="get" action="{{ url_for('salary_history') }}">
+        <label for="month_filter">Filter by Month:</label>
+        <select name="month" id="month_filter" onchange="this.form.submit()">
+            <option value="">-- All Months --</option>
+            {% for month in available_months %}
+                <option value="{{ month }}" {% if month == selected_month %}selected{% endif %}>
+                    {{ month }}
+                </option>
+            {% endfor %}
+        </select>
+    </form>
+
+    <p class="selected-month">
+        Showing results for: <strong>{{ selected_month or "All Months" }}</strong>
+    </p>
+</div>
+
+<!-- Printable Section -->
+<div class="print-area">
+    <!-- Print Header -->
+    <div class="print-header">
+        <img src="{{ url_for('static', filename='android-chrome-512x512.png') }}" alt="Company Logo" class="print-logo left-logo">
+        <div class="print-header-text">
+            <h1 class="company-name">Okoya Food Co., Staff Manager</h1>
+            <p class="company-motto" style="color: black;">"Quality Service, Trusted Management"</p>
+            <p class="company-address" style="color: white;">Saki, Oyo State, Nigeria</p>
+        </div>
+        <img src="{{ url_for('static', filename='android-chrome-512x512.png') }}" alt="Favicon" class="print-logo right-logo">
+    </div>
+
+    <hr>
+
+    <!-- Report Title -->
+    <h2 class="report-title">Salary Payment Report</h2>
+    <p class="report-date">Printed on: {{ now.strftime('%d %B %Y, %I:%M %p') }}</p>
+
+    <!-- Salary Table -->
+    {% if salary_records %}
+        <div class="table-wrapper">
+            <table class="salary-table">
+                <thead>
+                    <tr>
+                        <th>Worker ID</th>
+                        <th>Name</th>
+                        <th>Total Days Present</th>
+                        <th>Amount Paid (₦)</th>
+                        <th>Bank Account Name</th>
+                        <th>Bank Name</th>
+                        <th>Bank Account</th>
+                        <th>Payment Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in salary_records %}
+                        <tr>
+                            <td>{{ record.worker.worker_code }}</td>
+                            <td>{{ record.worker.name }}</td>
+                            <td>{{ record.total_days_present }}</td>
+                            <td>₦{{ "%.2f"|format(record.amount) }}</td>
+                            <td>{{ record.bank_account_name }}</td>
+                            <td>{{ record.bank_name }}</td>
+                            <td>{{ record.bank_account }}</td>
+                            <td>{{ record.payment_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p>No salary records available.</p>
+    {% endif %}
+
+    <!-- Signature Section -->
+    <div class="signature-section">
+        <div class="signature-left">
+            ________________________ <br>
+            Manager’s Signature
+        </div>
+        <div class="signature-right">
+            ________________________ <br>
+            Accountant’s Signature
+        </div>
+    </div>
+</div>
+
+<!-- Custom CSS -->
+<style>
+/* GENERAL PAGE LAYOUT */
+body {
+    background: #f0f6ff;
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+    overflow-x: hidden;
+}
+
+/* PAGE HEADER */
+.page-header {
+    background: #004080;
+    color: #fff;
+    padding: 20px 20px 60px 20px;
+    border-radius: 8px;
+    margin-bottom: 25px;
+    z-index: 1000;
+    text-align: left;
+}
+.page-header h1 {
+    margin: 10px 0;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+/* FLOATING NAVIGATION (TOP-RIGHT CORNER) */
+.floating-nav {
+    position: fixed;
+    top: 15px;
+    right: 20px;
+    display: flex;
+    gap: 10px;
+    z-index: 2000;
+}
+.floating-nav a.nav-link {
+    color: #ffffff;
+    background: #0066cc;
+    padding: 6px 12px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 500;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+}
+.floating-nav a.nav-link:hover {
+    background: #0099ff;
+    transform: scale(1.05);
+}
+.floating-nav a.logout {
+    background: #dc3545;
+}
+
+/* FILTER SECTION */
+.filter-section {
+    margin: 20px 0;
+    text-align: center;
+}
+.filter-section label {
+    font-weight: bold;
+    margin-right: 8px;
+    color: black;
+}
+.filter-section select {
+    padding: 6px 12px;
+    font-size: 14px;
+    border: 1px solid #aaa;
+    border-radius: 4px;
+}
+.selected-month {
+    color: green;
+    font-weight: 600;
+    margin-top: 5px;
+}
+
+/* PRINT HEADER */
+.print-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-align: center;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+}
+.print-header-text {
+    flex: 1;
+    text-align: center;
+    line-height: 1.3;
+}
+.print-logo {
+    width: 80px;
+    height: 80px;
+}
+.company-name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #03492c;
+}
+.company-address {
+    color: #006b3c;
+}
+
+/* TABLE WRAPPER */
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: auto;
+    max-height: 70vh;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background: #fff;
+}
+
+/* TABLE STYLING */
+.salary-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 0;
+    font-size: 13px;
+}
+.salary-table th,
+.salary-table td {
+    border: 1px solid #333;
+    padding: 6px 8px;
+    text-align: center;
+}
+.salary-table th {
+    background-color: #03492c;
+    color: white;
+}
+
+/* SIGNATURE SECTION */
+.signature-section {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 60px;
+    padding: 0 20px;
+    page-break-inside: avoid;
+    color: black;
+    font-weight: 600;
+}
+.signature-left,
+.signature-right {
+    text-align: center;
+    font-weight: 500;
+}
+
+/* RESPONSIVENESS */
+@media screen and (max-width: 768px) {
+    .table-wrapper {
+        max-height: 65vh;
+        font-size: 12px;
+    }
+    .floating-nav {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 8px;
+    }
+}
+
+/* PRINT MODE */
+@media print {
+    body {
+        background: none;
+        font-size: 12px;
+        margin: 1.5cm;
+    }
+    .no-print {
+        display: none !important;
+    }
+    .table-wrapper {
+        max-height: none;
+        overflow: visible;
+        border: 1px solid #000;
+    }
+    .salary-table {
+        width: 100%;
+        font-size: 12px;
+    }
+    @page {
+        size: A4 landscape;
+        margin: 1.5cm;
+    }
+}
+</style>
+
+{% endblock %}

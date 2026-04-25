@@ -1,0 +1,578 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="orders-wrapper">
+
+    <!-- ===== HEADER ===== -->
+    <header class="orders-header sticky-header">
+        <div class="header-left">
+            <h1>📦 Orders Dashboard</h1>
+            <p>Monitor all client orders in one place</p>
+        </div>
+        <div class="header-right">
+            {% if session.get('role') != 'admin' %}
+                <a href="{{ url_for('client_form') }}" class="btn primary-btn">＋ New Order</a>
+            {% endif %}
+            <a href="{{ url_for('admin_dashboard') }}" class="btn secondary-btn">← Dashboard</a>
+            <a href="{{ url_for('export_all_orders') }}" class="btn primary-btn">
+    📥 Export All
+</a>
+            <button onclick="window.print()" class="btn print-btn">🖨 Print All</button>
+        </div>
+    </header>
+
+    <!-- ===== SUMMARY PANELS ===== -->
+    <section class="orders-summary">
+        <div class="summary-panel">
+            <div class="summary-icon">📦</div>
+            <div class="summary-content">
+                <h3>Total Orders</h3>
+                <span>{{ soya_orders|length + cashew_orders|length + maize_orders|length + rice_orders|length }}</span>
+            </div>
+        </div>
+        <div class="summary-panel">
+            <div class="summary-icon">🫘</div>
+            <div class="summary-content">
+                <h3>Soya Orders</h3>
+                <span>{{ soya_orders|length }}</span>
+            </div>
+        </div>
+        <div class="summary-panel">
+            <div class="summary-icon">🥜</div>
+            <div class="summary-content">
+                <h3>Cashew Orders</h3>
+                <span>{{ cashew_orders|length }}</span>
+            </div>
+        </div>
+        <div class="summary-panel">
+            <div class="summary-icon">🌽</div>
+            <div class="summary-content">
+                <h3>Maize Orders</h3>
+                <span>{{ maize_orders|length }}</span>
+            </div>
+        </div>
+        <div class="summary-panel">
+            <div class="summary-icon">🍚</div>
+            <div class="summary-content">
+                <h3>Rice Orders</h3>
+                <span>{{ rice_orders|length }}</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== FILTER PANEL ===== -->
+    <aside class="filter-panel">
+        <h3>Filter Orders</h3>
+        <div class="filter-buttons">
+            <button class="filter-btn active" data-category="all">All</button>
+            <button class="filter-btn" data-category="soya">Soya Beans</button>
+            <button class="filter-btn" data-category="cashew">Cashew Nut</button>
+            <button class="filter-btn" data-category="maize">Maize</button>
+            <button class="filter-btn" data-category="rice">Rice</button>
+        </div>
+        <div class="filter-time" style="margin-top:12px;">
+            <label for="time-filter">Time:</label>
+            <select id="time-filter">
+                <option value="all">All</option>
+                <option value="day">Today</option>
+                <option value="month">This Month</option>
+                <option value="year">This Year</option>
+            </select>
+        </div>
+    </aside>
+
+    <div class="filter-time" style="margin-top:12px;">
+        <label for="date-search">Search by Date:</label>
+        <input
+            type="date"
+            id="date-search"
+            style="
+                padding:6px 10px;
+                border-radius:6px;
+                border:1px solid #d1d5db;
+                width:100%;
+                color:#000;
+                background:#fff;
+            "
+        >
+    </div>
+
+    <div style="margin-top:10px;">
+        <button id="reset-filters" class="filter-btn" style="background:#6b7280;color:#fff;">
+            Reset Filters
+        </button>
+    </div>
+
+<!-- ===== ORDERS GRID ===== -->
+<section class="orders-grid">
+
+    {# ================= MACRO ================= #}
+    {% macro order_row(order, sn) %}
+    <div class="order-row {{ order.items|lower|replace(' ', '-') }}"
+         data-category="{{ order.items|lower }}"
+         data-date="{{ order.date_needed.strftime('%Y-%m-%d') if order.date_needed else '' }}">
+
+        <div class="row-header">
+            <span class="sn">OFCL{{ sn }}</span>
+
+            <span class="product {{ order.items|lower|replace(' ', '-') }}">
+                {% if order.created_at and (order.created_at.timestamp() > (now.timestamp() - 86400)) %}
+                    <span class="new-badge">NEW</span>
+                {% endif %}
+                {{ order.items }}
+            </span>
+
+            <span class="status {{ order.status|lower }}">{{ order.status }}</span>
+            <button class="toggle-btn">Details ▼</button>
+        </div>
+
+        <div class="row-details">
+
+            <!-- CLIENT -->
+            <div class="details-section">
+                <h4>Client Info</h4>
+                <p><strong>Name:</strong> {{ order.name }}</p>
+                <p><strong>Email:</strong> {{ order.email or "—" }}</p>
+                <p><strong>Phone:</strong> {{ order.phone_number or "—" }}</p>
+                <p><strong>Bank:</strong> {{ order.bank_name or "—" }}</p>
+                <p><strong>Date:</strong>
+                    {{ order.date_needed.strftime('%d %b %Y') if order.date_needed else "—" }}
+                </p>
+            </div>
+
+            <!-- ORDER -->
+            <div class="details-section">
+                <h4>Order Details</h4>
+                <p><strong>Description:</strong> {{ order.description or "—" }}</p>
+                <p><strong>Quantity:</strong> {{ order.kilograms or 0 }} kg</p>
+                <p><strong>Unit Price:</strong> ₦{{ "%.2f"|format(order.unit_price or 0) }}</p>
+                <p><strong>Total:</strong> ₦{{ "%.2f"|format(order.total_amount or 0) }}</p>
+            </div>
+
+            <!-- DELIVERY -->
+            <div class="details-section">
+                <h4>Delivery Info</h4>
+                <p><strong>Driver:</strong> {{ order.driver_name or "—" }}</p>
+                <p><strong>Vehicle:</strong> {{ order.vehicle_plate_number or "—" }}</p>
+                <p><strong>Account:</strong> {{ order.account_number or "—" }}</p>
+                <p><strong>Bank:</strong> {{ order.account_bank_name or "—" }}</p>
+            </div>
+
+            <!-- TIME -->
+            <div class="details-section">
+                <h4>Timestamps</h4>
+                <p><strong>Created:</strong>
+                    {{ order.created_at.strftime('%d %b %Y, %I:%M %p') if order.created_at else '—' }}
+                </p>
+                <p><strong>Confirmed:</strong>
+                    {{ order.confirmed_at.strftime('%d %b %Y, %I:%M %p') if order.confirmed_at else 'Pending' }}
+                </p>
+            </div>
+
+            <!-- ACTIONS -->
+            <div class="row-actions">
+                <a href="{{ url_for('export_order', order_id=order.id) }}" class="btn primary-btn">
+                    📊 Export Excel
+                </a>
+
+                {% if order.status != 'Confirmed' %}
+                    <form method="POST" action="{{ url_for('confirm_order', order_id=order.id) }}">
+                        <button class="btn success-btn">✔ Confirm</button>
+                    </form>
+                {% else %}
+                    <button class="btn success-btn disabled">✅ Confirmed</button>
+                {% endif %}
+
+                <form method="POST"
+                      action="{{ url_for('delete_order', order_id=order.id) }}"
+                      onsubmit="return confirm('Delete this order?');">
+                    <button class="btn danger-btn">🗑 Delete</button>
+                </form>
+
+                <a href="{{ url_for('print_order', order_id=order.id) }}" target="_blank" class="btn print-btn">
+                    🖨 Print
+                </a>
+            </div>
+
+        </div>
+    </div>
+    {% endmacro %}
+
+
+    {# ================= LOOP ================= #}
+    {% set categories = {
+        "soya": soya_orders,
+        "cashew": cashew_orders,
+        "maize": maize_orders,
+        "rice": rice_orders
+    } %}
+
+    {% set sn = 1 %}
+
+    {% for cat, orders in categories.items() %}
+        {% for order in orders %}
+            {{ order_row(order, sn) }}
+            {% set sn = sn + 1 %}
+        {% endfor %}
+    {% endfor %}
+
+</section>
+</div>
+
+
+<!-- ===== FILTER & TOGGLE SCRIPT ===== -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const buttons = document.querySelectorAll('.filter-btn[data-category]');
+    const rows = document.querySelectorAll('.order-row');
+    const timeFilter = document.getElementById('time-filter');
+    const dateSearch = document.getElementById('date-search');
+    const resetBtn = document.getElementById('reset-filters');
+
+    /* ===== FILTER FUNCTION ===== */
+    function filterOrders() {
+        const activeCategory = document.querySelector('.filter-btn.active')?.dataset.category || 'all';
+        const timeValue = timeFilter.value;
+        const selectedDate = dateSearch.value;
+
+        const today = new Date();
+        const todayStr = today.toISOString().slice(0, 10);
+        const monthStr = today.toISOString().slice(0, 7);
+        const yearStr = today.getFullYear().toString();
+
+        rows.forEach(row => {
+            const rowCategory = row.dataset.category || '';
+            const rowDate = row.dataset.date || '';
+
+            let show = true;
+
+            /* CATEGORY FILTER */
+            if (activeCategory !== 'all' && !rowCategory.includes(activeCategory)) {
+                show = false;
+            }
+
+            /* TIME FILTER */
+            if (show && timeValue !== 'all' && rowDate) {
+                if (timeValue === 'day' && rowDate !== todayStr) show = false;
+                if (timeValue === 'month' && !rowDate.startsWith(monthStr)) show = false;
+                if (timeValue === 'year' && !rowDate.startsWith(yearStr)) show = false;
+            }
+
+            /* DATE SEARCH FILTER */
+            if (show && selectedDate) {
+                show = rowDate === selectedDate;
+            }
+
+            row.style.display = show ? '' : 'none';
+        });
+    }
+
+    /* ===== TOGGLE DETAILS FUNCTION ===== */
+    rows.forEach(row => {
+        const toggleBtn = row.querySelector('.toggle-btn');
+        const details = row.querySelector('.row-details');
+
+        toggleBtn.addEventListener('click', () => {
+            if (details.style.display === 'grid' || details.style.display === 'block') {
+                details.style.display = 'none';
+                toggleBtn.textContent = 'Details ▼';
+            } else {
+                details.style.display = 'grid';
+                toggleBtn.textContent = 'Hide ▲';
+            }
+        });
+    });
+
+    /* ===== FILTER BUTTON CLICK ===== */
+    buttons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            buttons.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            filterOrders();
+        });
+    });
+
+    timeFilter.addEventListener('change', filterOrders);
+    dateSearch.addEventListener('change', filterOrders);
+
+    resetBtn.addEventListener('click', () => {
+        buttons.forEach(b => b.classList.remove('active'));
+        document.querySelector('.filter-btn[data-category="all"]').classList.add('active');
+        timeFilter.value = 'all';
+        dateSearch.value = '';
+        filterOrders();
+    });
+});
+</script>
+
+
+<!-- ===== STYLES ===== -->
+<style>
+
+/* ===== GLOBAL ===== */
+.orders-wrapper {
+    font-family: 'Inter', 'Poppins', sans-serif;
+    background: #f8fafc;
+    padding: 30px;
+    min-height: 100vh;
+}
+
+/* ===== HEADER ===== */
+.orders-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #ffffff;
+    padding: 20px 25px;
+    border-radius: 14px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.06);
+    position: sticky;
+    top: 10px;
+    z-index: 1000;
+}
+
+.orders-header h1 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: #0f172a;
+}
+
+.orders-header p {
+    margin-top: 4px;
+    color: #64748b;
+    font-size: 0.9rem;
+}
+
+.header-right .btn {
+    margin-left: 10px;
+}
+
+/* ===== BUTTONS ===== */
+.btn {
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: 0.25s;
+}
+
+.primary-btn {
+    background: #2563eb;
+    color: #fff;
+}
+
+.primary-btn:hover {
+    background: #1d4ed8;
+}
+
+.secondary-btn {
+    background: #e2e8f0;
+    color: #0f172a;
+}
+
+.success-btn {
+    background: #16a34a;
+    color: #fff;
+}
+
+.danger-btn {
+    background: #dc2626;
+    color: #fff;
+}
+
+.print-btn {
+    background: #334155;
+    color: #fff;
+}
+
+.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* ===== SUMMARY ===== */
+.orders-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+    margin-top: 25px;
+}
+
+.summary-panel {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 18px;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.05);
+    transition: 0.3s;
+}
+
+.summary-panel:hover {
+    transform: translateY(-3px);
+}
+
+.summary-icon {
+    font-size: 1.6rem;
+}
+
+.summary-content h3 {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #64748b;
+}
+
+.summary-content span {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #0f172a;
+}
+
+/* ===== FILTER ===== */
+.filter-panel {
+    margin-top: 25px;
+    background: #ffffff;
+    padding: 18px;
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.05);
+}
+
+.filter-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.filter-btn {
+    padding: 8px;
+    border-radius: 8px;
+    background: #e2e8f0;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    color: #0f172a;
+}
+
+.filter-btn.active {
+    background: #2563eb;
+    color: #fff;
+}
+
+/* ===== ORDER CARD ===== */
+.orders-grid {
+    margin-top: 25px;
+    display: grid;
+    gap: 15px;
+}
+
+.order-row {
+    background: #ffffff;
+    border-radius: 14px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.05);
+    overflow: hidden;
+    transition: 0.3s;
+}
+
+.order-row:hover {
+    transform: translateY(-3px);
+}
+
+/* ===== HEADER ROW ===== */
+.row-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 18px;
+}
+
+.row-header .sn {
+    color: #64748b;
+}
+
+.row-header .product {
+    font-weight: 600;
+    color: #0f172a;
+}
+
+/* ===== NEW BADGE ===== */
+.new-badge {
+    background: #ef4444;
+    color: #fff;
+    font-size: 0.7rem;
+    padding: 3px 6px;
+    border-radius: 6px;
+    margin-right: 8px;
+    font-weight: bold;
+}
+
+/* ===== STATUS ===== */
+.status {
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.status.confirmed {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.status.pending {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+/* ===== DETAILS ===== */
+.row-details {
+    display: none;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+    padding: 15px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.details-section {
+    background: #f8fafc;
+    padding: 12px;
+    border-radius: 10px;
+}
+
+.details-section h4 {
+    margin-bottom: 6px;
+    font-size: 0.9rem;
+    color: #2563eb;
+}
+
+.details-section p {
+    font-size: 0.85rem;
+    color: #334155;
+}
+
+/* ===== ACTIONS ===== */
+.row-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+/* ===== MOBILE ===== */
+@media (max-width:768px) {
+    .orders-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .row-details {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+{% endblock %}
+

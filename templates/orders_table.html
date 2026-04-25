@@ -1,0 +1,56 @@
+<table class="table table-bordered table-striped">
+  <thead class="table-dark">
+    <tr>
+      <th>Client Name</th>
+      <th>Email</th>
+      <th>Quantity</th>
+      <th>Unit Price</th>
+      <th>Total Amount</th>
+      <th>Delivery Date</th>
+      <th>Driver</th>
+      <th>Vehicle</th>
+      <th>Bank Name</th>
+      <th>Account Number</th>
+      <th>Notes</th>
+      <th>Status</th> <!-- New column -->
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for order in orders %}
+    <tr>
+      <td>{{ order.name }}</td>
+      <td>{{ order.email }}</td>
+      <td>
+        {% if order.number_of_bags %}{{ order.number_of_bags }} Bags{% endif %}
+        {% if order.tonnage %}{{ order.tonnage }} Tons{% endif %}
+        {% if order.kilograms %}{{ order.kilograms }} Kg{% endif %}
+      </td>
+      <td>{{ order.unit_price }}</td>
+      <td>{{ order.total_amount }}</td>
+      <td>{{ order.date_needed }}</td>
+      <td>{{ order.driver_name }}</td>
+      <td>{{ order.vehicle_plate_number }}</td>
+      <td>{{ order.bank_name }}</td>
+      <td>{{ order.account_number }}</td>
+      <td>{{ order.description }}</td>
+      <td>
+        {% if order.status == "Confirmed" %}
+            <span class="badge bg-success">{{ order.status }}</span>
+        {% else %}
+            <form action="{{ url_for('confirm_order', order_id=order.id) }}" method="POST">
+                <button type="submit" class="btn btn-sm btn-warning">Confirm</button>
+            </form>
+        {% endif %}
+      </td>
+      <td>
+        <a href="{{ url_for('delete_order', order_id=order.id) }}" class="btn btn-sm btn-danger">Delete</a>
+      </td>
+    </tr>
+    {% else %}
+    <tr>
+      <td colspan="13" class="text-center">No orders found.</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
