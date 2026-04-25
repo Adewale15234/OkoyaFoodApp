@@ -2,12 +2,23 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+
     <title>{% block title %}Staff Management{% endblock %}</title>
+
+    <!-- =========================
+         FAVICON
+    ========================== -->
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+
+    <!-- CSS FILE -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
+
 <body>
 
-    <!-- Flash Messages -->
+    <!-- =========================
+         FLASH MESSAGES
+    ========================== -->
     {% with messages = get_flashed_messages() %}
         {% if messages %}
             <ul class="flash-messages">
@@ -18,11 +29,16 @@
         {% endif %}
     {% endwith %}
 
-    <!-- Main Content -->
+    <!-- =========================
+         MAIN CONTENT
+    ========================== -->
     <main>
         {% block content %}{% endblock %}
     </main>
 
+    <!-- =========================
+         THEME SCRIPT
+    ========================== -->
     <script>
         function setTheme(theme) {
             const body = document.body;
@@ -36,5 +52,6 @@
             if (savedTheme) setTheme(savedTheme);
         };
     </script>
+
 </body>
 </html>
