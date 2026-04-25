@@ -692,7 +692,7 @@ def secretary_attendance():
 @login_required()
 def attendance():
 
-    workers = Worker.query.all()
+    workers = Worker.query.filter_by(is_active=True).all()
     secretary = session.get('role') == 'secretary'  # detect if secretary
 
     if request.method == 'POST':
@@ -724,7 +724,7 @@ def attendance():
 @app.route('/salary', methods=['GET', 'POST'])
 @login_required(role='admin')  # Only admin can access
 def salary():
-    workers = Worker.query.all()
+    workers = Worker.query.filter_by(is_active=True).all()
     today = datetime.today()
     current_year = today.year
     current_month = today.month
