@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AI Offence Review</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+<style>
+
+/* =========================
+   PAGE CONTAINER (A4 STYLE)
+========================= */
+.review-container {
+    max-width: 900px;
+    margin: 20px auto;
+    padding: 20px;
+    border: 1px solid #000;
+    background: #fff;
+}
+
+/* =========================
+   HEADER (SAME STYLE AS YOUR FORM)
+========================= */
+.official-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.company-logo img {
+    height: 90px;
+}
+
+.official-header {
+    text-align: center;
+    flex: 1;
+}
+
+.company-name {
+    color: #0b5d3b;
+    font-size: 1.7rem;
+    font-weight: bold;
+}
+
+.company-motto {
+    color: goldenrod;
+    font-weight: bold;
+    font-size: 0.85rem;
+}
+
+.company-address {
+    background: black;
+    color: white;
+    padding: 5px 10px;
+    display: inline-block;
+    border-radius: 5px;
+    font-size: 0.8rem;
+    margin-top: 5px;
+}
+
+/* =========================
+   TITLE
+========================= */
+.page-title {
+    text-align: center;
+    color: #0b5d3b;
+    font-size: 1.4rem;
+    font-weight: bold;
+    margin: 10px 0 20px 0;
+}
+
+/* =========================
+   REVIEW BOX
+========================= */
+.review-box {
+    border: 2px solid #0b5d3b;
+    border-radius: 8px;
+    padding: 15px;
+    background: #f9f9f9;
+    margin-bottom: 20px;
+}
+
+.review-box p {
+    margin: 6px 0;
+    font-weight: 500;
+}
+
+/* AI OUTPUT */
+.ai-report {
+    background: #111827;
+    color: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    white-space: pre-wrap;
+    font-size: 0.9rem;
+    margin-top: 10px;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+.button-group {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.btn {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.btn-danger {
+    background: #dc2626;
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #b91c1c;
+}
+
+.btn-secondary {
+    background: #0b5d3b;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #10b981;
+    color: black;
+}
+
+/* PRINT MODE */
+@media print {
+    .no-print {
+        display: none;
+    }
+
+    .review-container {
+        border: none;
+        width: 190mm;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="review-container">
+
+    <!-- HEADER -->
+    <div class="official-header-row">
+
+        <div class="company-logo">
+            <img src="{{ url_for('static', filename='android-chrome-512x512.png') }}">
+        </div>
+
+        <div class="official-header">
+            <h1 class="company-name">OKOYA FOOD COMPANY LIMITED</h1>
+            <h3 class="company-motto">
+                POVERTY ERADICATION, REDUCE INEQUALITY AND LEAVE NO ONE BEHIND
+            </h3>
+            <p class="company-address">
+                KM 7 Idi APA community, Shaki, Oyo State, Nigeria
+            </p>
+        </div>
+
+        <div></div>
+    </div>
+
+    <!-- TITLE -->
+    <div class="page-title">
+        AI OFFENCE REVIEW PANEL
+    </div>
+
+    <!-- REVIEW INFO -->
+    <div class="review-box">
+
+        <p><b>Worker Name:</b> {{ worker.name }}</p>
+        <p><b>Worker Code:</b> {{ worker.worker_code }}</p>
+        <p><b>Position:</b> {{ worker.position }}</p>
+
+        <hr>
+
+        <p><b>Reported Reason:</b></p>
+        <p>{{ reason }}</p>
+
+        <hr>
+
+        <p><b>AI ANALYSIS REPORT:</b></p>
+
+        <div class="ai-report">
+            {{ ai_report }}
+        </div>
+
+    </div>
+
+    <!-- ACTION BUTTONS -->
+    <form method="POST" action="{{ url_for('toggle_worker_status', worker_id=worker.id) }}">
+
+        <input type="hidden" name="reason" value="{{ reason }}">
+        <input type="hidden" name="action" value="confirm">
+
+        <div class="button-group no-print">
+
+            <button type="submit" class="btn btn-danger">
+                Confirm Deactivation
+            </button>
+
+            <a href="{{ url_for('workers_name') }}">
+                <button type="button" class="btn btn-secondary">
+                    Cancel
+                </button>
+            </a>
+
+        </div>
+
+    </form>
+
+</div>
+
+</body>
+</html>

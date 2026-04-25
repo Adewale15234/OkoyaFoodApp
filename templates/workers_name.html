@@ -21,20 +21,22 @@
                 <th>Details</th>
                 <th>Edit</th>
                 <th>Delete</th>
-
-                <!-- ADDED ONLY THIS -->
                 <th>Status</th>
             </tr>
         </thead>
 
         <tbody>
         {% for worker in workers %}
+
+            <!-- MAIN ROW -->
             <tr>
                 <td data-label="Code">{{ worker.worker_code or '—' }}</td>
                 <td data-label="Name">{{ worker.name }}</td>
                 <td data-label="Phone">{{ worker.phone_number or '—' }}</td>
                 <td data-label="Position">{{ worker.position or '—' }}</td>
-                <td data-label="Employment Date">{{ worker.date_of_employment.strftime('%Y-%m-%d') if worker.date_of_employment else '—' }}</td>
+                <td data-label="Employment Date">
+                    {{ worker.date_of_employment.strftime('%Y-%m-%d') if worker.date_of_employment else '—' }}
+                </td>
                 <td data-label="Email">{{ worker.email or '—' }}</td>
 
                 <td data-label="Details">
@@ -54,7 +56,6 @@
                     </form>
                 </td>
 
-                <!-- ADDED STATUS (SAFE EXTENSION ONLY) -->
                 <td data-label="Status">
                     <form action="{{ url_for('toggle_worker_status', worker_id=worker.id) }}" method="post">
                         <input type="hidden" name="reason" id="reason-{{ worker.id }}">
@@ -69,11 +70,35 @@
                 </td>
             </tr>
 
-            <!-- Collapsible details row (UNCHANGED) -->
+            <!-- DETAILS ROW (FIXED PROPERLY INSIDE LOOP) -->
             <tr id="details-{{ worker.id }}" class="details-row" style="display:none;">
                 <td colspan="10">
                     <div class="details-container">
 
+                        <!-- HR RECORD -->
+                        {% if worker.status_reason %}
+                        <div class="details-section" style="flex: 1 1 100%;">
+                            <strong>⚠ HR RECORD:</strong><br><br>
+
+                            <b>Status:</b> {{ worker.status_type }} <br>
+                            <b>Reason:</b> {{ worker.status_reason }} <br>
+                            <b>Date:</b> {{ worker.status_date }} <br>
+
+                            <hr>
+
+                            <strong>📄 Official HR Letter:</strong><br><br>
+
+                            <pre style="white-space: pre-wrap; background:#fff; padding:10px; border:1px solid #ccc;">
+{{ worker.status_letter }}
+                            </pre>
+
+                            <button onclick="window.print()" class="edit-button">
+                                🖨 Print Letter
+                            </button>
+                        </div>
+                        {% endif %}
+
+                        <!-- PASSPORT -->
                         <div class="details-section">
                             <strong>Passport:</strong><br>
                             {% if worker.passport %}
@@ -85,6 +110,7 @@
                             {% endif %}
                         </div>
 
+                        <!-- PERSONAL INFO -->
                         <div class="details-section">
                             <strong>DOB:</strong> {{ worker.date_of_birth.strftime('%Y-%m-%d') if worker.date_of_birth else '—' }}<br>
                             <strong>Gender:</strong> {{ worker.gender or '—' }}<br>
@@ -95,6 +121,7 @@
                             <strong>Date of Employment:</strong> {{ worker.date_of_employment.strftime('%Y-%m-%d') if worker.date_of_employment else '—' }}
                         </div>
 
+                        <!-- ADDRESS -->
                         <div class="details-section">
                             <strong>Home Address:</strong> {{ worker.home_address or '—' }}<br>
                             <strong>Ethnic Group:</strong> {{ worker.ethnic_group or '—' }}<br>
@@ -102,6 +129,7 @@
                             <strong>Disability:</strong> {{ worker.disability or '—' }}
                         </div>
 
+                        <!-- BANK -->
                         <div class="details-section">
                             <strong>Amount of Salary:</strong> {{ worker.amount_of_salary or '—' }}<br>
                             <strong>Guarantor:</strong> {{ worker.guarantor or '—' }}<br>
@@ -113,11 +141,11 @@
                     </div>
                 </td>
             </tr>
+
         {% endfor %}
         </tbody>
     </table>
 </div>
-
 <!-- STYLE (UNCHANGED) -->
 <style>
 .page-header {

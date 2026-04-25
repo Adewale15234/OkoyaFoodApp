@@ -96,9 +96,15 @@ class Worker(db.Model):
     guarantor = db.Column(db.String(100), nullable=False)
     passport = db.Column(db.String(100), nullable=True)
 
-    # ✅ ADDED: Activation System
+    # =========================
+    # STATUS SYSTEM
+    # =========================
     is_active = db.Column(db.Boolean, default=True, nullable=False)
-    deactivation_reason = db.Column(db.String(255), nullable=True)
+
+    status_reason = db.Column(db.Text, nullable=True)
+    status_date = db.Column(db.DateTime, nullable=True)
+    status_type = db.Column(db.String(30), nullable=True)  # deactivated / reactivated
+    status_letter = db.Column(db.Text, nullable=True)
 
     # Relationships
     attendance_records = db.relationship(
@@ -117,6 +123,88 @@ class Worker(db.Model):
     def __repr__(self):
         return f"<Worker {self.name}>"
 
+
+      # ===============================
+# AI OFFENCE REVIEW FUNCTION
+# ===============================
+def ai_offence_review(worker, reason):
+    severity_keywords = ["theft", "fight", "absent", "steal", "violence", "insult", "late"]
+
+    severity = "Low"
+    for word in severity_keywords:
+        if word in reason.lower():
+            severity = "High"
+            break
+
+    explanation = f"""
+OFFENCE REVIEW ANALYSIS
+
+Worker: {worker.name}
+Position: {worker.position}
+Code: {worker.worker_code}
+
+Reported Issue:
+{reason}
+
+AI Assessment:
+- Severity Level: {severity}
+- Recommendation: {"Immediate Suspension" if severity == "High" else "Warning or Review"}
+
+Summary:
+This case requires {"strict disciplinary action" if severity == "High" else "HR monitoring and caution"}.
+"""
+
+    return explanation
+
+
+# ===============================
+# HR LETTER GENERATOR FUNCTION
+# ===============================
+def generate_hr_letter(worker, reason, status_type):
+
+    name = worker.name or "Unknown"
+    code = worker.worker_code or "N/A"
+    position = worker.position or "N/A"
+    date = datetime.utcnow().strftime('%Y-%m-%d')
+
+    if status_type == "deactivated":
+        return f"""
+OKOYA FOOD LTD
+OFFICIAL DISCIPLINARY NOTICE
+
+Employee: {name}
+Code: {code}
+Position: {position}
+
+STATUS: DEACTIVATED
+
+Reason:
+{reason or 'No reason provided'}
+
+HR Decision:
+You are temporarily suspended pending review.
+
+Date: {date}
+
+HR Department
+"""
+
+    else:
+        return f"""
+OKOYA FOOD LTD
+REINSTATEMENT NOTICE
+
+Employee: {name}
+Code: {code}
+
+STATUS: REACTIVATED
+
+You have been reinstated back to duty.
+
+Date: {date}
+
+HR Department
+"""
 
 # --- Client Order Model ---
 class Order(db.Model):
@@ -308,20 +396,43 @@ def fix_workers_table():
 @app.route('/toggle_worker_status/<int:worker_id>', methods=['POST'])
 def toggle_worker_status(worker_id):
     worker = Worker.query.get_or_404(worker_id)
+    reason = request.form.get('reason', '').strip()
+    action = request.form.get('action')  # review or confirm
+    now = datetime.utcnow()
 
-    reason = request.form.get('reason')
+    # =========================
+    # STEP 1: AI REVIEW MODE
+    # =========================
+    if action == "review":
+        ai_report = ai_offence_review(worker, reason)
 
-    # Toggle status
-    worker.is_active = not worker.is_active
+        return render_template(
+            "offence_review.html",
+            worker=worker,
+            reason=reason,
+            ai_report=ai_report
+        )
 
-    # Save reason when deactivating
+    # =========================
+    # STEP 2: CONFIRM DEACTIVATION
+    # =========================
     if worker.is_active:
-        worker.deactivation_reason = None
+        worker.is_active = False
+        worker.status_reason = reason or "No reason provided"
+        worker.status_type = "deactivated"
+        worker.status_date = now
+
+        worker.status_letter = generate_hr_letter(worker, reason, "deactivated")
+
     else:
-        worker.deactivation_reason = reason
+        worker.is_active = True
+        worker.status_type = "reactivated"
+        worker.status_reason = None
+        worker.status_date = now
+
+        worker.status_letter = generate_hr_letter(worker, reason, "reactivated")
 
     db.session.commit()
-
     return redirect(url_for('workers_name'))
 
 
@@ -690,7 +801,7 @@ def salary():
             logging.error(f"Error recording salary: {e}")
             flash("There was an error recording the salary. Please try again.", "error")
 
-    return render_template('salary.html', workers=salary_data)
+    return render_template('salary.html', salary_data=salary_data)
 
 
 @app.route('/attendance_history')
