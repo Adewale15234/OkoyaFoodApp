@@ -377,22 +377,6 @@ def workers_name():
     )
 
 
-@app.route('/fix_workers_table')
-@login_required(role='admin')
-def fix_workers_table():
-    try:
-        db.session.execute("ALTER TABLE workers ADD COLUMN passport VARCHAR(255);")
-        db.session.commit()
-        return "Column added"
-    except Exception as e:
-        if "duplicate column" in str(e).lower():
-            return "Column already exists"
-        return f"Error: {e}"
-
-        with app.app_context():
-            db.create_all()
-
-
 @app.route('/toggle_worker_status/<int:worker_id>', methods=['POST'])
 def toggle_worker_status(worker_id):
     worker = Worker.query.get_or_404(worker_id)
