@@ -330,10 +330,12 @@ def active_workers():
     workers = Worker.query.filter_by(is_active=True).all()
     return render_template('workers_name.html', workers=workers)
 
+
 @app.route('/inactive-workers')
 def inactive_workers():
     workers = Worker.query.filter_by(is_active=False).all()
     return render_template('workers_name.html', workers=workers)
+    
 
 @app.route('/client_form', methods=['GET', 'POST'])
 def client_form():
