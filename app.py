@@ -325,8 +325,7 @@ def toggle_worker_status(worker_id):
     return redirect(url_for('workers_name'))
 
 
-
-    @app.route('/active-workers')
+ @app.route('/active-workers')
 def active_workers():
     workers = Worker.query.filter_by(is_active=True).all()
     return render_template('workers_name.html', workers=workers)
@@ -336,7 +335,6 @@ def inactive_workers():
     workers = Worker.query.filter_by(is_active=False).all()
     return render_template('workers_name.html', workers=workers)
 
-    
 @app.route('/client_form', methods=['GET', 'POST'])
 def client_form():
     if 'role' not in session:
