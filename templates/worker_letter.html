@@ -1,0 +1,200 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+<style>
+body {
+    background: #f4f6f9;
+}
+
+/* MAIN CONTAINER */
+.letter-container {
+    width: 70%;
+    margin: 40px auto;
+    background: white;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    font-family: Arial, sans-serif;
+    color: #222;
+}
+
+/* HEADER */
+.company-header {
+    text-align: center;
+    border-bottom: 2px solid #004080;
+    padding-bottom: 15px;
+    margin-bottom: 25px;
+    color: #111;
+}
+
+.company-header img {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+}
+
+.company-header h1 {
+    margin: 10px 0 5px;
+    font-size: 22px;
+    color: #004080;
+}
+
+.company-header p {
+    margin: 0;
+    font-size: 13px;
+    color: #444;
+}
+
+/* LETTER TITLE */
+.letter-title {
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+    margin: 20px 0;
+    color: #222;
+}
+
+/* INFO BOX */
+.info-box {
+    margin-bottom: 20px;
+    font-size: 15px;
+    line-height: 1.8;
+    color: #111;
+}
+
+.info-box strong {
+    color: #004080;
+}
+
+/* LETTER CONTENT */
+.letter-content {
+    background: #f1f3f5;
+    border-left: 5px solid #004080;
+    padding: 20px;
+    white-space: pre-wrap;
+    font-size: 15px;
+    color: #111;
+}
+
+/* BUTTONS */
+.btn-area {
+    margin-top: 25px;
+    text-align: center;
+}
+
+.print-btn {
+    background: #28a745;
+    color: white;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+.back-btn {
+    background: #007bff;
+    color: white;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 6px;
+    text-decoration: none;
+}
+
+/* =========================
+   PRINT FIX (A4 PROFESSIONAL)
+   ========================= */
+@media print {
+
+    body {
+        background: white !important;
+    }
+
+    .letter-container {
+        width: 210mm;
+        min-height: 297mm;
+        margin: 0;
+        padding: 20mm;
+        box-shadow: none;
+        border-radius: 0;
+    }
+
+    .btn-area,
+    .back-btn,
+    .print-btn {
+        display: none !important;
+    }
+
+    .company-header img {
+        width: 70px;
+        height: 70px;
+    }
+
+    .letter-content {
+        font-size: 14px;
+        line-height: 1.6;
+        background: white !important;
+        border-left: 4px solid #004080;
+        padding: 15px;
+    }
+
+    .info-box {
+        font-size: 14px;
+    }
+
+    @page {
+        size: A4;
+        margin: 15mm;
+    }
+}
+</style>
+
+<div class="letter-container">
+
+    <!-- COMPANY HEADER -->
+    <div class="company-header">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Company Logo">
+        <h1>OKOYA FOOD LIMITED</h1>
+        <p>Staff Management & HR Department</p>
+    </div>
+
+    <!-- TITLE -->
+    <div class="letter-title">
+        OFFICIAL HR DISCIPLINARY / REINSTATEMENT LETTER
+    </div>
+
+    <!-- WORKER INFO -->
+    <div class="info-box">
+        <p><strong>Worker Name:</strong> {{ worker.name }}</p>
+        <p><strong>Worker Code:</strong> {{ worker.worker_code }}</p>
+        <p><strong>Position:</strong> {{ worker.position }}</p>
+    </div>
+
+    <hr>
+
+    <!-- LETTER BODY -->
+    {% if worker.status_letter %}
+        <div class="letter-content">
+            {{ worker.status_letter }}
+        </div>
+    {% else %}
+        <p style="color:red; text-align:center;">
+            No HR letter available for this worker.
+        </p>
+    {% endif %}
+
+    <!-- ACTION BUTTONS -->
+    <div class="btn-area">
+        <button class="print-btn" onclick="window.print()">🖨 Print Letter</button>
+        <a class="back-btn" href="{{ url_for('workers_name') }}">← Back</a>
+        <a class="print-btn" href="{{ url_for('send_worker_letter', worker_id=worker.id) }}">
+            📧 Send to Email
+        </a>
+    </div>
+
+</div>
+
+{% endblock %}

@@ -14,25 +14,29 @@ import uuid
 from werkzeug.utils import secure_filename
 
 # ------------------------------
-# Login decorator
+# Login decorator (IMPROVED)
 # ------------------------------
 def login_required(role=None):
     """
-    Protect a route with login and optional role-based access.
-
-    Usage:
-        @login_required()                  -> any logged-in user
-        @login_required(role='admin')      -> only admin
-        @login_required(role='secretary')  -> only secretary
+    Protect routes with login and optional role-based access.
     """
+
     def decorator(f):
         @wraps(f)
         def decorated_function(*args, **kwargs):
-            user_role = session.get('role')
-            if not user_role or (role and user_role != role):
-                flash("Please login with proper credentials.", "danger")
+
+            # Check login
+            if 'role' not in session:
+                flash("Please login first.", "warning")
                 return redirect(url_for('login'))
+
+            # Check role
+            if role and session.get('role') != role:
+                flash("You are not authorized to access this page.", "danger")
+                return redirect(url_for('login'))
+
             return f(*args, **kwargs)
+
         return decorated_function
     return decorator
 
@@ -50,7 +54,19 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 
 app = Flask(__name__)
+from flask_mail import Mail, Message
+
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME', '')
+app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD', '')
+
+mail = Mail(app)
+
 app.secret_key = os.environ.get('SECRET_KEY', 'your-secret-key')
+
+app.config['UPLOAD_FOLDER'] = 'static/uploads'
 
 # ------------------------------
 # Database config FIRST
@@ -60,8 +76,8 @@ db_url = os.environ.get('DATABASE_URL')
 if not db_url:
     db_url = "sqlite:///okoya.db"
 
-if db_url.startswith("postgres://"):
-    db_url = db_url.replace("postgres://", "postgresql+psycopg2://", 1)
+if db_url.startswith("postgresql://"):
+    db_url = db_url.replace("postgresql://", "postgresql+psycopg2://", 1)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -103,7 +119,7 @@ class Worker(db.Model):
 
     status_reason = db.Column(db.Text, nullable=True)
     status_date = db.Column(db.DateTime, nullable=True)
-    status_type = db.Column(db.String(30), nullable=True)  # deactivated / reactivated
+    status_type = db.Column(db.String(30), nullable=True)
     status_letter = db.Column(db.Text, nullable=True)
 
     # Relationships
@@ -123,6 +139,18 @@ class Worker(db.Model):
     def __repr__(self):
         return f"<Worker {self.name}>"
 
+
+class EmailLog(db.Model):
+    __tablename__ = 'email_logs'
+
+    id = db.Column(db.Integer, primary_key=True)
+    worker_id = db.Column(db.Integer, db.ForeignKey('workers.id'), nullable=False)
+    email = db.Column(db.String(120), nullable=False)
+    sent_at = db.Column(db.DateTime, default=datetime.utcnow)
+    status = db.Column(db.String(20), default="Sent")
+
+    worker = db.relationship('Worker', backref='email_logs')
+      
 
       # ===============================
 # AI OFFENCE REVIEW FUNCTION
@@ -254,6 +282,7 @@ PASSWORD = os.environ.get('ADMIN_PASSWORD', 'Alayinde001')
 # Routes
 ...
 @app.route('/register_worker', methods=['GET', 'POST'])
+@login_required(role='admin')
 def register_worker():
     if request.method == 'POST':
         try:
@@ -378,6 +407,7 @@ def workers_name():
 
 
 @app.route('/toggle_worker_status/<int:worker_id>', methods=['POST'])
+@login_required(role='admin')
 def toggle_worker_status(worker_id):
     worker = Worker.query.get_or_404(worker_id)
     reason = request.form.get('reason', '').strip()
@@ -421,18 +451,98 @@ def toggle_worker_status(worker_id):
 
 
 @app.route('/active-workers')
+@login_required()
 def active_workers():
     workers = Worker.query.filter_by(is_active=True).all()
     return render_template('workers_name.html', workers=workers)
 
 
 @app.route('/inactive-workers')
+@login_required()
 def inactive_workers():
     workers = Worker.query.filter_by(is_active=False).all()
     return render_template('workers_name.html', workers=workers)
 
 
+@app.route('/worker_letter/<int:worker_id>')
+@login_required()
+def worker_letter(worker_id):
+    worker = Worker.query.get_or_404(worker_id)
+
+    if not worker.status_letter:
+        flash("No letter available for this worker.", "warning")
+        return redirect(url_for('workers_name'))
+
+    return render_template('worker_letter.html', worker=worker)
+
+
+@app.route('/send_worker_letter/<int:worker_id>')
+@login_required(role='admin')
+def send_worker_letter(worker_id):
+    worker = Worker.query.get_or_404(worker_id)
+
+    if not worker.email:
+        flash("Worker has no email address.", "danger")
+        return redirect(url_for('worker_letter', worker_id=worker_id))
+
+    if not worker.status_letter:
+        flash("No letter found for this worker.", "warning")
+        return redirect(url_for('worker_letter', worker_id=worker_id))
+
+    try:
+        msg = Message(
+            subject="Official HR Letter - Okoya Food Ltd",
+            sender=app.config['MAIL_USERNAME'],
+            recipients=[worker.email]
+        )
+
+        msg.body = f"""
+Dear {worker.name},
+
+Please find your official HR letter below:
+
+---------------------------------
+{worker.status_letter}
+---------------------------------
+
+Regards,
+HR Department
+Okoya Food Ltd
+"""
+
+        mail.send(msg)
+
+        # 🔔 EMAIL LOG SAVE
+        log = EmailLog(
+            worker_id=worker.id,
+            email=worker.email,
+            status="Sent"
+        )
+
+        db.session.add(log)
+        db.session.commit()
+
+        flash("Letter sent successfully to worker email.", "success")
+
+    except Exception as e:
+        db.session.rollback()
+
+        # log failed attempt
+        log = EmailLog(
+            worker_id=worker.id,
+            email=worker.email,
+            status=f"Failed: {str(e)}"
+        )
+        db.session.add(log)
+        db.session.commit()
+
+        flash(f"Failed to send email: {e}", "danger")
+
+    return redirect(url_for('worker_letter', worker_id=worker_id))
+
+
 @app.route('/client_form', methods=['GET', 'POST'])
+@login_required()
 def client_form():
     if 'role' not in session:
         return redirect(url_for('login'))
@@ -514,6 +624,7 @@ def orders_overview():
 
 
 @app.route('/confirm_order/<int:order_id>', methods=['POST'])
+@login_required(role='admin')
 def confirm_order(order_id):
     if session.get('role') != 'admin':
         return redirect(url_for('login'))
@@ -527,6 +638,7 @@ def confirm_order(order_id):
 
 
 @app.route('/delete_order/<int:order_id>', methods=['POST'])
+@login_required(role='admin')
 def delete_order(order_id):
     if session.get('role') != 'admin':
         return redirect(url_for('login'))
@@ -538,12 +650,14 @@ def delete_order(order_id):
     return redirect(url_for('orders_overview'))
 
 @app.route('/print_order/<int:order_id>')
+@login_required()
 def print_order(order_id):
     order = Order.query.get_or_404(order_id)  # Fetch the order by ID
     return render_template('print_order.html', order=order)
 
         
 @app.route('/export_order/<int:order_id>')
+@login_required()
 def export_order(order_id):
     if session.get('role') not in ['admin', 'secretary']:
         return redirect(url_for('login'))
@@ -580,6 +694,7 @@ def export_order(order_id):
 
 
 @app.route('/export_all_orders')
+@login_required(role='admin')
 def export_all_orders():
     if session.get('role') != 'admin':
         return redirect(url_for('login'))
@@ -834,6 +949,7 @@ def attendance_history():
 
 
 @app.route('/salary_history')
+@login_required()
 def salary_history():
         # Restrict access to admin and secretary only
     if session.get('role') not in ['admin', 'secretary']:
@@ -897,7 +1013,7 @@ def login():
 
 
         # --- Secretary credentials ---
-        SECRETARY_USER = os.environ.get('SECRETARY_USER', 'secretary')
+        SECRETARY_USER = os.environ.get('SECRETARY_USERNAME', 'secretary')
         SECRETARY_PASS = os.environ.get('SECRETARY_PASS', 'Sec001')
 
         # --- Check credentials ---
