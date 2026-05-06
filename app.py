@@ -14,7 +14,7 @@ import uuid
 from werkzeug.utils import secure_filename
 
 # ------------------------------
-# Login decorator (IMPROVED)
+# Login decorator (FINAL CLEAN VERSION)
 # ------------------------------
 def login_required(role=None):
     """
@@ -25,20 +25,29 @@ def login_required(role=None):
         @wraps(f)
         def decorated_function(*args, **kwargs):
 
-            # Check login
+            # 1. Check login
             if 'role' not in session:
                 flash("Please login first.", "warning")
                 return redirect(url_for('login'))
 
-            # Check role
-            if role and session.get('role') != role:
+            # 2. Check role only if required
+            if role is not None and session.get('role') != role:
                 flash("You are not authorized to access this page.", "danger")
-                return redirect(url_for('login'))
+
+                # redirect based on user role (better UX)
+                if session.get('role') == 'secretary':
+                    return redirect(url_for('secretary_dashboard'))
+                elif session.get('role') == 'admin':
+                    return redirect(url_for('admin_dashboard'))
+                else:
+                    return redirect(url_for('login'))
 
             return f(*args, **kwargs)
 
         return decorated_function
+
     return decorator
+
 
 # ------------------------------
 # Logging setup
@@ -52,24 +61,31 @@ import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+from flask_mail import Mail
 
 app = Flask(__name__)
-from flask_mail import Mail, Message
 
-app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-app.config['MAIL_PORT'] = 587
-app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME', '')
-app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD', '')
+# Secret key
+app.secret_key = os.environ.get('SECRET_KEY', 'your-secret-key')
+
+# Upload folder
+app.config['UPLOAD_FOLDER'] = 'static/uploads'
+
+# Mail config
+app.config.update(
+    MAIL_SERVER='smtp.gmail.com',
+    MAIL_PORT=587,
+    MAIL_USE_TLS=True,
+    MAIL_USE_SSL=False,
+    MAIL_USERNAME=os.environ.get('MAIL_USERNAME'),
+    MAIL_PASSWORD=os.environ.get('MAIL_PASSWORD'),
+    MAIL_DEFAULT_SENDER=os.environ.get('MAIL_USERNAME')
+)
 
 mail = Mail(app)
 
-app.secret_key = os.environ.get('SECRET_KEY', 'your-secret-key')
-
-app.config['UPLOAD_FOLDER'] = 'static/uploads'
-
 # ------------------------------
-# Database config FIRST
+# Database config
 # ------------------------------
 db_url = os.environ.get('DATABASE_URL')
 
@@ -539,6 +555,26 @@ Okoya Food Ltd
         flash(f"Failed to send email: {e}", "danger")
 
     return redirect(url_for('worker_letter', worker_id=worker_id))
+
+
+@app.route("/mail-debug")
+def mail_debug():
+    return {...}
+
+@app.route('/mail-test')
+def mail_test():
+    try:
+        ...
+        msg = Message(
+            subject="Test Email",
+            sender=app.config['MAIL_USERNAME'],
+            recipients=[app.config['MAIL_USERNAME']]
+        )
+        msg.body = "Testing Gmail SMTP"
+        mail.send(msg)
+        return "Email sent successfully"
+    except Exception as e:
+        return str(e)
 
 
 @app.route('/client_form', methods=['GET', 'POST'])
