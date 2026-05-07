@@ -85,9 +85,9 @@ mail = Mail(app)
 # ------------------------------
 # Database config
 # ------------------------------
-db_url = os.environ.get('DATABASE_URL')
-
-if not db_url:
+if os.environ.get("RENDER"):
+    db_url = os.environ.get("DATABASE_URL")
+else:
     db_url = "sqlite:///okoya.db"
 
 if db_url.startswith("postgresql://"):
@@ -109,6 +109,12 @@ app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
     "pool_recycle": 280,
 }
 migrate = Migrate(app, db)
+
+# ------------------------------
+# Auto create database tables
+# ------------------------------
+with app.app_context():
+    db.create_all()
 
 
 class Worker(db.Model):
@@ -273,7 +279,7 @@ class Order(db.Model):
     unit_price = db.Column(db.Float, nullable=True)
     total_amount = db.Column(db.Float, nullable=True)
     date_needed = db.Column(db.DateTime)
-    confirmed_at = db.Column(db.DateTime)   # <-- ADD THIS (you are using it!)
+    # confirmed_at = db.Column(db.DateTime)   # <-- ADD THIS (you are using it!)
     driver_name = db.Column(db.String(100))
     vehicle_plate_number = db.Column(db.String(50))
     bank_name = db.Column(db.String(100))
@@ -683,7 +689,7 @@ def confirm_order(order_id):
 
     order = Order.query.get_or_404(order_id)
     order.status = "Confirmed"
-    order.confirmed_at = datetime.utcnow()
+    # order.confirmed_at = datetime.utcnow()
 
     db.session.commit()
     return redirect(url_for('orders_overview'))
