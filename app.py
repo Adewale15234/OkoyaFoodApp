@@ -9,6 +9,7 @@ import os
 import logging
 import pandas as pd
 import io
+import psycopg2
 from functools import wraps
 import uuid
 from werkzeug.utils import secure_filename
@@ -96,6 +97,17 @@ app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
+from sqlalchemy import create_engine
+
+@app.teardown_appcontext
+def shutdown_session(exception=None):
+    db.session.remove()
+
+
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+    "pool_pre_ping": True,
+    "pool_recycle": 280,
+}
 migrate = Migrate(app, db)
 
 
@@ -990,7 +1002,7 @@ def salary_history():
         return redirect(url_for('login'))
 
     # Base query (join to include worker details)
-    salary_query = Salary.query.join(Worker).order_by(Salary.payment_date.desc())
+    salary_query = db.session.query(Salary).join(Worker).order_by(Salary.payment_date.desc())
 
     # Get month filter from query string (format: 'YYYY-MM')
     selected_month = request.args.get('month')

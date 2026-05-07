@@ -5,23 +5,61 @@
 
     <title>{% block title %}Staff Management{% endblock %}</title>
 
-    <!-- =========================
-         FAVICON
-    ========================== -->
+    <!-- FAVICON -->
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
 
-    <!-- CSS FILE -->
+    <!-- CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <!-- =========================
+         GLOBAL PRINT SYSTEM (IMPORTANT FIX)
+    ========================== -->
+    <style>
+        /* GLOBAL PRINT CONTROL */
+        @media print {
+            body {
+                background: white !important;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            .print-container {
+                width: 100%;
+                margin: 0;
+                padding: 15mm;
+                box-shadow: none !important;
+            }
+
+            @page {
+                size: A4;
+                margin: 15mm;
+            }
+        }
+
+        /* FLASH MESSAGE STYLING (PREVENT UI BREAKS) */
+        .flash-messages {
+            list-style: none;
+            padding: 10px;
+            margin: 0;
+            background: #fff3cd;
+            color: #856404;
+            border-bottom: 1px solid #ffeeba;
+        }
+
+        .flash-messages li {
+            margin: 5px 0;
+        }
+    </style>
 </head>
 
 <body>
 
-    <!-- =========================
-         FLASH MESSAGES
-    ========================== -->
+    <!-- FLASH MESSAGES -->
     {% with messages = get_flashed_messages() %}
         {% if messages %}
-            <ul class="flash-messages">
+            <ul class="flash-messages no-print">
                 {% for msg in messages %}
                     <li>{{ msg }}</li>
                 {% endfor %}
@@ -29,16 +67,12 @@
         {% endif %}
     {% endwith %}
 
-    <!-- =========================
-         MAIN CONTENT
-    ========================== -->
+    <!-- MAIN CONTENT -->
     <main>
         {% block content %}{% endblock %}
     </main>
 
-    <!-- =========================
-         THEME SCRIPT
-    ========================== -->
+    <!-- THEME SCRIPT -->
     <script>
         function setTheme(theme) {
             const body = document.body;
