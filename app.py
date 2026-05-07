@@ -306,7 +306,7 @@ PASSWORD = os.environ.get('ADMIN_PASSWORD', 'Alayinde001')
 
 
 # Routes
-...
+
 @app.route('/register_worker', methods=['GET', 'POST'])
 @login_required(role='admin')
 def register_worker():
@@ -569,20 +569,26 @@ Okoya Food Ltd
 
 @app.route("/mail-debug")
 def mail_debug():
-    return {...}
+    return {
+        "MAIL_USERNAME": app.config.get("MAIL_USERNAME"),
+        "MAIL_PASSWORD_EXISTS": bool(app.config.get("MAIL_PASSWORD"))
+    }
 
 @app.route('/mail-test')
 def mail_test():
     try:
-        ...
         msg = Message(
             subject="Test Email",
             sender=app.config['MAIL_USERNAME'],
             recipients=[app.config['MAIL_USERNAME']]
         )
+
         msg.body = "Testing Gmail SMTP"
+
         mail.send(msg)
+
         return "Email sent successfully"
+
     except Exception as e:
         return str(e)
 
