@@ -12,6 +12,7 @@ import io
 from functools import wraps
 import uuid
 from werkzeug.utils import secure_filename
+from flask_mail import Mail, Message
 
 # ------------------------------
 # Login decorator (FINAL CLEAN VERSION)
@@ -559,12 +560,11 @@ Okoya Food Ltd
 
 @app.route("/mail-debug")
 def mail_debug():
-    return {...}
+    return "Mail debug route is working"
 
 @app.route('/mail-test')
 def mail_test():
     try:
-        ...
         msg = Message(
             subject="Test Email",
             sender=app.config['MAIL_USERNAME'],
@@ -574,7 +574,7 @@ def mail_test():
         mail.send(msg)
         return "Email sent successfully"
     except Exception as e:
-        return str(e)
+        return f"Mail error: {str(e)}"
 
 
 @app.route('/client_form', methods=['GET', 'POST'])
@@ -1104,9 +1104,13 @@ def test_routes():
         return f"Error: {e}"
 
         
+@app.errorhandler(500)
+def server_error(e):
+    return f"Internal Server Error Occurred: {str(e)}", 500
 # ------------------------------
 # Main block
 # ------------------------------
+
 if __name__ == '__main__':
     print("🚀 Okoya Co,. Food Staff Manager app is starting...")
     app.debug = True
