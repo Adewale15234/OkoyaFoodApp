@@ -589,20 +589,26 @@ def mail_debug():
 @app.route('/mail-test')
 def mail_test():
     import traceback
-
     try:
+        print("MAIL TEST STARTED")
+
         msg = Message(
             subject="SMTP FINAL TEST",
             sender=app.config['MAIL_USERNAME'],
             recipients=[app.config['MAIL_USERNAME']]
         )
+
         msg.body = "Testing Render SMTP"
+        print("ABOUT TO SEND MAIL")
 
         mail.send(msg)
 
+        print("MAIL SENT SUCCESSFULLY")
         return "EMAIL SENT SUCCESSFULLY"
 
     except Exception as e:
+        print("MAIL ERROR OCCURRED:", str(e))
+        print(traceback.format_exc())
         return f"<pre>{traceback.format_exc()}</pre>"
 
 
