@@ -591,11 +591,16 @@ def mail_test():
     import traceback
 
     try:
-        return f"""
-        MAIL_USERNAME: {app.config.get('MAIL_USERNAME')} <br>
-        MAIL_PASSWORD EXISTS: {bool(app.config.get('MAIL_PASSWORD'))} <br>
-        MAIL_DEFAULT_SENDER: {app.config.get('MAIL_DEFAULT_SENDER')}
-        """
+        msg = Message(
+            subject="SMTP FINAL TEST",
+            sender=app.config['MAIL_USERNAME'],
+            recipients=[app.config['MAIL_USERNAME']]
+        )
+        msg.body = "Testing Render SMTP"
+
+        mail.send(msg)
+
+        return "EMAIL SENT SUCCESSFULLY"
 
     except Exception as e:
         return f"<pre>{traceback.format_exc()}</pre>"
