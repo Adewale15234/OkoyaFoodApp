@@ -1130,6 +1130,9 @@ def test_routes():
 # ------------------------------
 # Main block
 # ------------------------------
+with app.app_context():
+    db.create_all()
+
 if __name__ == '__main__':
     print("🚀 Okoya Co,. Food Staff Manager app is starting...")
     app.debug = True
