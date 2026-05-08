@@ -86,18 +86,23 @@ app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_USERNAME')
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 
 # Mail config
+MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
+MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
+
 app.config.update(
     MAIL_SERVER='smtp.gmail.com',
     MAIL_PORT=587,
     MAIL_USE_TLS=True,
     MAIL_USE_SSL=False,
-    MAIL_USERNAME=os.environ.get('MAIL_USERNAME'),
-    MAIL_PASSWORD=os.environ.get('MAIL_PASSWORD'),
-    MAIL_DEFAULT_SENDER=os.environ.get('MAIL_USERNAME')
+    MAIL_USERNAME=MAIL_USERNAME,
+    MAIL_PASSWORD=MAIL_PASSWORD,   # ✅ FIXED (was missing safety use)
+    MAIL_DEFAULT_SENDER=MAIL_USERNAME
 )
 
 mail = Mail(app)
 
+print("MAIL USER:", MAIL_USERNAME)
+print("MAIL PASS EXISTS:", bool(MAIL_PASSWORD))
 # ------------------------------
 # Database config
 # ------------------------------
@@ -524,7 +529,7 @@ def worker_letter(worker_id):
     return render_template('worker_letter.html', worker=worker)
 
 
-@app.route('/send_worker_letter/<int:worker_id>')
+@app.route('/send_worker_letter/<int:worker_id>', methods=['POST'])
 @login_required(role='admin')
 def send_worker_letter(worker_id):
     worker = Worker.query.get_or_404(worker_id)
@@ -538,7 +543,11 @@ def send_worker_letter(worker_id):
         return redirect(url_for('worker_letter', worker_id=worker_id))
 
     try:
-        sender_email = app.config.get("MAIL_DEFAULT_SENDER") or app.config.get("MAIL_USERNAME")
+        sender_email = app.config.get("MAIL_USERNAME")
+        mail_password = app.config.get("MAIL_PASSWORD")
+
+        if not sender_email or not mail_password:
+            raise Exception("EMAIL CONFIG MISSING IN ENV VARIABLES")
 
         msg = Message(
             subject="Official HR Letter - Okoya Food Ltd",

@@ -188,12 +188,20 @@ body {
 
     <!-- ACTION BUTTONS -->
     <div class="btn-area">
-        <button class="print-btn" onclick="window.print()">🖨 Print Letter</button>
-        <a class="back-btn" href="{{ url_for('workers_name') }}">← Back</a>
-        <a class="print-btn" href="{{ url_for('send_worker_letter', worker_id=worker.id) }}">
-            📧 to Email
-        </a>
-    </div>
+    <button class="print-btn" onclick="window.print()">🖨 Print Letter</button>
+
+    <a class="back-btn" href="{{ url_for('workers_name') }}">← Back</a>
+
+    <!-- OLD LINK (kept but now optional) -->
+    <a class="print-btn" href="{{ url_for('send_worker_letter', worker_id=worker.id) }}">
+        📧 to Email
+    </a>
+
+    <!-- NEW SAFE POST FORM (YOUR REQUEST) -->
+    <form action="{{ url_for('send_worker_letter', worker_id=worker.id) }}" method="post" style="display:inline;">
+        <button type="submit" class="print-btn">📨 Send Email</button>
+    </form>
+</div>
 
 </div>
 
