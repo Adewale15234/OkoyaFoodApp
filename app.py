@@ -89,11 +89,16 @@ mail = Mail(app)
 # ------------------------------
 # Database config
 # ------------------------------
-if os.environ.get("RENDER"):
-    db_url = os.environ.get("DATABASE_URL")
-else:
+# ------------------------------
+# Database config
+# ------------------------------
+db_url = os.environ.get("DATABASE_URL")
+
+# Fallback to SQLite only for local development
+if not db_url:
     db_url = "sqlite:///okoya.db"
 
+# Fix Render PostgreSQL URL
 if db_url.startswith("postgresql://"):
     db_url = db_url.replace("postgresql://", "postgresql+psycopg2://", 1)
 
