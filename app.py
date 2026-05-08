@@ -1,20 +1,23 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash, send_from_directory, send_file
+from flask import Flask, render_template, request, redirect, url_for, session, flash, send_file
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from datetime import datetime, date
 from calendar import monthrange
 from sqlalchemy import extract, create_engine, text
 from sqlalchemy.orm import sessionmaker
+
 import os
 import logging
 import pandas as pd
-import os
-from dotenv import load_dotenv
-
-load_dotenv()
 import psycopg2
-from functools import wraps
 import uuid
+import io
+import traceback
+
+from dotenv import load_dotenv
+load_dotenv()
+
+from functools import wraps
 from werkzeug.utils import secure_filename
 from flask_mail import Mail, Message
 # ------------------------------
@@ -65,6 +68,15 @@ logging.basicConfig(level=logging.INFO)
 # Flask app & secret key
 # ------------------------------
 app = Flask(__name__)
+
+# ==============================
+# GLOBAL ERROR DEBUG (ADD HERE)
+# ==============================
+@app.errorhandler(500)
+def server_error(e):
+    print("🔥 INTERNAL SERVER ERROR TRACE:")
+    print(traceback.format_exc())
+    return "Server Error - check logs", 500
 
 # Secret key
 app.secret_key = os.environ.get('SECRET_KEY', 'your-secret-key')
