@@ -8,7 +8,10 @@ from sqlalchemy.orm import sessionmaker
 import os
 import logging
 import pandas as pd
-import io
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 import psycopg2
 from functools import wraps
 import uuid
@@ -65,6 +68,7 @@ app = Flask(__name__)
 
 # Secret key
 app.secret_key = os.environ.get('SECRET_KEY', 'your-secret-key')
+app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_USERNAME')
 
 # Upload folder
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
@@ -110,11 +114,6 @@ app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
 }
 migrate = Migrate(app, db)
 
-# ------------------------------
-# Auto create database tables
-# ------------------------------
-with app.app_context():
-    db.create_all()
 
 
 class Worker(db.Model):
@@ -522,9 +521,11 @@ def send_worker_letter(worker_id):
         return redirect(url_for('worker_letter', worker_id=worker_id))
 
     try:
+        sender_email = app.config.get("MAIL_DEFAULT_SENDER") or app.config.get("MAIL_USERNAME")
+
         msg = Message(
             subject="Official HR Letter - Okoya Food Ltd",
-            sender=app.config['MAIL_USERNAME'],
+            sender=sender_email,
             recipients=[worker.email]
         )
 
@@ -544,13 +545,12 @@ Okoya Food Ltd
 
         mail.send(msg)
 
-        # 🔔 EMAIL LOG SAVE
+        # log success
         log = EmailLog(
             worker_id=worker.id,
             email=worker.email,
             status="Sent"
         )
-
         db.session.add(log)
         db.session.commit()
 
@@ -559,7 +559,7 @@ Okoya Food Ltd
     except Exception as e:
         db.session.rollback()
 
-        # log failed attempt
+        # log failure
         log = EmailLog(
             worker_id=worker.id,
             email=worker.email,
@@ -573,10 +573,11 @@ Okoya Food Ltd
     return redirect(url_for('worker_letter', worker_id=worker_id))
 
 
-@app.route("/mail-debug")
+@app.route('/mail-debug')
 def mail_debug():
     return {
         "MAIL_USERNAME": app.config.get("MAIL_USERNAME"),
+        "MAIL_DEFAULT_SENDER": app.config.get("MAIL_DEFAULT_SENDER"),
         "MAIL_PASSWORD_EXISTS": bool(app.config.get("MAIL_PASSWORD"))
     }
 
@@ -1125,7 +1126,7 @@ def test_routes():
     except Exception as e:
         return f"Error: {e}"
 
-        
+
 # ------------------------------
 # Main block
 # ------------------------------
