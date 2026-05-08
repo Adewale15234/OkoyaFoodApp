@@ -602,7 +602,8 @@ def mail_test():
         return "Email sent successfully"
 
     except Exception as e:
-        return str(e)
+        import traceback
+        return f"<pre>{traceback.format_exc()}</pre>"
 
 
 @app.route('/client_form', methods=['GET', 'POST'])
