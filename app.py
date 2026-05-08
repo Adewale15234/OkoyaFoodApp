@@ -588,21 +588,16 @@ def mail_debug():
 
 @app.route('/mail-test')
 def mail_test():
+    import traceback
+
     try:
-        msg = Message(
-            subject="Test Email",
-            sender=app.config['MAIL_USERNAME'],
-            recipients=[app.config['MAIL_USERNAME']]
-        )
-
-        msg.body = "Testing Gmail SMTP"
-
-        mail.send(msg)
-
-        return "Email sent successfully"
+        return f"""
+        MAIL_USERNAME: {app.config.get('MAIL_USERNAME')} <br>
+        MAIL_PASSWORD EXISTS: {bool(app.config.get('MAIL_PASSWORD'))} <br>
+        MAIL_DEFAULT_SENDER: {app.config.get('MAIL_DEFAULT_SENDER')}
+        """
 
     except Exception as e:
-        import traceback
         return f"<pre>{traceback.format_exc()}</pre>"
 
 
