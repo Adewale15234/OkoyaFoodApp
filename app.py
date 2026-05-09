@@ -81,22 +81,18 @@ app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_USERNAME')
 # Upload folder
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 
-# Mail config
+# Mail config (BREVO SMTP - FIXED)
 MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
 MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
 
 app.config.update(
-    MAIL_SERVER='smtp.gmail.com',
+    MAIL_SERVER='smtp-relay.brevo.com',
     MAIL_PORT=587,
     MAIL_USE_TLS=True,
     MAIL_USE_SSL=False,
     MAIL_USERNAME=MAIL_USERNAME,
     MAIL_PASSWORD=MAIL_PASSWORD,
-    MAIL_DEFAULT_SENDER=MAIL_USERNAME,
-    MAIL_MAX_EMAILS=None,
-    MAIL_ASCII_ATTACHMENTS=False,
-    MAIL_SUPPRESS_SEND=False,
-    MAIL_TIMEOUT=30
+    MAIL_DEFAULT_SENDER=os.environ.get('MAIL_DEFAULT_SENDER'),
 )
 
 mail = Mail(app)
@@ -536,7 +532,9 @@ def send_worker_letter(worker_id):
     worker = Worker.query.get_or_404(worker_id)
 
     try:
-
+        # -----------------------------
+        # VALIDATION
+        # -----------------------------
         if not worker.email:
             flash("Worker has no email address.", "danger")
             return redirect(url_for('worker_letter', worker_id=worker.id))
@@ -545,23 +543,32 @@ def send_worker_letter(worker_id):
             flash("No HR letter available.", "danger")
             return redirect(url_for('worker_letter', worker_id=worker.id))
 
+        # -----------------------------
+        # CREATE MESSAGE
+        # -----------------------------
         msg = Message(
             subject="Official HR Letter - Okoya Food Ltd",
-            recipients=[worker.email]
+            recipients=[worker.email],
+            body=worker.status_letter,
+            sender=app.config.get("MAIL_DEFAULT_SENDER")
         )
 
-        msg.body = worker.status_letter
+        # -----------------------------
+        # SEND EMAIL SAFELY (BREVO)
+        # -----------------------------
+        try:
+            mail.send(msg)
+            flash("Letter sent successfully!", "success")
 
-        mail.send(msg)
-
-        flash("Letter sent successfully!", "success")
+        except Exception as mail_error:
+            print("BREVO EMAIL FAILED:", str(mail_error))
+            traceback.print_exc()
+            flash("Email failed but system is stable. Check SMTP settings.", "warning")
 
     except Exception as e:
-
-        print("EMAIL ERROR:", str(e))
+        print("SYSTEM ERROR:", str(e))
         traceback.print_exc()
-
-        flash(f"Email failed: {str(e)}", "danger")
+        flash(f"Unexpected error: {str(e)}", "danger")
 
     return redirect(url_for('worker_letter', worker_id=worker.id))
 
