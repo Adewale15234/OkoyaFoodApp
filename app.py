@@ -323,8 +323,8 @@ class Salary(db.Model):
     payment_date = db.Column(db.DateTime, nullable=False, default=db.func.current_timestamp())
 
 # Hardcoded credentials (Not secure! Replace with real auth for production)
-USERNAME = os.environ.get('ADMIN_USERNAME', 'admin')
-PASSWORD = os.environ.get('ADMIN_PASSWORD', 'Alayinde001')
+# USERNAME = os.environ.get('ADMIN_USERNAME', 'admin')
+# PASSWORD = os.environ.get('ADMIN_PASSWORD', 'Alayinde001')
 
 
 # Routes
@@ -1122,23 +1122,22 @@ def test_routes():
 def handle_exception(e):
     import traceback
     traceback.print_exc()
-    return f"<h1>ERROR</h1><pre>{str(e)}</pre>", 500
+
+    return render_template(
+        "error.html",
+        error="Something went wrong."
+    ), 500
 # ------------------------------
 # Main block
 # ------------------------------
 # ------------------------------
 # Create database tables safely
 # ------------------------------
-with app.app_context():
-    try:
-        db.create_all()
-        print("Database connected successfully.")
-    except Exception as e:
-        print("DATABASE CONNECTION ERROR:")
-        print(str(e))
-
 if __name__ == '__main__':
-    print("🚀 Okoya Co,. Food Staff Manager app is starting...")
+    with app.app_context():
+        db.create_all()
+
+    print("🚀 Okoya Food Staff Manager app is starting...")
     app.debug = True
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
