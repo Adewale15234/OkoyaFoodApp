@@ -82,8 +82,12 @@ app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_USERNAME')
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 
 # Mail config (BREVO SMTP - FIXED)
+# Mail config (BREVO SMTP - FIXED)
 MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
 MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
+
+app.config['MAIL_USERNAME'] = MAIL_USERNAME
+app.config['MAIL_PASSWORD'] = MAIL_PASSWORD
 
 app.config.update(
     MAIL_SERVER='smtp-relay.brevo.com',
@@ -530,6 +534,9 @@ def send_worker_letter(worker_id):
 
     worker = Worker.query.get_or_404(worker_id)
 
+    # -----------------------
+    # VALIDATION
+    # -----------------------
     if not worker.email:
         flash("Worker has no email address.", "danger")
         return redirect(url_for('worker_letter', worker_id=worker.id))
@@ -539,6 +546,16 @@ def send_worker_letter(worker_id):
         return redirect(url_for('worker_letter', worker_id=worker.id))
 
     try:
+        # -----------------------
+        # DEBUG (PUT EXACTLY HERE)
+        # -----------------------
+        print("SENDING EMAIL TO:", worker.email)
+        print("SMTP USER:", app.config['MAIL_USERNAME'])
+        print("SMTP SERVER:", app.config['MAIL_SERVER'])
+
+        # -----------------------
+        # CREATE EMAIL MESSAGE
+        # -----------------------
         msg = Message(
             subject="Official HR Letter - Okoya Food Ltd",
             sender=app.config['MAIL_DEFAULT_SENDER'],
@@ -546,6 +563,9 @@ def send_worker_letter(worker_id):
             body=worker.status_letter
         )
 
+        # -----------------------
+        # SEND EMAIL
+        # -----------------------
         mail.send(msg)
 
         flash("Letter sent successfully!", "success")
@@ -557,6 +577,21 @@ def send_worker_letter(worker_id):
 
     return redirect(url_for('worker_letter', worker_id=worker.id))
 
+@app.route("/smtp-test")
+def smtp_test():
+    try:
+        msg = Message(
+            subject="Test Email",
+            sender=app.config['MAIL_DEFAULT_SENDER'],
+            recipients=[app.config['MAIL_USERNAME']],
+            body="SMTP is working"
+        )
+        mail.send(msg)
+        return "EMAIL SENT OK"
+    except Exception as e:
+        import traceback
+        return f"<pre>{traceback.format_exc()}</pre>"
+    
 
 @app.route('/mail-debug-test')
 def mail_debug_test():
