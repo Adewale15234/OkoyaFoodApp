@@ -92,9 +92,8 @@ app.config.update(
     MAIL_USE_SSL=False,
     MAIL_USERNAME=MAIL_USERNAME,
     MAIL_PASSWORD=MAIL_PASSWORD,
-    MAIL_DEFAULT_SENDER=os.environ.get('MAIL_DEFAULT_SENDER'),
+    MAIL_DEFAULT_SENDER=MAIL_USERNAME
 )
-
 mail = Mail(app)
 
 print("MAIL USER:", MAIL_USERNAME)
@@ -542,9 +541,9 @@ def send_worker_letter(worker_id):
     try:
         msg = Message(
             subject="Official HR Letter - Okoya Food Ltd",
+            sender=app.config['MAIL_DEFAULT_SENDER'],
             recipients=[worker.email],
-            body=worker.status_letter,
-            sender=app.config.get("MAIL_DEFAULT_SENDER")
+            body=worker.status_letter
         )
 
         mail.send(msg)
@@ -554,19 +553,24 @@ def send_worker_letter(worker_id):
     except Exception as e:
         print("EMAIL ERROR:", str(e))
         traceback.print_exc()
-
-        flash("Email failed (SMTP issue or timeout). Try again.", "danger")
+        flash("Email failed. Check SMTP or network.", "danger")
 
     return redirect(url_for('worker_letter', worker_id=worker.id))
 
 
-@app.route('/mail-debug')
-def mail_debug():
-    return {
-        "MAIL_USERNAME": app.config.get("MAIL_USERNAME"),
-        "MAIL_DEFAULT_SENDER": app.config.get("MAIL_DEFAULT_SENDER"),
-        "MAIL_PASSWORD_EXISTS": bool(app.config.get("MAIL_PASSWORD"))
-    }
+@app.route('/mail-debug-test')
+def mail_debug_test():
+    try:
+        msg = Message(
+            subject="TEST",
+            sender=app.config['MAIL_DEFAULT_SENDER'],
+            recipients=[MAIL_USERNAME],
+            body="Test email"
+        )
+        mail.send(msg)
+        return "MAIL SENT"
+    except Exception as e:
+        return str(e)
 
 @app.route('/mail-test')
 def mail_test():
@@ -712,8 +716,8 @@ def print_order(order_id):
 @app.route('/favicon.ico')
 def favicon():
     return "", 204
-    
-            
+
+
 @app.route('/export_order/<int:order_id>')
 @login_required()
 def export_order(order_id):
