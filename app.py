@@ -532,6 +532,7 @@ def worker_letter(worker_id):
 @app.route('/send_worker_letter/<int:worker_id>', methods=['POST'])
 @login_required(role='admin')
 def send_worker_letter(worker_id):
+
     worker = Worker.query.get_or_404(worker_id)
 
     if not worker.email:
@@ -543,26 +544,23 @@ def send_worker_letter(worker_id):
         return redirect(url_for('worker_letter', worker_id=worker_id))
 
     try:
-        sender_email = app.config.get("MAIL_USERNAME")
-        mail_password = app.config.get("MAIL_PASSWORD")
-
-        if not sender_email or not mail_password:
-            raise Exception("EMAIL CONFIG MISSING IN ENV VARIABLES")
 
         msg = Message(
             subject="Official HR Letter - Okoya Food Ltd",
-            sender=sender_email,
+            sender=MAIL_USERNAME,
             recipients=[worker.email]
         )
 
         msg.body = f"""
 Dear {worker.name},
 
-Please find your official HR letter below:
+Please find your official HR letter below.
 
----------------------------------
+================================
+
 {worker.status_letter}
----------------------------------
+
+================================
 
 Regards,
 HR Department
@@ -571,30 +569,34 @@ Okoya Food Ltd
 
         mail.send(msg)
 
-        # log success
         log = EmailLog(
             worker_id=worker.id,
             email=worker.email,
             status="Sent"
         )
+
         db.session.add(log)
         db.session.commit()
 
-        flash("Letter sent successfully to worker email.", "success")
+        flash("Letter sent successfully!", "success")
 
     except Exception as e:
+
         db.session.rollback()
 
-        # log failure
+        print("EMAIL ERROR:", str(e))
+        print(traceback.format_exc())
+
         log = EmailLog(
             worker_id=worker.id,
             email=worker.email,
             status=f"Failed: {str(e)}"
         )
+
         db.session.add(log)
         db.session.commit()
 
-        flash(f"Failed to send email: {e}", "danger")
+        flash(f"Email failed: {str(e)}", "danger")
 
     return redirect(url_for('worker_letter', worker_id=worker_id))
 
