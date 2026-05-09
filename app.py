@@ -531,21 +531,15 @@ def send_worker_letter(worker_id):
 
     worker = Worker.query.get_or_404(worker_id)
 
+    if not worker.email:
+        flash("Worker has no email address.", "danger")
+        return redirect(url_for('worker_letter', worker_id=worker.id))
+
+    if not worker.status_letter:
+        flash("No HR letter available.", "danger")
+        return redirect(url_for('worker_letter', worker_id=worker.id))
+
     try:
-        # -----------------------------
-        # VALIDATION
-        # -----------------------------
-        if not worker.email:
-            flash("Worker has no email address.", "danger")
-            return redirect(url_for('worker_letter', worker_id=worker.id))
-
-        if not worker.status_letter:
-            flash("No HR letter available.", "danger")
-            return redirect(url_for('worker_letter', worker_id=worker.id))
-
-        # -----------------------------
-        # CREATE MESSAGE
-        # -----------------------------
         msg = Message(
             subject="Official HR Letter - Okoya Food Ltd",
             recipients=[worker.email],
@@ -553,22 +547,15 @@ def send_worker_letter(worker_id):
             sender=app.config.get("MAIL_DEFAULT_SENDER")
         )
 
-        # -----------------------------
-        # SEND EMAIL SAFELY (BREVO)
-        # -----------------------------
-        try:
-            mail.send(msg)
-            flash("Letter sent successfully!", "success")
+        mail.send(msg)
 
-        except Exception as mail_error:
-            print("BREVO EMAIL FAILED:", str(mail_error))
-            traceback.print_exc()
-            flash("Email failed but system is stable. Check SMTP settings.", "warning")
+        flash("Letter sent successfully!", "success")
 
     except Exception as e:
-        print("SYSTEM ERROR:", str(e))
+        print("EMAIL ERROR:", str(e))
         traceback.print_exc()
-        flash(f"Unexpected error: {str(e)}", "danger")
+
+        flash("Email failed (SMTP issue or timeout). Try again.", "danger")
 
     return redirect(url_for('worker_letter', worker_id=worker.id))
 
@@ -721,7 +708,12 @@ def print_order(order_id):
     order = Order.query.get_or_404(order_id)  # Fetch the order by ID
     return render_template('print_order.html', order=order)
 
-        
+
+@app.route('/favicon.ico')
+def favicon():
+    return "", 204
+    
+            
 @app.route('/export_order/<int:order_id>')
 @login_required()
 def export_order(order_id):
