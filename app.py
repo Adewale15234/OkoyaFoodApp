@@ -72,11 +72,6 @@ app = Flask(__name__)
 # ==============================
 # GLOBAL ERROR DEBUG (ADD HERE)
 # ==============================
-@app.errorhandler(500)
-def server_error(e):
-    print("🔥 INTERNAL SERVER ERROR TRACE:")
-    print(traceback.format_exc())
-    return "Server Error - check logs", 500
 
 # Secret key
 app.secret_key = os.environ.get('SECRET_KEY', 'your-secret-key')
@@ -533,15 +528,9 @@ def worker_letter(worker_id):
 @login_required(role='admin')
 def send_worker_letter(worker_id):
 
+    import traceback
+
     worker = Worker.query.get_or_404(worker_id)
-
-    if not worker.email:
-        flash("Worker has no email address.", "danger")
-        return redirect(url_for('worker_letter', worker_id=worker_id))
-
-    if not worker.status_letter:
-        flash("No letter found for this worker.", "warning")
-        return redirect(url_for('worker_letter', worker_id=worker_id))
 
     try:
 
@@ -551,54 +540,21 @@ def send_worker_letter(worker_id):
             recipients=[worker.email]
         )
 
-        msg.body = f"""
-Dear {worker.name},
-
-Please find your official HR letter below.
-
-================================
-
-{worker.status_letter}
-
-================================
-
-Regards,
-HR Department
-Okoya Food Ltd
-"""
+        msg.body = worker.status_letter
 
         mail.send(msg)
 
-        log = EmailLog(
-            worker_id=worker.id,
-            email=worker.email,
-            status="Sent"
-        )
-
-        db.session.add(log)
-        db.session.commit()
-
-        flash("Letter sent successfully!", "success")
+        flash("Email sent successfully!", "success")
 
     except Exception as e:
 
-        db.session.rollback()
+        print("========== EMAIL ERROR ==========")
+        traceback.print_exc()
+        print("=================================")
 
-        print("EMAIL ERROR:", str(e))
-        print(traceback.format_exc())
+        flash(str(e), "danger")
 
-        log = EmailLog(
-            worker_id=worker.id,
-            email=worker.email,
-            status=f"Failed: {str(e)}"
-        )
-
-        db.session.add(log)
-        db.session.commit()
-
-        flash(f"Email failed: {str(e)}", "danger")
-
-    return redirect(url_for('worker_letter', worker_id=worker_id))
+    return redirect(url_for('worker_letter', worker_id=worker.id))
 
 
 @app.route('/mail-debug')
@@ -1162,6 +1118,11 @@ def test_routes():
         return f"Error: {e}"
 
 
+@app.errorhandler(Exception)
+def handle_exception(e):
+    import traceback
+    traceback.print_exc()
+    return f"<h1>ERROR</h1><pre>{str(e)}</pre>", 500
 # ------------------------------
 # Main block
 # ------------------------------
