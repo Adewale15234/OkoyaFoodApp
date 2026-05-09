@@ -1126,8 +1126,16 @@ def handle_exception(e):
 # ------------------------------
 # Main block
 # ------------------------------
+# ------------------------------
+# Create database tables safely
+# ------------------------------
 with app.app_context():
-    db.create_all()
+    try:
+        db.create_all()
+        print("Database connected successfully.")
+    except Exception as e:
+        print("DATABASE CONNECTION ERROR:")
+        print(str(e))
 
 if __name__ == '__main__':
     print("🚀 Okoya Co,. Food Staff Manager app is starting...")
