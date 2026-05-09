@@ -13,6 +13,7 @@ import psycopg2
 import uuid
 import io
 import traceback
+import smtplib
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -90,8 +91,12 @@ app.config.update(
     MAIL_USE_TLS=True,
     MAIL_USE_SSL=False,
     MAIL_USERNAME=MAIL_USERNAME,
-    MAIL_PASSWORD=MAIL_PASSWORD,   # ✅ FIXED (was missing safety use)
-    MAIL_DEFAULT_SENDER=MAIL_USERNAME
+    MAIL_PASSWORD=MAIL_PASSWORD,
+    MAIL_DEFAULT_SENDER=MAIL_USERNAME,
+    MAIL_MAX_EMAILS=None,
+    MAIL_ASCII_ATTACHMENTS=False,
+    MAIL_SUPPRESS_SEND=False,
+    MAIL_TIMEOUT=30
 )
 
 mail = Mail(app)
@@ -528,15 +533,20 @@ def worker_letter(worker_id):
 @login_required(role='admin')
 def send_worker_letter(worker_id):
 
-    import traceback
-
     worker = Worker.query.get_or_404(worker_id)
 
     try:
 
+        if not worker.email:
+            flash("Worker has no email address.", "danger")
+            return redirect(url_for('worker_letter', worker_id=worker.id))
+
+        if not worker.status_letter:
+            flash("No HR letter available.", "danger")
+            return redirect(url_for('worker_letter', worker_id=worker.id))
+
         msg = Message(
             subject="Official HR Letter - Okoya Food Ltd",
-            sender=MAIL_USERNAME,
             recipients=[worker.email]
         )
 
@@ -544,15 +554,14 @@ def send_worker_letter(worker_id):
 
         mail.send(msg)
 
-        flash("Email sent successfully!", "success")
+        flash("Letter sent successfully!", "success")
 
     except Exception as e:
 
-        print("========== EMAIL ERROR ==========")
+        print("EMAIL ERROR:", str(e))
         traceback.print_exc()
-        print("=================================")
 
-        flash(str(e), "danger")
+        flash(f"Email failed: {str(e)}", "danger")
 
     return redirect(url_for('worker_letter', worker_id=worker.id))
 
@@ -1122,11 +1131,7 @@ def test_routes():
 def handle_exception(e):
     import traceback
     traceback.print_exc()
-
-    return render_template(
-        "error.html",
-        error="Something went wrong."
-    ), 500
+    return f"<pre>{traceback.format_exc()}</pre>", 500
 # ------------------------------
 # Main block
 # ------------------------------
