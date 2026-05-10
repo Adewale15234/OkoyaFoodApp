@@ -20,6 +20,17 @@ load_dotenv()
 from functools import wraps
 from werkzeug.utils import secure_filename
 from flask_mail import Mail, Message
+
+# ------------------------------
+# Allowed image extensions
+# ------------------------------
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+
+def allowed_file(filename):
+    return (
+        '.' in filename and
+        filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+    )
 # ------------------------------
 # Login decorator (FINAL CLEAN VERSION)
 # ------------------------------
@@ -68,6 +79,11 @@ logging.basicConfig(level=logging.INFO)
 # Flask app & secret key
 # ------------------------------
 app = Flask(__name__)
+app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024  # 5MB upload limit
+
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SECURE'] = False
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 
 # ==============================
 # GLOBAL ERROR DEBUG (ADD HERE)
@@ -79,6 +95,11 @@ app.secret_key = os.environ.get('SECRET_KEY', 'your-secret-key')
 
 # Upload folder
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'webp'}
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 # Mail config (BREVO SMTP - FIXED)
 # Mail config (BREVO SMTP - FIXED)
@@ -360,7 +381,9 @@ class Salary(db.Model):
 @app.route('/register_worker', methods=['GET', 'POST'])
 @login_required(role='admin')
 def register_worker():
+
     if request.method == 'POST':
+
         try:
             # -------------------------
             # Collect form data
@@ -386,10 +409,17 @@ def register_worker():
             bank_account = request.form.get('bank_account')
 
             # -------------------------
-            # Convert date strings to date objects
+            # Convert dates
             # -------------------------
-            date_of_birth = datetime.strptime(date_of_birth_str, '%Y-%m-%d').date()
-            date_of_employment = datetime.strptime(date_of_employment_str, '%Y-%m-%d').date()
+            date_of_birth = datetime.strptime(
+                date_of_birth_str,
+                '%Y-%m-%d'
+            ).date()
+
+            date_of_employment = datetime.strptime(
+                date_of_employment_str,
+                '%Y-%m-%d'
+            ).date()
 
             # -------------------------
             # Passport upload handling
@@ -397,29 +427,47 @@ def register_worker():
             passport_file = request.files.get('passport')
             passport_filename = None
 
-
             if passport_file and passport_file.filename != "":
+
+                # Validate image extension
+                if not allowed_file(passport_file.filename):
+                    flash("Only image files are allowed.", "danger")
+                    return redirect(url_for('register_worker'))
+
+                # Create upload folder
                 passport_folder = app.config['UPLOAD_FOLDER']
                 os.makedirs(passport_folder, exist_ok=True)
 
-                passport_filename = str(uuid.uuid4()) + "_" + secure_filename(passport_file.filename)
-                passport_file.save(os.path.join(passport_folder, passport_filename))
+                # Secure unique filename
+                passport_filename = (
+                    str(uuid.uuid4()) + "_" +
+                    secure_filename(passport_file.filename)
+                )
+
+                # Save file
+                passport_file.save(
+                    os.path.join(passport_folder, passport_filename)
+                )
 
             # -------------------------
-            # Auto-generate worker code
+            # Generate worker code
             # -------------------------
-            last_worker = Worker.query.order_by(Worker.id.desc()).first()
+            last_worker = Worker.query.order_by(
+                Worker.id.desc()
+            ).first()
+
             if last_worker and last_worker.worker_code:
-                # Extract number from code, e.g., OFCL005 -> 5
-                last_number = int(last_worker.worker_code.replace("OFCL", ""))
+                last_number = int(
+                    last_worker.worker_code.replace("OFCL", "")
+                )
                 new_number = last_number + 1
             else:
                 new_number = 1
 
-            worker_code = f"OFCL{new_number:03d}"  # Zero-padded to 3 digits
+            worker_code = f"OFCL{new_number:03d}"
 
             # -------------------------
-            # Create Worker object
+            # Create worker
             # -------------------------
             new_worker = Worker(
                 worker_code=worker_code,
@@ -450,15 +498,24 @@ def register_worker():
             # -------------------------
             db.session.add(new_worker)
             db.session.commit()
-            flash(f'Worker registered successfully! Worker Code: {worker_code}', 'success')
+
+            flash(
+                f'Worker registered successfully! Worker Code: {worker_code}',
+                'success'
+            )
+
             return redirect(url_for('workers_name'))
 
         except Exception as e:
             db.session.rollback()
+
+            print("REGISTER WORKER ERROR:", str(e))
+            traceback.print_exc()
+
             flash(f"Error saving worker: {e}", 'danger')
+
             return redirect(url_for('register_worker'))
 
-    # GET request: show form
     return render_template('register_worker.html')
 
 
