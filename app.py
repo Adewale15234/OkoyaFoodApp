@@ -13,7 +13,6 @@ import psycopg2
 import uuid
 import io
 import traceback
-import smtplib
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -88,30 +87,28 @@ app.config['UPLOAD_FOLDER'] = 'static/uploads'
 # BREVO SMTP CONFIG
 # ==============================
 
+# ==============================
+# BREVO SMTP CONFIG
+# ==============================
+
 MAIL_USERNAME = os.environ.get("MAIL_USERNAME")
 MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD")
 
-app.config.update(
-    MAIL_SERVER="smtp-relay.brevo.com",
-    MAIL_PORT=587,
-    MAIL_USE_TLS=True,
-    MAIL_USE_SSL=False,
-    MAIL_USERNAME=MAIL_USERNAME,
-    MAIL_PASSWORD=MAIL_PASSWORD,
-    MAIL_DEFAULT_SENDER=MAIL_USERNAME,
-    MAIL_MAX_EMAILS=None,
-    MAIL_SUPPRESS_SEND=False,
-    MAIL_ASCII_ATTACHMENTS=False,
-    MAIL_TIMEOUT=30
-)
+app.config['MAIL_SERVER'] = 'smtp-relay.brevo.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USE_SSL'] = False
+app.config['MAIL_USERNAME'] = MAIL_USERNAME
+app.config['MAIL_PASSWORD'] = MAIL_PASSWORD
+app.config['MAIL_DEFAULT_SENDER'] = MAIL_USERNAME
 
-mail = Mail()
-mail.init_app(app)
+mail = Mail(app)
 
 print("MAIL USER:", MAIL_USERNAME)
 print("MAIL PASSWORD EXISTS:", bool(MAIL_PASSWORD))
-print("MAIL PORT:", app.config["MAIL_PORT"])
-print("MAIL SSL:", app.config["MAIL_USE_SSL"])
+print("MAIL PORT:", app.config['MAIL_PORT'])
+print("MAIL TLS:", app.config['MAIL_USE_TLS'])
+print("MAIL SSL:", app.config['MAIL_USE_SSL'])
 # ------------------------------
 # Database config
 # ------------------------------
@@ -621,28 +618,19 @@ def mail_debug_test():
 
 @app.route('/mail-test')
 def mail_test():
-    import traceback
     try:
-        print("MAIL TEST STARTED")
-
         msg = Message(
-            subject="SMTP FINAL TEST",
-            sender=app.config['MAIL_USERNAME'],
-            recipients=[app.config['MAIL_USERNAME']]
+            subject="SMTP TEST",
+            recipients=[MAIL_USERNAME],
+            body="Brevo SMTP is working from Render."
         )
-
-        msg.body = "Testing Render SMTP"
-        print("ABOUT TO SEND MAIL")
 
         mail.send(msg)
 
-        print("MAIL SENT SUCCESSFULLY")
         return "EMAIL SENT SUCCESSFULLY"
 
     except Exception as e:
-        print("MAIL ERROR OCCURRED:", str(e))
-        print(traceback.format_exc())
-        return f"<pre>{traceback.format_exc()}</pre>"
+        return f"MAIL ERROR: {str(e)}"
 
 
 @app.route('/client_form', methods=['GET', 'POST'])
@@ -1177,11 +1165,6 @@ def test_routes():
         return f"Error: {e}"
 
 
-@app.errorhandler(Exception)
-def handle_exception(e):
-    import traceback
-    traceback.print_exc()
-    return f"<pre>{traceback.format_exc()}</pre>", 500
 # ------------------------------
 # Main block
 # ------------------------------
@@ -1193,6 +1176,5 @@ if __name__ == '__main__':
         db.create_all()
 
     print("🚀 Okoya Food Staff Manager app is starting...")
-    app.debug = True
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
