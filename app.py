@@ -75,7 +75,7 @@ app = Flask(__name__)
 
 # Secret key
 app.secret_key = os.environ.get('SECRET_KEY', 'your-secret-key')
-app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_USERNAME')
+# app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_USERNAME')
 
 # Upload folder
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
@@ -635,18 +635,26 @@ def mail_debug_test():
 @app.route("/mail-test")
 def mail_test():
     try:
+        print("STARTING EMAIL TEST")
+
         msg = Message(
-            subject="Test Email",
+            subject="Okoya SMTP Test",
+            sender=app.config['MAIL_DEFAULT_SENDER'],
             recipients=["wismailadewale@gmail.com"],
-            body="Brevo SMTP working successfully"
+            body="Brevo SMTP is now working from Render."
         )
 
+        print("MESSAGE CREATED")
+
         mail.send(msg)
+
+        print("EMAIL SENT SUCCESSFULLY")
 
         return "MAIL SENT SUCCESSFULLY"
 
     except Exception as e:
         import traceback
+        traceback.print_exc()
         return f"<pre>{traceback.format_exc()}</pre>"
 
 
