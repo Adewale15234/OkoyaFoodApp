@@ -91,16 +91,19 @@ app.config['UPLOAD_FOLDER'] = 'static/uploads'
 MAIL_USERNAME = os.environ.get("MAIL_USERNAME")
 MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD")
 
-app.config["MAIL_SERVER"] = "smtp-relay.brevo.com"
-app.config["MAIL_PORT"] = 465
-app.config["MAIL_USE_TLS"] = False
-app.config["MAIL_USE_SSL"] = True
-app.config["MAIL_USERNAME"] = MAIL_USERNAME
-app.config["MAIL_PASSWORD"] = MAIL_PASSWORD
-app.config["MAIL_DEFAULT_SENDER"] = MAIL_USERNAME
-app.config["MAIL_MAX_EMAILS"] = None
-app.config["MAIL_SUPPRESS_SEND"] = False
-app.config["MAIL_ASCII_ATTACHMENTS"] = False
+app.config.update(
+    MAIL_SERVER="smtp-relay.brevo.com",
+    MAIL_PORT=587,
+    MAIL_USE_TLS=True,
+    MAIL_USE_SSL=False,
+    MAIL_USERNAME=MAIL_USERNAME,
+    MAIL_PASSWORD=MAIL_PASSWORD,
+    MAIL_DEFAULT_SENDER=MAIL_USERNAME,
+    MAIL_MAX_EMAILS=None,
+    MAIL_SUPPRESS_SEND=False,
+    MAIL_ASCII_ATTACHMENTS=False,
+    MAIL_TIMEOUT=30
+)
 
 mail = Mail()
 mail.init_app(app)
