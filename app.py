@@ -91,21 +91,27 @@ app.config['UPLOAD_FOLDER'] = 'static/uploads'
 # BREVO SMTP CONFIG
 # ==============================
 
-MAIL_USERNAME = os.environ.get("MAIL_USERNAME")
-MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD")
+# ==============================
+# BREVO SMTP CONFIG
+# ==============================
 
-app.config['MAIL_SERVER'] = 'smtp-relay.brevo.com'
-app.config['MAIL_PORT'] = 587
+app.config['MAIL_SERVER'] = os.environ.get('MAIL_SERVER')
+app.config['MAIL_PORT'] = int(os.environ.get('MAIL_PORT', 587))
+
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
-app.config['MAIL_USERNAME'] = MAIL_USERNAME
-app.config['MAIL_PASSWORD'] = MAIL_PASSWORD
-app.config['MAIL_DEFAULT_SENDER'] = MAIL_USERNAME
+app.config['MAIL_TIMEOUT'] = 30
+
+app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
+
+app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_DEFAULT_SENDER')
 
 mail = Mail(app)
 
-print("MAIL USER:", MAIL_USERNAME)
-print("MAIL PASSWORD EXISTS:", bool(MAIL_PASSWORD))
+print("MAIL USER:", app.config['MAIL_USERNAME'])
+print("MAIL PASSWORD EXISTS:", bool(app.config['MAIL_PASSWORD']))
+print("MAIL SERVER:", app.config['MAIL_SERVER'])
 print("MAIL PORT:", app.config['MAIL_PORT'])
 print("MAIL TLS:", app.config['MAIL_USE_TLS'])
 print("MAIL SSL:", app.config['MAIL_USE_SSL'])
@@ -301,22 +307,30 @@ class Order(db.Model):
     
     id = db.Column(db.Integer, primary_key=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
     name = db.Column(db.String(150))
     email = db.Column(db.String(150))
     items = db.Column(db.String(50))
     kilograms = db.Column(db.Integer, nullable=True)
     unit_price = db.Column(db.Float, nullable=True)
     total_amount = db.Column(db.Float, nullable=True)
+
     date_needed = db.Column(db.DateTime)
-    # confirmed_at = db.Column(db.DateTime)   # <-- ADD THIS (you are using it!)
+
     driver_name = db.Column(db.String(100))
     vehicle_plate_number = db.Column(db.String(50))
+
     bank_name = db.Column(db.String(100))
     account_number = db.Column(db.String(50))
     account_bank_name = db.Column(db.String(200))
+
     description = db.Column(db.String(255))
     phone_number = db.Column(db.String(100))
+
     status = db.Column(db.String(20), default="Pending")
+
+    # ✅ FIX ADDED (important for tracking)
+    confirmed_at = db.Column(db.DateTime, nullable=True)
 
 class Attendance(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -608,29 +622,32 @@ def mail_debug_test():
         msg = Message(
             subject="TEST",
             sender=app.config['MAIL_DEFAULT_SENDER'],
-            recipients=[MAIL_USERNAME],
+            recipients=[app.config['MAIL_USERNAME']],
             body="Test email"
         )
+
         mail.send(msg)
         return "MAIL SENT"
+
     except Exception as e:
         return str(e)
 
-@app.route('/mail-test')
+@app.route("/mail-test")
 def mail_test():
     try:
         msg = Message(
-            subject="SMTP TEST",
-            recipients=[MAIL_USERNAME],
-            body="Brevo SMTP is working from Render."
+            subject="Test Email",
+            recipients=["wismailadewale@gmail.com"],
+            body="Brevo SMTP working successfully"
         )
 
         mail.send(msg)
 
-        return "EMAIL SENT SUCCESSFULLY"
+        return "MAIL SENT SUCCESSFULLY"
 
     except Exception as e:
-        return f"MAIL ERROR: {str(e)}"
+        import traceback
+        return f"<pre>{traceback.format_exc()}</pre>"
 
 
 @app.route('/client_form', methods=['GET', 'POST'])
@@ -718,12 +735,10 @@ def orders_overview():
 @app.route('/confirm_order/<int:order_id>', methods=['POST'])
 @login_required(role='admin')
 def confirm_order(order_id):
-    if session.get('role') != 'admin':
-        return redirect(url_for('login'))
-
     order = Order.query.get_or_404(order_id)
+
     order.status = "Confirmed"
-    # order.confirmed_at = datetime.utcnow()
+    order.confirmed_at = datetime.utcnow()  # ✅ FIX ADDED
 
     db.session.commit()
     return redirect(url_for('orders_overview'))
