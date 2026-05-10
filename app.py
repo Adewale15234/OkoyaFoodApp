@@ -84,26 +84,31 @@ app.config['UPLOAD_FOLDER'] = 'static/uploads'
 # Mail config (BREVO SMTP - FIXED)
 # Mail config (BREVO SMTP - FIXED)
 # Mail config (BREVO SMTP)
-MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
-MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
+# ==============================
+# BREVO SMTP CONFIG
+# ==============================
 
-app.config['MAIL_USERNAME'] = MAIL_USERNAME
-app.config['MAIL_PASSWORD'] = MAIL_PASSWORD
+MAIL_USERNAME = os.environ.get("MAIL_USERNAME")
+MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD")
 
-app.config.update(
-    MAIL_SERVER='smtp-relay.brevo.com',
-    MAIL_PORT=465,
-    MAIL_USE_TLS=False,
-    MAIL_USE_SSL=True,
-    MAIL_USERNAME=MAIL_USERNAME,
-    MAIL_PASSWORD=MAIL_PASSWORD,
-    MAIL_DEFAULT_SENDER=MAIL_USERNAME
-)
+app.config["MAIL_SERVER"] = "smtp-relay.brevo.com"
+app.config["MAIL_PORT"] = 465
+app.config["MAIL_USE_TLS"] = False
+app.config["MAIL_USE_SSL"] = True
+app.config["MAIL_USERNAME"] = MAIL_USERNAME
+app.config["MAIL_PASSWORD"] = MAIL_PASSWORD
+app.config["MAIL_DEFAULT_SENDER"] = MAIL_USERNAME
+app.config["MAIL_MAX_EMAILS"] = None
+app.config["MAIL_SUPPRESS_SEND"] = False
+app.config["MAIL_ASCII_ATTACHMENTS"] = False
 
-mail = Mail(app)
+mail = Mail()
+mail.init_app(app)
 
 print("MAIL USER:", MAIL_USERNAME)
-print("MAIL PASS EXISTS:", bool(MAIL_PASSWORD))
+print("MAIL PASSWORD EXISTS:", bool(MAIL_PASSWORD))
+print("MAIL PORT:", app.config["MAIL_PORT"])
+print("MAIL SSL:", app.config["MAIL_USE_SSL"])
 # ------------------------------
 # Database config
 # ------------------------------
