@@ -1,42 +1,33 @@
-import os
-import shutil
 from datetime import datetime
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-
-BACKUP_DIR = "backups"
+import os
 
 def create_backup(db_url):
-    if not os.path.exists(BACKUP_DIR):
-        os.makedirs(BACKUP_DIR)
-
-    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    backup_file = f"{BACKUP_DIR}/backup_{timestamp}.sqlite"
-
-    # CASE 1: SQLite backup (simple copy)
-    if "sqlite" in db_url:
-        db_path = db_url.replace("sqlite:///", "")
-        shutil.copy(db_path, backup_file)
-        return backup_file
-
-    # CASE 2: PostgreSQL backup (Render)
-    else:
-        return backup_postgres(db_url, backup_file)
-
-
-def backup_postgres(db_url, output_file):
-    """
-    Dumps PostgreSQL using pg_dump
-    (works on Render if pg_dump is available)
-    """
     try:
-        import subprocess
+        from sqlalchemy import create_engine, text
 
-        cmd = f'pg_dump "{db_url}" > {output_file}'
-        subprocess.run(cmd, shell=True, check=True)
+        engine = create_engine(db_url)
 
-        return output_file
+        conn = engine.connect()
+
+        result = conn.execute(text("SELECT tablename FROM pg_tables WHERE schemaname='public'"))
+        tables = [row[0] for row in result]
+
+        backup_data = {}
+
+        for table in tables:
+            rows = conn.execute(text(f"SELECT * FROM {table}")).fetchall()
+            backup_data[table] = [dict(row._mapping) for row in rows]
+
+        os.makedirs("backups", exist_ok=True)
+
+        filename = f"backups/backup_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.json"
+
+        import json
+        with open(filename, "w") as f:
+            json.dump(backup_data, f, default=str, indent=2)
+
+        return filename
 
     except Exception as e:
-        print("Backup failed:", e)
+        print("Backup error:", e)
         return None

@@ -5,13 +5,12 @@ from datetime import datetime, date
 from calendar import monthrange
 from sqlalchemy import extract, create_engine, text
 from sqlalchemy.orm import sessionmaker
-from flask import request, redirect, url_for, render_template, flash, session
 from sqlalchemy import func
 from io import BytesIO
 from backup_manager import create_backup
 import os
-import logging
 import pandas as pd
+import logging
 import psycopg2
 import uuid
 import io
@@ -102,11 +101,6 @@ app = Flask(__name__)
 app.config['PROPAGATE_EXCEPTIONS'] = True
 app.config['DEBUG'] = True
 
-@app.errorhandler(Exception)
-def handle_exception(e):
-    import traceback
-    return f"<pre>{traceback.format_exc()}</pre>", 500
-
 app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024  # 5MB upload limit
 
 app.config['SESSION_COOKIE_HTTPONLY'] = True
@@ -118,12 +112,12 @@ app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 # ==============================
 
 # Secret key
-app.secret_key = os.environ.get('SECRET_KEY', 'your-secret-key')
-# app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_USERNAME')
+app.secret_key = os.environ.get('SECRET_KEY', 'dev-secret-key')
+app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_USERNAME')
 
 # Upload folder
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'webp'}
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -1118,34 +1112,42 @@ def favicon():
     return "", 204
 
 
+from openpyxl import Workbook
+
 @app.route('/export_order/<int:order_id>')
 @login_required()
 def export_order(order_id):
-    if session.get('role') not in ['admin', 'secretary']:
-        return redirect(url_for('login'))
-
     order = Order.query.get_or_404(order_id)
 
-    data = [{
-        "Client Name": order.name,
-        "Email": order.email,
-        "Phone": order.phone_number,
-        "Item": order.items,
-        "Description": order.description,
-        "Kilograms": order.kilograms,
-        "Unit Price": order.unit_price,
-        "Total": order.total_amount,
-        "Driver": order.driver_name,
-        "Vehicle": order.vehicle_plate_number,
-        "Account Number": order.account_number,
-        "Bank": order.account_bank_name,
-        "Date": order.date_needed
-    }]
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Order"
 
-    df = pd.DataFrame(data)
+    ws.append([
+        "Client Name", "Email", "Phone", "Item",
+        "Description", "Kilograms", "Unit Price",
+        "Total", "Driver", "Vehicle",
+        "Account Number", "Bank", "Date"
+    ])
 
-    output = io.BytesIO()
-    df.to_excel(output, index=False)
+    ws.append([
+        order.name,
+        order.email,
+        order.phone_number,
+        order.items,
+        order.description,
+        order.kilograms,
+        order.unit_price,
+        order.total_amount,
+        order.driver_name,
+        order.vehicle_plate_number,
+        order.account_number,
+        order.account_bank_name,
+        order.date_needed
+    ])
+
+    output = BytesIO()
+    wb.save(output)
     output.seek(0)
 
     return send_file(
@@ -1811,11 +1813,12 @@ def auto_backup_loop():
 
         time.sleep(86400)  # 24 hours
         
-threading.Thread(target=auto_backup_loop, daemon=True).start()
+if os.environ.get("RENDER") != "true":
+    threading.Thread(target=auto_backup_loop, daemon=True).start()
 
 if __name__ == '__main__':
     with app.app_context():
-        db.create_all()
+        pass  # REMOVE db.create_all()
 
     print("🚀 Okoya Food Staff Manager app is starting...")
     port = int(os.environ.get('PORT', 5000))
