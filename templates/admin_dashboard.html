@@ -1,302 +1,390 @@
 {% extends 'base.html' %}
+{% block title %}Admin Dashboard | Okoya Food{% endblock %}
+
 {% block content %}
 
-<div class="dashboard-container">
+<div class="admin-dashboard-page">
 
-    <!-- Top Header (Sticky) -->
-    <header class="dashboard-header sticky-header">
-        <div class="logo-section">
-            <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="dashboard-logo">
-            <div class="company-info">
-                <h1 class="company-name">OKOYA FOOD COMPANY LIMITED (OFCL)</h1>
-                <h2 class="company-motto">POVERTY ERADICATION • REDUCE INEQUALITY • LEAVE NO ONE BEHIND</h2>
-                <p class="company-address">
-                    KM 7 Idi APA Community, Along Ilesha Ibaruba Expressway, Saki, Oyo State, Nigeria
-                </p>
+    <!-- HERO HEADER -->
+    <header class="admin-topbar">
+
+        <div class="admin-company-block">
+            <div class="logo-wrap">
+                <img src="{{ url_for('static', filename='logo.png') }}" class="main-company-logo">
+            </div>
+
+            <div class="company-text-block">
+                <h1>OKOYA FOOD COMPANY LIMITED</h1>
+                <h2>POVERTY ERADICATION • REDUCE INEQUALITY • LEAVE NO ONE BEHIND</h2>
+                <p>KM 7 Idi APA Community, Saki, Oyo State, Nigeria</p>
             </div>
         </div>
 
-        <div class="user-panel">
-            <p class="greeting">👋 Hello, Admin!</p>
-            <p class="today-date">📅 Today: <span id="todayDate"></span></p>
-            <div class="header-links">
-                <a href="{{ url_for('admin_dashboard') }}" class="nav-btn">🏠 Dashboard</a>
-                <a href="{{ url_for('logout') }}" class="nav-btn logout-btn">🚪 Logout</a>
+        <div class="admin-user-box">
+            <div class="user-status">
+                <h3>ADMIN PANEL</h3>
+                <p>System Access Active</p>
+                <span id="todayDate"></span>
+            </div>
+
+            <div class="top-actions">
+                <a href="{{ url_for('admin_dashboard') }}" class="top-btn">Dashboard</a>
+                <a href="{{ url_for('logout') }}" class="top-btn logout-top-btn">Logout</a>
             </div>
         </div>
+
     </header>
 
-    <!-- Spacer Fix (Prevents Overlap with Sticky Header) -->
-    <div class="header-spacer"></div>
+    <!-- MAIN INTRO -->
+    <section class="welcome-zone">
 
-    <!-- Welcome Section -->
-    <section class="dashboard-welcome">
-        <h1>Welcome to <span>Okoya Food Co,.</span> Staff Management</h1>
-        <p>Manage workers, attendance, and salaries effortlessly.</p>
+        <div class="welcome-box">
+            <h1>Staff Management Control Center</h1>
+            <p>
+                Manage workers, salaries, attendance, client records and internal operations through one secure system.
+            </p>
+        </div>
+
     </section>
 
-    <!-- Dashboard Cards -->
-    <section class="dashboard-grid">
-        <a href="{{ url_for('register_worker') }}" class="dash-card green">📋 Register Worker</a>
-        <a href="{{ url_for('attendance') }}" class="dash-card teal">🕒 Mark Attendance</a>
-        <a href="{{ url_for('salary') }}" class="dash-card gold">💰 Record Salary</a>
-        <a href="{{ url_for('attendance_history') }}" class="dash-card blue">📅 Attendance History</a>
-        <a href="{{ url_for('salary_history') }}" class="dash-card purple">🧾 Salary History</a>
-        <a href="{{ url_for('workers_name') }}" class="dash-card grey">👥 View Workers</a>
-        <a href="{{ url_for('client_form') }}" class="dash-card orange">📝 Client Form</a>
-        <a href="{{ url_for('orders_overview') }}" class="dash-card lime">📦 Orders Overview</a>
-        <a href="{{ url_for('logout') }}" class="dash-card red">🚪 Logout</a>
+    <!-- QUICK SYSTEM STATS -->
+    <section class="live-stats-grid">
+
+        <div class="mini-stat">
+            <small>Total Modules</small>
+            <h2>9</h2>
+        </div>
+
+        <div class="mini-stat">
+            <small>Deployment</small>
+            <h2>LIVE</h2>
+        </div>
+
+        <div class="mini-stat">
+            <small>Storage</small>
+            <h2>SECURE</h2>
+        </div>
+
+        <div class="mini-stat">
+            <small>Version</small>
+            <h2>v2.0</h2>
+        </div>
+
     </section>
+
+    <!-- MODULES -->
+    <section class="main-module-grid">
+
+        <a href="{{ url_for('register_worker') }}" class="module-card card-green">
+            <div class="icon-box">👤</div>
+            <h3>Register Worker</h3>
+            <p>Add new staff into company records.</p>
+        </a>
+
+        <a href="{{ url_for('attendance') }}" class="module-card card-teal">
+            <div class="icon-box">🕒</div>
+            <h3>Mark Attendance</h3>
+            <p>Daily staff attendance control.</p>
+        </a>
+
+        <a href="{{ url_for('salary') }}" class="module-card card-gold">
+            <div class="icon-box">💰</div>
+            <h3>Record Salary</h3>
+            <p>Calculate and store payment records.</p>
+        </a>
+
+        <a href="{{ url_for('attendance_history') }}" class="module-card card-blue">
+            <div class="icon-box">📊</div>
+            <h3>Attendance History</h3>
+            <p>Track previous attendance logs.</p>
+        </a>
+
+        <a href="{{ url_for('salary_history') }}" class="module-card card-purple">
+            <div class="icon-box">🧾</div>
+            <h3>Salary History</h3>
+            <p>View past salary records.</p>
+        </a>
+
+        <a href="{{ url_for('workers_name') }}" class="module-card card-grey">
+            <div class="icon-box">👥</div>
+            <h3>Workers List</h3>
+            <p>Manage registered workers.</p>
+        </a>
+
+        <a href="{{ url_for('client_form') }}" class="module-card card-orange">
+            <div class="icon-box">📝</div>
+            <h3>Client Form</h3>
+            <p>Submit customer order requests.</p>
+        </a>
+
+        <a href="{{ url_for('orders_overview') }}" class="module-card card-lime">
+            <div class="icon-box">📦</div>
+            <h3>Orders Overview</h3>
+            <p>Review submitted company orders.</p>
+        </a>
+
+        <a href="{{ url_for('backup_now') }}" class="module-card card-yellow">
+            <div class="icon-box">💾</div>
+            <h3>Database Backup</h3>
+            <p>Download full system backup instantly.</p>
+        </a>
+
+        <a href="{{ url_for('logout') }}" class="module-card card-red">
+            <div class="icon-box">🚪</div>
+            <h3>Logout</h3>
+            <p>Exit management system.</p>
+        </a>
+
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="admin-footer">
+        <h3>OKOYA FOOD MANAGEMENT PLATFORM</h3>
+        <p>Built with Flask • Production Deployment • Internal HR System</p>
+    </footer>
 
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    const today = new Date();
-    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    document.getElementById('todayDate').textContent = today.toLocaleDateString('en-US', options);
+document.addEventListener("DOMContentLoaded", function() {
+    const date = new Date();
+    const options = {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    };
+    document.getElementById("todayDate").textContent =
+        date.toLocaleDateString("en-US", options);
 });
 </script>
 
 <style>
-/* ================================
-   PROFESSIONAL EMERALD DASHBOARD
-   ================================ */
 
-/* BODY */
-body {
-    font-family: 'Poppins', sans-serif;
-    margin: 0;
-    padding: 0;
-    background: linear-gradient(135deg, #012a1a, #026533, #0de07a);
-    color: #f5f7f6;
-    min-height: 100vh;
+/* ================= BASE ================= */
+.admin-dashboard-page{
+    width:100%;
+    min-height:100vh;
+    padding:30px;
+    background:linear-gradient(135deg,#042417,#063d25,#0a5a34);
+    font-family:'Poppins',sans-serif;
 }
 
-/* DASHBOARD CONTAINER */
-.dashboard-container {
-    padding: 40px 20px;
-    max-width: 1280px;
-    margin: 0 auto;
+/* ================= HEADER ================= */
+.admin-topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:30px;
+    flex-wrap:wrap;
+    background:rgba(255,255,255,0.08);
+    backdrop-filter:blur(18px);
+    border-radius:25px;
+    padding:30px;
+    box-shadow:0 18px 40px rgba(0,0,0,0.25);
+    margin-bottom:40px;
 }
 
-/* DASHBOARD HEADER */
-.dashboard-header {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: center;
-    padding: 25px 30px;
-    border-radius: 20px;
-    background: linear-gradient(135deg, #045e32, #078f4a, #0bbf59);
-    box-shadow: 0 14px 40px rgba(0,0,0,0.35), inset 0 0 25px rgba(255,255,255,0.08);
-    backdrop-filter: blur(6px);
-    transition: all 0.3s ease;
-    color: #fff;
-    margin-bottom: 50px;
+.admin-company-block{
+    display:flex;
+    align-items:center;
+    gap:20px;
+    flex:1;
+    min-width:300px;
 }
 
-/* Sticky Header */
-.sticky-header {
-    position: sticky;
-    top: 0;
-    z-index: 999;
+.logo-wrap{
+    width:120px;
+    height:120px;
+    border-radius:18px;
+    background:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:10px;
+    box-shadow:0 8px 20px rgba(0,0,0,0.2);
 }
 
-/* Spacer to prevent welcome section overlap */
-.header-spacer {
-    height: 40px;
-}
-
-/* LOGO & INFO */
-.logo-section {
-    display: flex;
-    flex-direction: row;
-    align-items: flex-start;
-    gap: 20px;
-    flex: 1 1 60%;
-    min-width: 250px;
-}
-
-.dashboard-logo {
-    width: 130px;
-    height: 130px;
-    object-fit: cover;
-    border-radius: 20px;
-    border: 3px solid rgba(255,255,255,0.35);
-    box-shadow: 0 12px 30px rgba(0,0,0,0.4);
-    background: rgba(255,255,255,0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.dashboard-logo:hover {
-    transform: scale(1.08);
-    box-shadow: 0 18px 45px rgba(0,0,0,0.55);
-}
-
-.company-info {
-    line-height: 1.4;
-}
-
-/* UPDATED COLORS TO WHITE */
-.company-name {
-    font-size: 2.1rem;
-    color: #ffffff; /* Changed to white */
-    font-weight: 900;
-    text-shadow: 0 2px 10px rgba(0,255,153,0.5);
-    letter-spacing: 1px;
-    margin: 0;
-}
-
-.company-motto {
-    font-size: 1rem;
-    color: #ffffff; /* Changed to white */
-    font-weight: 500;
-    margin: 5px 0;
-}
-
-.company-address {
-    font-size: 0.95rem;
-    color: #e0f2e9;
-    background: rgba(255,255,255,0.15);
-    padding: 6px 12px;
-    border-radius: 10px;
-    margin-top: 5px;
-}
-
-/* USER PANEL */
-.user-panel {
-    text-align: right;
-    min-width: 200px;
-    flex: 1 1 35%;
-}
-
-.user-panel .greeting { font-size: 1rem; color: #e3ffe9; margin-bottom: 3px; }
-.today-date { font-size: 0.95rem; color: #cff7d7; margin-bottom: 10px; }
-.header-links { display: flex; gap: 10px; justify-content: flex-end; }
-
-.nav-btn {
-    background: linear-gradient(135deg,#07a54d,#1eea7c);
-    color: #fff;
-    padding: 10px 22px;
-    border-radius: 12px;
-    font-weight: 600;
-    border: none;
-    text-decoration: none;
-    transition: all 0.3s ease;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.25);
-    font-size: 0.95rem;
-}
-
-.nav-btn:hover { background: linear-gradient(135deg,#0bd764,#33ff91); transform: translateY(-2px); }
-.logout-btn { background: linear-gradient(135deg,#cc0000,#ff4444); }
-.logout-btn:hover { background: linear-gradient(135deg,#ff4444,#ff7777); }
-
-/* WELCOME SECTION */
-.dashboard-welcome { 
-    text-align: center; 
-    margin: 60px 0 30px; 
-    animation: fadeIn 1s ease forwards; 
-}
-.dashboard-welcome h1 {
-    font-size: 2.6rem;
-    font-weight: 900;
-    background: linear-gradient(90deg,#00ff99,#00d4ff,#78ffd6);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    letter-spacing: 1.2px;
-    text-shadow: 2px 2px 12px rgba(0,0,0,0.3);
-    margin: 0;
-}
-.dashboard-welcome h1 span {
-    background: linear-gradient(90deg,#faff72,#00ff99,#00d4ff);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    text-shadow: 0 0 12px rgba(0,255,153,0.5);
-}
-.dashboard-welcome p { color: #e0ffeb; font-size: 1.1rem; font-weight: 500; margin-top: 8px; }
-
-/* FADE IN */
-@keyframes fadeIn { 0% { opacity:0; transform: translateY(-10px); } 100% { opacity:1; transform: translateY(0); } }
-
-/* DASHBOARD GRID */
-.dashboard-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit,minmax(260px,1fr));
-    gap: 25px;
-    padding: 0 10px;
-}
-
-/* DASHBOARD CARD */
-.dash-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 45px 20px;
-    border-radius: 20px;
-    font-size: 1.25rem;
-    font-weight: 700;
-    text-decoration: none;
-    color: #024d27;
-    background: linear-gradient(145deg,#ffffff,#f0f5f0);
-    box-shadow: 0 12px 28px rgba(0,0,0,0.25), 0 6px 12px rgba(0,0,0,0.12);
-    position: relative;
-    overflow: hidden;
-    transition: all 0.4s ease;
-    cursor: pointer;
-}
-.dash-card::before {
-    content: "";
-    position: absolute;
-    top:0;
-    left:-120%;
-    width:120%;
+.main-company-logo{
+    width:100%;
     height:100%;
-    background: linear-gradient(120deg, rgba(18,204,107,0.15), rgba(0,179,179,0.1), rgba(224,176,0,0.15));
-    transform: skewX(-25deg);
-    transition: all 0.5s ease;
-    z-index:1;
+    object-fit:contain;
 }
-.dash-card:hover::before { left: -10%; }
-.dash-card:hover { transform: translateY(-8px) scale(1.05); box-shadow:0 20px 40px rgba(0,0,0,0.35),0 10px 20px rgba(0,0,0,0.15); }
-.dash-card > * { position: relative; z-index:2; }
 
-/* Card Colors */
-.dash-card.green  { border-left:5px solid #12cc6b; background:linear-gradient(145deg,#eafff0,#d4f8e8); }
-.dash-card.teal   { border-left:5px solid #00b3b3; background:linear-gradient(145deg,#e0f7f7,#c0f0f0); }
-.dash-card.gold   { border-left:5px solid #e0b000; background:linear-gradient(145deg,#fff8e1,#ffe6a0); }
-.dash-card.blue   { border-left:5px solid #2196f3; background:linear-gradient(145deg,#e3f2fd,#a0d4ff); }
-.dash-card.purple { border-left:5px solid #b24dff; background:linear-gradient(145deg,#f3e8ff,#d0b4ff); }
-.dash-card.grey   { border-left:5px solid #6b7280; background:linear-gradient(145deg,#f5f5f5,#dcdcdc); }
-.dash-card.orange { border-left:5px solid #ea580c; background:linear-gradient(145deg,#fff0e0,#ffd2b0); }
-.dash-card.lime   { border-left:5px solid #65a30d; background:linear-gradient(145deg,#f0ffe0,#c8f080); }
-.dash-card.red    { border-left:5px solid #b91c1c; background:linear-gradient(145deg,#ffe0e0,#ffb0b0); }
+.company-text-block h1{
+    font-size:1.7rem;
+    color:#fff;
+    margin-bottom:6px;
+    font-weight:800;
+}
 
-/* RESPONSIVE */
+.company-text-block h2{
+    font-size:0.9rem;
+    color:#d6ffd8;
+    margin-bottom:6px;
+    font-weight:500;
+}
+
+.company-text-block p{
+    font-size:0.85rem;
+    color:#fff;
+    opacity:0.85;
+}
+
+/* ================= ADMIN ================= */
+.admin-user-box{
+    text-align:right;
+    min-width:250px;
+}
+
+.user-status h3{
+    color:#fff;
+    font-size:1.2rem;
+}
+
+.user-status p{
+    color:#d9ffe2;
+    font-size:0.9rem;
+}
+
+.user-status span{
+    color:#fff;
+    font-size:0.85rem;
+}
+
+.top-actions{
+    margin-top:12px;
+    display:flex;
+    justify-content:flex-end;
+    gap:10px;
+}
+
+.top-btn{
+    background:#16a34a;
+    color:#fff;
+    padding:8px 14px;
+    border-radius:10px;
+    text-decoration:none;
+    font-size:13px;
+}
+
+.logout-top-btn{
+    background:#dc2626;
+}
+
+/* ================= WELCOME ================= */
+.welcome-zone{
+    text-align:center;
+    margin-bottom:35px;
+}
+
+.welcome-box h1{
+    font-size:2.2rem;
+    color:#fff;
+    font-weight:800;
+}
+
+.welcome-box p{
+    color:#e5ffe9;
+}
+
+/* ================= STATS ================= */
+.live-stats-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    gap:20px;
+    margin-bottom:40px;
+}
+
+.mini-stat{
+    background:#fff;
+    border-radius:16px;
+    padding:22px;
+    text-align:center;
+    box-shadow:0 10px 25px rgba(0,0,0,0.15);
+}
+
+.mini-stat small{
+    color:#555;
+    font-weight:600;
+}
+
+.mini-stat h2{
+    margin-top:8px;
+    color:#0a7a45;
+}
+
+/* ================= MODULES ================= */
+.main-module-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    gap:22px;
+}
+
+.module-card{
+    background:#fff;
+    border-radius:20px;
+    padding:30px 20px;
+    text-decoration:none;
+    text-align:center;
+    color:#000;
+    box-shadow:0 12px 30px rgba(0,0,0,0.15);
+    transition:0.3s;
+}
+
+.module-card:hover{
+    transform:translateY(-6px);
+}
+
+.icon-box{
+    font-size:2.5rem;
+    margin-bottom:10px;
+}
+
+.card-yellow{
+    background: #f1c40f;
+    color: #111;
+    text-decoration: none;
+}
+
+/* COLORS */
+.card-green{border-top:5px solid #00b894;}
+.card-teal{border-top:5px solid #00cec9;}
+.card-gold{border-top:5px solid #f39c12;}
+.card-blue{border-top:5px solid #3498db;}
+.card-purple{border-top:5px solid #9b59b6;}
+.card-grey{border-top:5px solid #636e72;}
+.card-orange{border-top:5px solid #e67e22;}
+.card-lime{border-top:5px solid #6ab04c;}
+.card-red{border-top:5px solid #e74c3c;}
+
+/* ================= FOOTER ================= */
+.admin-footer{
+    margin-top:50px;
+    text-align:center;
+    color:#fff;
+}
+
+/* ================= MOBILE ================= */
 @media(max-width:768px){
-    .dashboard-header { flex-direction: column; text-align: center; padding: 20px; }
-    .logo-section { flex-direction: column; align-items: center; gap: 15px; }
-    .dashboard-logo { width:110px; height:110px; }
-    .company-name { font-size:1.7rem; }
-    .company-motto { font-size:0.9rem; }
-    .company-address { font-size:0.85rem; padding:5px 10px; }
-    .user-panel { margin-top: 15px; text-align: center; }
-    .dashboard-welcome h1 { font-size: 2rem; }
-    .dashboard-welcome p { font-size: 1rem; }
-    .dash-card { padding: 35px 15px; font-size: 1rem; }
+    .admin-topbar{
+        flex-direction:column;
+        text-align:center;
+    }
+
+    .admin-user-box{
+        text-align:center;
+    }
+
+    .top-actions{
+        justify-content:center;
+    }
+
+    .company-text-block h1{
+        font-size:1.3rem;
+    }
 }
 
-/* SMALLER MOBILE */
-@media(max-width:480px){
-    .dashboard-header { padding: 15px 10px; }
-    .dashboard-logo { width: 90px; height: 90px; }
-    .company-name { font-size: 1.5rem; }
-    .company-motto { font-size: 0.85rem; }
-    .company-address { font-size:0.75rem; padding: 4px 8px; }
-    .user-panel .greeting, .today-date { font-size: 0.85rem; }
-    .nav-btn { padding: 8px 16px; font-size: 0.85rem; }
-    .dash-card { padding: 25px 10px; font-size: 0.95rem; }
-}
 </style>
+
 {% endblock %}

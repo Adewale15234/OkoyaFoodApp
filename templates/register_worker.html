@@ -3,282 +3,408 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Okoya Worker Registration</title>
-<!-- Link to external CSS -->
-<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-<style>
-/* =========================
-   Register Worker Page
-   ========================= */
+<title>Okoya Worker Registration (HR System)</title>
 
-/* General Container */
-.register-container {
-    max-width: 900px;
-    margin: auto;
-    padding: 20px;
-    border: 1px solid #000;
-    background: #fff;
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+<style>
+
+/* =========================
+   GLOBAL RESET
+========================= */
+body {
+    background: #f3f6fb;
     font-family: Arial, sans-serif;
 }
 
-/* Back to Dashboard */
-.back-dashboard {
-    margin: 10px 0;
+/* =========================
+   MAIN CONTAINER
+========================= */
+.register-container {
+    max-width: 1000px;
+    margin: 20px auto;
+    background: #fff;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    border: 1px solid #ddd;
 }
 
+/* =========================
+   BACK BUTTON
+========================= */
 .back-dashboard a {
     text-decoration: none;
-    color: #004080;
     font-weight: bold;
+    color: #004080;
 }
-
 .back-dashboard a:hover {
     text-decoration: underline;
 }
 
-/* Official Header Row (Logo + Text + Passport) */
+/* =========================
+   HEADER
+========================= */
 .official-header-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
     flex-wrap: wrap;
+    border-bottom: 2px solid #004080;
+    padding-bottom: 15px;
 }
 
-.company-logo img {
-    height: 120px;
-    width: 120px;
-    object-fit: contain;
-    border-radius: 10px;
-}
-
+.company-logo img,
 .passport-preview img {
+    width: 120px;
     height: 120px;
-    width: 100px;
     object-fit: cover;
-    border: 1px solid #000;
+    border-radius: 10px;
+    border: 1px solid #ccc;
 }
 
 .official-header {
-    flex: 1 1 60%;
-    padding: 0 15px;
+    flex: 1;
     text-align: center;
 }
 
-/* Header Text Styling */
 .company-name {
-    color: green;
+    color: #0a7a0a;
     font-size: 1.8rem;
-    font-weight: bold;
     margin: 0;
 }
 
 .company-motto {
     color: goldenrod;
-    font-weight: bold;
-    font-size: 1rem;
-    margin: 5px 0;
+    font-size: 0.95rem;
 }
 
-/* Updated company-address styling: centered black box */
 .company-address {
-    color: white;                  /* White text */
-    background-color: black;       /* Black box */
-    font-weight: bold;
-    font-size: 0.9rem;
-    margin: 10px auto;
-    padding: 5px 10px;
-    border-radius: 5px;
-    text-align: center;            /* Center text */
-    display: inline-block;         /* Fit the text only */
+    background: black;
+    color: white;
+    display: inline-block;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 0.85rem;
 }
 
-/* Form titles */
-.form-title {
-    color: goldenrod;
-    font-weight: bold;
-    font-size: 1.2rem;
-    margin: 10px 0 3px;
-}
-
-.form-note {
-    color: black;
-    font-weight: bold;
-    font-size: 0.9rem;
-    margin-bottom: 15px;
-}
-
-/* Passport Upload Box */
-.passport-box label {
-    font-weight: bold;
-    color: black; /* Ensure label text is black */
-}
-
-/* Form Layout */
-.register-form {
-    width: 100%;
-}
-
+/* =========================
+   FORM LAYOUT
+========================= */
 .form-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 15px 40px;
-    margin-bottom: 20px;
-}
-
-.form-grid label {
-    display: block;
-    font-weight: bold;
-    margin-bottom: 3px;
-    color: black; /* Make all labels black */
-}
-
-.form-grid input {
-    border: none;
-    border-bottom: 1px solid #000;
-    width: 100%;
-    padding: 4px 5px;
-    background: transparent;
-    outline: none;
-    color: black;          /* Input text color black */
-    font-weight: 500;
-}
-
-/* If you want some inputs green */
-.form-grid input.green-input {
-    color: green;          /* Optional green text */
-}
-
-/* Submit Button */
-.form-submit {
-    text-align: center;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px 25px;
     margin-top: 20px;
 }
 
-.form-submit input,
-.form-submit button {
-    padding: 10px 20px;
-    font-size: 16px;
+.form-section-title {
+    grid-column: span 2;
     font-weight: bold;
-    background: #004080;
-    color: #fff;
+    color: #004080;
+    margin-top: 10px;
+    border-left: 4px solid #004080;
+    padding-left: 8px;
+}
+
+label {
+    font-weight: bold;
+    font-size: 13px;
+    display: block;
+    margin-bottom: 4px;
+    color: #111;
+}
+
+input {
+    width: 100%;
+    padding: 7px;
+    border: 1px solid #bbb;
+    border-radius: 6px;
+    outline: none;
+}
+
+input:focus {
+    border-color: #004080;
+    box-shadow: 0 0 5px rgba(0,64,128,0.2);
+}
+
+/* =========================
+   VALIDATION STATES
+========================= */
+.invalid {
+    border: 2px solid red !important;
+}
+
+.valid {
+    border: 2px solid green !important;
+}
+
+/* =========================
+   LIVE INFO BOX
+========================= */
+.info-box {
+    background: #eef6ff;
+    padding: 10px;
+    border-left: 5px solid #004080;
+    margin-top: 10px;
+    font-size: 13px;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+.form-submit {
+    text-align: center;
+    margin-top: 25px;
+}
+
+.form-submit button,
+.form-submit input {
+    padding: 10px 18px;
     border: none;
+    border-radius: 6px;
     cursor: pointer;
-    border-radius: 5px;
+    font-weight: bold;
     margin: 5px;
 }
 
-.form-submit input:hover,
+.form-submit button {
+    background: #004080;
+    color: white;
+}
+
 .form-submit button:hover {
     background: #0066cc;
 }
 
-/* Print Styles for A4 */
+/* =========================
+   PASSPORT UPLOAD
+========================= */
+.passport-box {
+    margin-top: 10px;
+}
+
+/* =========================
+   PRINT MODE
+========================= */
 @media print {
-    body {
-        margin: 0;
-        background: #fff;
+
+    @page {
+        size: A4;
+        margin: 10mm;
     }
+
+    /* hide UI elements */
+    .back-dashboard,
     .no-print {
         display: none !important;
     }
+
+    html, body {
+        width: 100%;
+        height: auto;
+        overflow: visible;
+    }
+
     .register-container {
+        width: 100%;
+        max-width: 100%;
         margin: 0;
-        padding: 10mm;
-        width: 190mm;
-        max-width: 190mm;
+        padding: 10px;
+        box-shadow: none;
         border: none;
     }
-    .official-header-row {
-        flex-wrap: nowrap;
+
+    /* prevent cutting tables/forms */
+    .form-grid,
+    table,
+    tr,
+    td {
+        break-inside: avoid;
     }
-    .form-grid {
-        grid-template-columns: 1fr 1fr;
-        gap: 12px 20px;
-    }
+
     .form-submit {
-        display: none;
+        display: none !important; /* optional: hide print/register buttons */
+    }
+
+    * {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
     }
 }
+
 </style>
 </head>
-<body class="form-page">
 
-<!-- Back to Dashboard Button -->
+<body>
+
 <div class="back-dashboard no-print">
-    <a href="{{ url_for('admin_dashboard') }}">&#8592; Back to Dashboard</a>
+    <a href="{{ url_for('admin_dashboard') }}">← Back to Dashboard</a>
 </div>
 
-<div class="register-container print-area">
+<div class="register-container">
 
-    <!-- Official Header Row with Logo, Text, Passport -->
-    <div class="official-header-row">
-        <div class="company-logo">
-            <img src="{{ url_for('static', filename='android-chrome-512x512.png') }}" alt="Company Logo" id="company-logo">
-        </div>
+<!-- HEADER -->
+<div class="official-header-row">
 
-        <div class="official-header">
-            <h1 class="company-name">OKOYA FOOD COMPANY LIMITED</h1>
-            <h3 class="company-motto">POVERTY ERADICTION, REDUCE INEQUALITY AND LEAVE NO ONE BEHIND</h3>
-            <p class="company-address">
-                KM 7 Idi APA community, along Ilesha Ibaruba express way, Shaki, Oyo State, Nigeria
-            </p>
-            <h3 class="form-title">WORKER REGISTRATION FORM</h3>
-            <p class="form-note">(PLEASE WRITE OR TYPE IN BLOCK LETTERS)</p>
-        </div>
-
-        <div class="passport-preview">
-            <img id="passportPreview" alt="Passport Photo">
-        </div>
+    <div class="company-logo">
+        <img src="{{ url_for('static', filename='android-chrome-512x512.png') }}">
     </div>
 
-    <!-- Passport Upload (hidden when printing) -->
-    <div class="passport-box no-print">
-        <label for="passport">Upload Passport Photograph</label><br><br>
-        <input type="file" id="passport" name="passport" accept="image/*"><br><br>
+    <div class="official-header">
+        <h1 class="company-name">OKOYA FOOD COMPANY LIMITED</h1>
+        <h3 class="company-motto">POVERTY ERADICATION • EQUALITY • PRODUCTIVITY</h3>
+        <p class="company-address">Shaki, Oyo State, Nigeria</p>
+        <h3>WORKER REGISTRATION SYSTEM</h3>
     </div>
 
-    <!-- Worker Registration Form -->
-    <form method="POST" action="{{ url_for('register_worker') }}" enctype="multipart/form-data" class="register-form">
-        <div class="form-grid">
-            <div><label>Name:</label><input type="text" name="name" class="green-input" required></div>
-            <div><label>Phone:</label><input type="text" name="phone_number" class="green-input" required></div>
-            <div><label>Date of Birth:</label><input type="date" name="date_of_birth" required></div>
-            <div><label>Gender:</label><input type="text" name="gender" required></div>
-            <div><label>Email:</label><input type="email" name="email" required></div>
-            <div><label>Qualifications:</label><input type="text" name="qualifications" required></div>
-            <div><label>Position:</label><input type="text" name="position" required></div>
-            <div><label>Amount of Salary:</label><input type="number" name="amount_of_salary" required></div>
-            <div><label>Date of Employment:</label><input type="date" name="date_of_employment" required></div>
-            <div><label>Guarantor:</label><input type="text" name="guarantor" required></div>
-            <div><label>National ID:</label><input type="text" name="national_id" required></div>
-            <div><label>Nationality:</label><input type="text" name="nationality" required></div>
-            <div><label>Ethnic Group:</label><input type="text" name="ethnic_group" required></div>
-            <div><label>Disability:</label><input type="text" name="disability"></div>
-            <div><label>Home Address:</label><input type="text" name="home_address" required></div>
-            <div><label>Place of Residence:</label><input type="text" name="place_of_residence" required></div>
-            <div><label>Bank Account Name:</label><input type="text" name="bank_account_name" required></div>
-            <div><label>Bank Name:</label><input type="text" name="bank_name" required></div>
-            <div><label>Bank Account:</label><input type="number" name="bank_account" required></div>
-        </div>
+    <div class="passport-preview">
+        <img id="passportPreview">
+    </div>
 
-        <!-- Submit and Print Buttons -->
-        <div class="form-submit no-print">
-            <input type="submit" value="Register Worker">
-            <button type="button" onclick="window.print()">Print Form</button>
-        </div>
-    </form>
 </div>
 
-<!-- JS for Passport Preview -->
+<!-- LIVE INFO -->
+<div class="info-box">
+    Age: <span id="ageDisplay">--</span> |
+    Salary Status: <span id="salaryStatus">Pending</span> |
+    NIN Status: <span id="ninStatus">Not Verified</span>
+</div>
+
+
+<!-- FORM -->
+<form method="POST" action="{{ url_for('register_worker') }}" enctype="multipart/form-data">
+<!-- PASSPORT -->
+<div class="passport-box no-print">
+    <label>Upload Passport</label>
+    <input type="file" id="passport" name="passport" accept="image/*">
+</div>
+
+<div class="form-grid">
+
+    <div class="form-section-title">Personal Information</div>
+
+    <div>
+        <label>Name *</label>
+        <input name="name" required>
+    </div>
+
+    <div>
+        <label>Phone *</label>
+        <input name="phone_number" required>
+    </div>
+
+    <div>
+        <label>Date of Birth *</label>
+        <input type="date" id="dob" name="date_of_birth" required>
+    </div>
+
+    <div>
+        <label>Gender</label>
+        <input name="gender">
+    </div>
+
+    <div class="form-section-title">Identity Verification</div>
+
+    <div>
+        <label>NIN Number *</label>
+        <input id="nin" name="national_id" required>
+    </div>
+
+    <div>
+        <label>Nationality</label>
+        <input name="nationality">
+    </div>
+
+    <div class="form-section-title">Employment</div>
+
+    <div>
+        <label>Position *</label>
+        <input name="position" required>
+    </div>
+
+    <div>
+        <label>Salary (₦) *</label>
+        <input type="number" name="amount_of_salary" required>
+    </div>
+
+    <div>
+        <label>Date of Employment</label>
+        <input type="date" name="date_of_employment">
+    </div>
+
+    <div class="form-section-title">Bank Details</div>
+
+    <div>
+        <label>Bank Name</label>
+        <input name="bank_name">
+    </div>
+
+    <div>
+        <label>Account Number *</label>
+        <input id="acc" name="bank_account">
+    </div>
+
+    <div>
+        <label>Account Name</label>
+        <input name="bank_account_name">
+    </div>
+
+</div>
+
+<!-- BUTTONS -->
+<div class="form-submit no-print">
+    <button type="button" onclick="window.print()">Print</button>
+    <button type="submit">Register Worker</button>
+</div>
+
+</form>
+
+</div>
+
+<!-- ================= SCRIPT ================= -->
 <script>
-document.getElementById('passport').addEventListener('change', function(event) {
-    const preview = document.getElementById('passportPreview');
-    const file = event.target.files[0];
-    if (file) {
-        preview.src = URL.createObjectURL(file);
+
+// PASSPORT PREVIEW
+document.getElementById('passport').addEventListener('change', function(e){
+    const file = e.target.files[0];
+    if(file){
+        document.getElementById('passportPreview').src = URL.createObjectURL(file);
     }
 });
+
+// AGE CALCULATION
+document.getElementById('dob').addEventListener('change', function(){
+    let dob = new Date(this.value);
+    let age = new Date().getFullYear() - dob.getFullYear();
+    document.getElementById('ageDisplay').innerText = age;
+});
+
+// NIN VALIDATION (basic smart check)
+document.getElementById('nin').addEventListener('input', function(){
+    let val = this.value;
+
+    if(val.length === 11 && /^\d+$/.test(val)){
+        this.classList.add("valid");
+        this.classList.remove("invalid");
+        document.getElementById("ninStatus").innerText = "Valid Format";
+    } else {
+        this.classList.add("invalid");
+        this.classList.remove("valid");
+        document.getElementById("ninStatus").innerText = "Invalid NIN";
+    }
+});
+
+// ACCOUNT VALIDATION
+document.getElementById('acc').addEventListener('input', function(){
+    if(this.value.length >= 10){
+        this.style.border = "2px solid green";
+    } else {
+        this.style.border = "2px solid red";
+    }
+});
+
 </script>
+
 </body>
 </html>

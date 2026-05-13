@@ -1,296 +1,456 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<!-- PAGE HEADER -->
-<div class="page-header">
-    <h1>Registered Workers</h1>
-    <a href="{{ url_for('admin_dashboard') }}" class="back-link">← Back to Dashboard</a>
-</div>
+<div class="workers-page">
 
-<!-- WORKERS TABLE -->
-<div class="workers-table-container">
-    <table id="workers-table">
+    <!-- HEADER -->
+    <section class="workers-header">
+        <div class="header-left">
+            <img src="{{ url_for('static', filename='logo.png') }}" class="header-logo">
+            <div>
+                <h1>Registered Workers Directory</h1>
+                <p>Okoya Food Company Limited — HR Personnel Management System</p>
+            </div>
+        </div>
 
-        <thead>
-            <tr>
-                <th>Code</th>
-                <th>Name</th>
-                <th>Phone</th>
-                <th>Position</th>
-                <th>Employment Date</th>
-                <th>Email</th>
-                <th>Details</th>
-                <th>Edit</th>
-                <th>Delete</th>
-                <th>Status</th>
-                <th>Letter</th>
-            </tr>
-        </thead>
+        <div class="header-right">
+            <a href="{{ url_for('admin_dashboard') }}" class="back-btn">← Dashboard</a>
+        </div>
+    </section>
 
-        <tbody>
-        {% for worker in workers %}
+    <!-- SEARCH -->
+    <section class="search-section">
+        <input type="text" id="searchInput" placeholder="Search worker by name, code, phone or position...">
+    </section>
 
-            <!-- MAIN ROW -->
-            <tr>
-                <td data-label="Code">{{ worker.worker_code or '—' }}</td>
-                <td data-label="Name">{{ worker.name }}</td>
-                <td data-label="Phone">{{ worker.phone_number or '—' }}</td>
-                <td data-label="Position">{{ worker.position or '—' }}</td>
-                <td data-label="Employment Date">
-                    {{ worker.date_of_employment.strftime('%Y-%m-%d') if worker.date_of_employment else '—' }}
-                </td>
-                <td data-label="Email">{{ worker.email or '—' }}</td>
+    <!-- TABLE -->
+    <section class="table-wrapper">
+        <table id="workers-table">
+            <thead>
+                <tr>
+                    <th>Code</th>
+                    <th>Name</th>
+                    <th>Phone</th>
+                    <th>Position</th>
+                    <th>Employment Date</th>
+                    <th>Email</th>
+                    <th>Details</th>
+                    <th>Edit</th>
+                    <th>Delete</th>
+                    <th>Status</th>
+                    <th>Letter</th>
+                </tr>
+            </thead>
 
-                <!-- DETAILS -->
-                <td data-label="Details">
-                    <button type="button" onclick="toggleDetails({{ worker.id }})">
-                        Details
-                    </button>
-                </td>
+            <tbody>
+            {% for worker in workers %}
+                <!-- MAIN ROW -->
+                <tr class="worker-row">
+                    <td data-label="Code">{{ worker.worker_code or '—' }}</td>
+                    <td data-label="Name">{{ worker.name }}</td>
+                    <td data-label="Phone">{{ worker.phone_number or '—' }}</td>
+                    <td data-label="Position">{{ worker.position or '—' }}</td>
+                    <td data-label="Employment Date">
+                        {{ worker.date_of_employment.strftime('%Y-%m-%d') if worker.date_of_employment else '—' }}
+                    </td>
+                    <td data-label="Email">{{ worker.email or '—' }}</td>
 
-                <!-- EDIT -->
-                <td data-label="Edit">
-                    <a href="{{ url_for('edit_worker', worker_id=worker.id) }}" class="edit-button">Edit</a>
-                </td>
+                    <td>
+                        <button onclick="toggleDetails(this)" data-id="{{ worker.id }}" class="action-btn view-btn">
+    Details
+</button>
+                    </td>
 
-                <!-- DELETE -->
-                <td data-label="Delete">
-                    <form action="{{ url_for('delete_worker', worker_id=worker.id) }}" method="post"
-                          onsubmit="return confirm('Are you sure you want to delete this worker?');">
-                        <button type="submit" class="delete-button">Delete</button>
-                    </form>
-                </td>
+                    <td>
+                        <a href="{{ url_for('edit_worker', worker_id=worker.id) }}" class="action-btn edit-btn">Edit</a>
+                    </td>
 
-                <!-- STATUS (FIXED ONLY ONCE) -->
-                <td data-label="Status">
+                    <td>
+                        <form action="{{ url_for('delete_worker', worker_id=worker.id) }}" method="post"
+                              onsubmit="return confirm('Delete this worker permanently?');">
+                            <button type="submit" class="action-btn delete-btn">Delete</button>
+                        </form>
+                    </td>
 
+                <td>
                     {% if worker.is_active %}
-                        <span style="color:green;font-weight:bold;">Active</span>
+                        <span class="status active">Active</span>
                     {% else %}
-                        <span style="color:red;font-weight:bold;">Inactive</span>
+                        <span class="status inactive">Inactive</span>
                     {% endif %}
 
                     <br><br>
 
                     <form action="{{ url_for('toggle_worker_status', worker_id=worker.id) }}" method="post">
-                        <input type="hidden" name="reason" id="reason-{{ worker.id }}">
 
-                        <button type="button"
-                                class="{{ 'delete-button' if worker.is_active else 'edit-button' }}"
-                                onclick="toggleStatus({{ worker.id }}, {{ 'true' if worker.is_active else 'false' }})">
+                        <input type="text"
+                            name="reason"
+                            placeholder="Enter reason (required)"
+                            required
+                            style="padding:6px; width:250px; margin-right:10px;">
 
-                            {{ 'Deactivate' if worker.is_active else 'Activate' }}
-                        </button>
-                    </form>
-
-                </td>
-
-                <!-- LETTER -->
-                <td data-label="Letter">
-                    <a href="{{ url_for('worker_letter', worker_id=worker.id) }}" class="edit-button">
-                        View Letter
-                    </a>
-                </td>
-
-            </tr>
-
-            <!-- DETAILS ROW -->
-            <tr id="details-{{ worker.id }}" class="details-row" style="display:none;">
-                <td colspan="11">
-                    <div class="details-container">
-
-                        {% if worker.status_reason %}
-                        <div class="details-section" style="flex: 1 1 100%;">
-                            <strong>⚠ HR RECORD:</strong><br><br>
-
-                            <b>Status:</b> {{ worker.status_type }} <br>
-                            <b>Reason:</b> {{ worker.status_reason }} <br>
-                            <b>Date:</b> {{ worker.status_date }} <br>
-
-                            <hr>
-
-                            <strong>📄 Official HR Letter:</strong><br><br>
-
-                            <pre style="white-space: pre-wrap; background:#fff; padding:10px; border:1px solid #ccc;">
-{{ worker.status_letter }}
-                            </pre>
-
-                            <button onclick="window.print()" class="edit-button">
-                                🖨 Print Letter
+                        {% if worker.is_active %}
+                            <input type="hidden" name="action" value="toggle">
+                            <button type="submit" class="action-btn delete-btn">
+                                Deactivate
                             </button>
-                        </div>
+                        {% else %}
+                            <input type="hidden" name="action" value="toggle">
+                            <button type="submit" class="action-btn edit-btn">
+                                Activate
+                            </button>
                         {% endif %}
 
-                        <div class="details-section">
-                            <strong>Passport:</strong><br>
-                            {% if worker.passport %}
-                                <img src="{{ url_for('static', filename='passports/' ~ worker.passport) }}"
-                                     style="width:120px;height:150px;border:1px solid #000;object-fit:cover;">
-                            {% else %}
-                                No passport uploaded
-                            {% endif %}
-                        </div>
-
-                        <div class="details-section">
-                            <strong>DOB:</strong> {{ worker.date_of_birth.strftime('%Y-%m-%d') if worker.date_of_birth else '—' }}<br>
-                            <strong>Gender:</strong> {{ worker.gender or '—' }}<br>
-                            <strong>Qualifications:</strong> {{ worker.qualifications or '—' }}<br>
-                            <strong>National ID:</strong> {{ worker.national_id or '—' }}<br>
-                            <strong>Nationality:</strong> {{ worker.nationality or '—' }}<br>
-                            <strong>Email:</strong> {{ worker.email or '—' }}
-                        </div>
-
-                        <div class="details-section">
-                            <strong>Home Address:</strong> {{ worker.home_address or '—' }}<br>
-                            <strong>Ethnic Group:</strong> {{ worker.ethnic_group or '—' }}<br>
-                            <strong>Place of Residence:</strong> {{ worker.place_of_residence or '—' }}<br>
-                            <strong>Disability:</strong> {{ worker.disability or '—' }}
-                        </div>
-
-                        <div class="details-section">
-                            <strong>Salary:</strong> {{ worker.amount_of_salary or '—' }}<br>
-                            <strong>Guarantor:</strong> {{ worker.guarantor or '—' }}<br>
-                            <strong>Bank Name:</strong> {{ worker.bank_name or '—' }}<br>
-                            <strong>Account:</strong> {{ worker.bank_account or '—' }}
-                        </div>
-
-                    </div>
+                    </form>
                 </td>
-            </tr>
 
-        {% endfor %}
-        </tbody>
+                    <td>
+                        <a href="{{ url_for('worker_letter', worker_id=worker.id) }}" class="action-btn letter-btn">
+                            View
+                        </a>
+                    </td>
+                </tr>
 
-    </table>
+                <!-- DETAILS -->
+                <tr id="details-{{ worker.id }}" class="details-row" style="display:none;">
+                    <td colspan="11">
+
+                        <div class="details-box">
+
+                            {% if worker.status_reason %}
+                            <div class="detail-card full">
+                                <h3>⚠ HR Record</h3>
+                                <p><strong>Status:</strong> {{ worker.status_type }}</p>
+                                <p><strong>Reason:</strong> {{ worker.status_reason }}</p>
+                                <p><strong>Date:</strong> {{ worker.status_date }}</p>
+
+                                <hr>
+
+                                <h3>Official Letter</h3>
+
+                                <pre>{{ worker.status_letter }}</pre>
+
+                                <button onclick="window.print()" class="action-btn edit-btn">
+                                    🖨 Print Letter
+                                </button>
+                            </div>
+                            
+                            {% endif %}
+
+                            <div class="detail-card">
+                                <h3>Staff Identity Card</h3>
+
+                                <a href="{{ url_for('worker_id_card', worker_id=worker.id) }}"
+                                    target="_blank"
+                                    class="action-btn letter-btn">
+                                    Generate ID Card
+                                </a>
+                            </div>
+                            
+                            <div class="detail-card">
+                                <h3>Passport</h3>
+                                {% if worker.passport %}
+                                   <img src="{{ url_for('static', filename='uploads/' ~ worker.passport) }}?v={{ worker.updated_at.timestamp() if worker.updated_at else worker.id }}" class="passport-img">
+                                {% else %}
+                                    <p>No passport uploaded</p>
+                                {% endif %}
+                            </div>
+
+                            <div class="detail-card">
+                                <h3>Personal Info</h3>
+                                <p><strong>DOB:</strong> {{ worker.date_of_birth.strftime('%Y-%m-%d') if worker.date_of_birth else '—' }}</p>
+                                <p><strong>Gender:</strong> {{ worker.gender or '—' }}</p>
+                                <p><strong>Qualification:</strong> {{ worker.qualifications or '—' }}</p>
+                                <p><strong>National ID:</strong> {{ worker.national_id or '—' }}</p>
+                                <p><strong>Nationality:</strong> {{ worker.nationality or '—' }}</p>
+                                <p><strong>Email:</strong> {{ worker.email or '—' }}</p>
+                            </div>
+
+                            <div class="detail-card">
+                                <h3>Residence</h3>
+                                <p><strong>Home:</strong> {{ worker.home_address or '—' }}</p>
+                                <p><strong>Ethnic Group:</strong> {{ worker.ethnic_group or '—' }}</p>
+                                <p><strong>Residence:</strong> {{ worker.place_of_residence or '—' }}</p>
+                                <p><strong>Disability:</strong> {{ worker.disability or '—' }}</p>
+                            </div>
+
+                            <div class="detail-card">
+                                <h3>Finance</h3>
+                                <p><strong>Salary:</strong> {{ worker.amount_of_salary or '—' }}</p>
+                                <p><strong>Guarantor:</strong> {{ worker.guarantor or '—' }}</p>
+                                <p><strong>Bank:</strong> {{ worker.bank_name or '—' }}</p>
+                                <p><strong>Account:</strong> {{ worker.bank_account or '—' }}</p>
+                            </div>
+
+                        </div>
+
+                    </td>
+                </tr>
+
+            {% endfor %}
+            </tbody>
+        </table>
+    </section>
+
 </div>
 
-<!-- CSS (UNCHANGED) -->
 <style>
-.page-header {
-    text-align: center;
-    margin: 20px auto;
-    padding: 15px 10px;
-    background-color: #004080;
-    color: white;
-    border-radius: 8px;
-    position: relative;
+
+body{
+    background:linear-gradient(135deg,#042d18,#066839,#10c46d);
+    font-family:'Poppins',sans-serif;
 }
 
-.page-header h1 {
-    margin: 0 0 10px 0;
-    font-size: 28px;
-    font-weight: 700;
+/* PAGE */
+.workers-page{
+    width:96%;
+    max-width:1500px;
+    margin:auto;
+    padding:30px 15px;
 }
 
-.back-link {
-    display: inline-block;
-    margin-top: 5px;
-    color: #28a745;
-    font-weight: bold;
-    text-decoration: none;
+/* HEADER */
+.workers-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    background:linear-gradient(135deg,#024628,#05894d,#0bd16c);
+    padding:25px 30px;
+    border-radius:20px;
+    box-shadow:0 15px 35px rgba(0,0,0,0.25);
+    margin-bottom:25px;
 }
 
-.workers-table-container {
-    width: 95%;
-    margin: 0 auto 30px auto;
-    overflow-x: auto;
-    max-height: 80vh;
-    overflow-y: auto;
+.header-left{
+    display:flex;
+    align-items:center;
+    gap:20px;
+    flex-wrap:wrap;
 }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+.header-logo{
+    width:120px;
+    height:120px;
+    object-fit:cover;
+    border-radius:18px;
+    border:4px solid rgba(255,255,255,0.25);
+    background:#fff;
 }
 
-th, td {
-    padding: 12px 15px;
-    border: 1px solid #ccc;
-    text-align: left;
+.header-left h1{
+    margin:0;
+    color:#fff;
+    font-size:2rem;
+    font-weight:900;
 }
 
-th {
-    background-color: #03492c;
-    color: white;
+.header-left p{
+    margin-top:5px;
+    color:#d9ffe9;
 }
 
-tr:nth-child(even) {
-    background-color: #f8f8f8;
+.back-btn{
+    background:#fff;
+    color:#026533;
+    padding:12px 24px;
+    border-radius:10px;
+    text-decoration:none;
+    font-weight:700;
 }
 
-.edit-button, .delete-button, button {
-    padding: 6px 12px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: bold;
+/* SEARCH */
+.search-section{
+    margin-bottom:20px;
 }
 
-.edit-button {
-    background-color: #007bff;
-    color: white;
+.search-section input{
+    width:100%;
+    padding:16px;
+    border:none;
+    border-radius:12px;
+    font-size:16px;
+    box-shadow:0 6px 18px rgba(0,0,0,0.18);
 }
 
-.delete-button {
-    background-color: #dc3545;
-    color: white;
+/* TABLE */
+.table-wrapper{
+    overflow:auto;
+    max-height:75vh;
+    border-radius:18px;
+    background:#fff;
+    box-shadow:0 12px 30px rgba(0,0,0,0.22);
 }
 
-button {
-    background-color: #28a745;
-    color: white;
+table{
+    width:100%;
+    border-collapse:collapse;
+    min-width:1400px;
 }
 
-.details-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 30px;
-    padding: 15px;
-    background: #f5f7fa;
-    border-radius: 10px;
+thead{
+    position:sticky;
+    top:0;
+    z-index:100;
 }
 
-.details-section {
-    flex: 1 1 250px;
-    min-width: 250px;
+th{
+    background:#03492c;
+    color:#fff;
+    padding:16px;
+    font-size:14px;
+    text-transform:uppercase;
 }
 
-@media screen and (max-width: 768px) {
-    .workers-table-container {
-        max-height: 75vh;
-        overflow-y: auto;
+td{
+    padding:14px;
+    border-bottom:1px solid #ddd;
+    font-size:14px;
+}
+
+.worker-row:hover{
+    background:#f1fff7;
+}
+
+/* BUTTONS */
+.action-btn{
+    padding:8px 12px;
+    border:none;
+    border-radius:8px;
+    color:white;
+    font-weight:700;
+    text-decoration:none;
+    cursor:pointer;
+    display:inline-block;
+    font-size:13px;
+}
+
+.view-btn{background:#16a34a;}
+.edit-btn{background:#2563eb;}
+.delete-btn{background:#dc2626;}
+.letter-btn{background:#9333ea;}
+
+.status{
+    font-weight:700;
+    padding:6px 10px;
+    border-radius:20px;
+    font-size:12px;
+}
+
+.active{
+    background:#d1fae5;
+    color:#065f46;
+}
+
+.inactive{
+    background:#fee2e2;
+    color:#991b1b;
+}
+
+/* DETAILS */
+.details-box{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    gap:20px;
+    padding:25px;
+    background:#f8fafc;
+}
+
+.detail-card{
+    background:white;
+    border-radius:14px;
+    padding:20px;
+    box-shadow:0 8px 20px rgba(0,0,0,0.08);
+}
+
+.detail-card.full{
+    grid-column:1/-1;
+}
+
+.detail-card h3{
+    margin-top:0;
+    color:#065f46;
+}
+
+.passport-img{
+    width:150px;
+    height:180px;
+    object-fit:cover;
+    border-radius:10px;
+    border:2px solid #ddd;
+}
+
+pre{
+    white-space:pre-wrap;
+    background:#f1f5f9;
+    padding:15px;
+    border-radius:10px;
+    max-height:400px;
+    overflow:auto;
+}
+
+/* MOBILE */
+@media(max-width:768px){
+
+    .workers-header{
+        flex-direction:column;
+        text-align:center;
+        gap:20px;
     }
+
+    .header-left{
+        flex-direction:column;
+    }
+
+    .header-logo{
+        width:90px;
+        height:90px;
+    }
+
+    .header-left h1{
+        font-size:1.4rem;
+    }
+
+    table{
+        min-width:1200px;
+    }
+
 }
+
 </style>
 
-<!-- JS (UNCHANGED) -->
 <script>
-function toggleDetails(id) {
+
+function toggleDetails(btn) {
+
+    const id = btn.dataset.id;
+
     const row = document.getElementById('details-' + id);
-    const isHidden = row.style.display === 'none';
+    const hidden = row.style.display === 'none';
 
-    document.querySelectorAll('.details-row').forEach(r => r.style.display = 'none');
+    document.querySelectorAll('.details-row').forEach(r => {
+        r.style.display = 'none';
+    });
 
-    if (isHidden) {
+    if (hidden) {
         row.style.display = 'table-row';
     }
 }
 
-function toggleStatus(id, isActive) {
-    let reason = "";
+/* SEARCH */
+document.getElementById('searchInput').addEventListener('keyup', function(){
 
-    if (isActive) {
-        reason = prompt("Enter reason for deactivating this worker:");
-        if (!reason) return;
-    } else {
-        reason = "Reactivated";
-    }
+    let value=this.value.toLowerCase();
 
-    document.getElementById("reason-" + id).value = reason;
+    let rows=document.querySelectorAll('.worker-row');
 
-    document.querySelector(`form[action*="toggle_worker_status"][action*="${id}"]`).submit();
-}
+    rows.forEach(row=>{
+        let text=row.innerText.toLowerCase();
+        row.style.display=text.includes(value) ? '' : 'none';
+    });
+
+});
+
 </script>
 
 {% endblock %}

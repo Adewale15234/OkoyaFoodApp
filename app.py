@@ -5,7 +5,10 @@ from datetime import datetime, date
 from calendar import monthrange
 from sqlalchemy import extract, create_engine, text
 from sqlalchemy.orm import sessionmaker
-
+from flask import request, redirect, url_for, render_template, flash, session
+from sqlalchemy import func
+from io import BytesIO
+from backup_manager import create_backup
 import os
 import logging
 import pandas as pd
@@ -13,6 +16,11 @@ import psycopg2
 import uuid
 import io
 import traceback
+import qrcode
+import base64
+import json
+import threading
+import time
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -31,6 +39,18 @@ def allowed_file(filename):
         '.' in filename and
         filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
     )
+
+# ==============================
+# HELPER FUNCTION (ADD HERE)
+# ==============================
+
+import time
+from flask import url_for
+
+def get_passport_url(worker):
+    if worker.passport:
+        return url_for('static', filename=f'uploads/{worker.passport}') + f"?v={int(time.time())}"
+    return url_for('static', filename='default.png')
 # ------------------------------
 # Login decorator (FINAL CLEAN VERSION)
 # ------------------------------
@@ -79,6 +99,14 @@ logging.basicConfig(level=logging.INFO)
 # Flask app & secret key
 # ------------------------------
 app = Flask(__name__)
+app.config['PROPAGATE_EXCEPTIONS'] = True
+app.config['DEBUG'] = True
+
+@app.errorhandler(Exception)
+def handle_exception(e):
+    import traceback
+    return f"<pre>{traceback.format_exc()}</pre>", 500
+
 app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024  # 5MB upload limit
 
 app.config['SESSION_COOKIE_HTTPONLY'] = True
@@ -117,7 +145,7 @@ def allowed_file(filename):
 # ==============================
 
 app.config['MAIL_SERVER'] = os.environ.get('MAIL_SERVER')
-app.config['MAIL_PORT'] = int(os.environ.get('MAIL_PORT', 2525))
+app.config['MAIL_PORT'] = int(os.environ.get('MAIL_PORT', 587))
 
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
@@ -178,7 +206,9 @@ class Worker(db.Model):
     __tablename__ = 'workers'
 
     id = db.Column(db.Integer, primary_key=True)
+
     worker_code = db.Column(db.String(10), unique=True, nullable=True)
+
     name = db.Column(db.String(100), nullable=False)
     phone_number = db.Column(db.String(20), nullable=False)
     date_of_birth = db.Column(db.Date, nullable=False)
@@ -193,89 +223,146 @@ class Worker(db.Model):
     disability = db.Column(db.String(100), nullable=True)
     email = db.Column(db.String(100), nullable=False)
     date_of_employment = db.Column(db.Date, nullable=False)
+
     amount_of_salary = db.Column(db.Float, nullable=False)
+
     bank_name = db.Column(db.String(100), nullable=True)
     bank_account = db.Column(db.String(50), nullable=True)
     bank_account_name = db.Column(db.String(100), nullable=False)
+
     guarantor = db.Column(db.String(100), nullable=False)
+
     passport = db.Column(db.String(100), nullable=True)
 
-    # =========================
-    # STATUS SYSTEM
-    # =========================
-    is_active = db.Column(db.Boolean, default=True, nullable=False)
+    # ADD THIS
+    updated_at = db.Column(
+        db.DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow
+    )
 
+    # STATUS
+    is_active = db.Column(db.Boolean, default=True, nullable=False)
+    status_type = db.Column(db.String(30), nullable=True)
     status_reason = db.Column(db.Text, nullable=True)
     status_date = db.Column(db.DateTime, nullable=True)
-    status_type = db.Column(db.String(30), nullable=True)
     status_letter = db.Column(db.Text, nullable=True)
 
-    # Relationships
+    warning_count = db.Column(db.Integer, default=0)
+    last_action_by = db.Column(db.String(100), nullable=True)
+    last_action_date = db.Column(db.DateTime, nullable=True)
+
+    notes = db.Column(db.Text, nullable=True)
+
+    # RELATIONSHIPS
     attendance_records = db.relationship(
         'Attendance',
         backref='worker',
-        lazy=True,
-        cascade="all, delete-orphan"
+        cascade="all, delete-orphan",
+        passive_deletes=True
     )
-    salary_records = db.relationship(
+
+    salaries = db.relationship(
         'Salary',
         backref='worker',
-        lazy=True,
-        cascade="all, delete-orphan"
+        cascade="all, delete-orphan",
+        passive_deletes=True
     )
 
-    def __repr__(self):
-        return f"<Worker {self.name}>"
-
+    email_logs = db.relationship(
+        'EmailLog',
+        backref=db.backref('worker_ref', lazy=True),
+        cascade="all, delete-orphan",
+        passive_deletes=True
+    )
 
 class EmailLog(db.Model):
     __tablename__ = 'email_logs'
 
     id = db.Column(db.Integer, primary_key=True)
-    worker_id = db.Column(db.Integer, db.ForeignKey('workers.id'), nullable=False)
+
+    worker_id = db.Column(
+        db.Integer,
+        db.ForeignKey('workers.id', ondelete="CASCADE"),
+        nullable=False
+    )
+
     email = db.Column(db.String(120), nullable=False)
     sent_at = db.Column(db.DateTime, default=datetime.utcnow)
     status = db.Column(db.String(20), default="Sent")
 
-    # ✅ KEEP THIS ONLY (DO NOT CREATE relationship in Worker again)
-    worker = db.relationship('Worker', backref='email_logs')
-      
+    # ❌ REMOVE THIS (VERY IMPORTANT)
+    # worker = db.relationship('Worker', backref='email_logs')  
 
-      # ===============================
-# AI OFFENCE REVIEW FUNCTION
+ # ===============================
+# AI OFFENCE REVIEW FUNCTION (UPGRADED)
 # ===============================
 def ai_offence_review(worker, reason):
-    severity_keywords = ["theft", "fight", "absent", "steal", "violence", "insult", "late"]
 
-    severity = "Low"
-    for word in severity_keywords:
-        if word in reason.lower():
-            severity = "High"
-            break
+    if not reason:
+        reason = "No reason provided"
 
-    explanation = f"""
-OFFENCE REVIEW ANALYSIS
+    reason_lower = reason.lower()
 
-Worker: {worker.name}
+    # Weighted severity scoring (better than simple keyword match)
+    high_severity_words = ["theft", "steal", "fight", "violence", "assault", "fraud", "dismissed"]
+    medium_severity_words = ["absent", "lateness", "late", "insult", "disrespect", "warning"]
+
+    score = 0
+
+    for word in high_severity_words:
+        if word in reason_lower:
+            score += 3
+
+    for word in medium_severity_words:
+        if word in reason_lower:
+            score += 1
+
+    # Determine severity level
+    if score >= 3:
+        severity = "HIGH"
+        recommendation = "Immediate Suspension / Investigation"
+    elif score == 2:
+        severity = "MEDIUM"
+        recommendation = "Formal Warning Required"
+    else:
+        severity = "LOW"
+        recommendation = "Verbal Warning / Monitoring"
+
+    # Auto escalation suggestion
+    escalation = "HR Director Review Required" if severity == "HIGH" else "Supervisor Review"
+
+    return f"""
+==============================
+AI OFFENCE REVIEW REPORT
+==============================
+
+Worker Name: {worker.name}
+Worker Code: {worker.worker_code}
 Position: {worker.position}
-Code: {worker.worker_code}
 
 Reported Issue:
 {reason}
 
-AI Assessment:
-- Severity Level: {severity}
-- Recommendation: {"Immediate Suspension" if severity == "High" else "Warning or Review"}
+------------------------------
+AI ANALYSIS
+------------------------------
+Severity Level: {severity}
+Risk Score: {score}
 
-Summary:
-This case requires {"strict disciplinary action" if severity == "High" else "HR monitoring and caution"}.
+Recommendation: {recommendation}
+Escalation Level: {escalation}
+
+------------------------------
+SUMMARY
+------------------------------
+This case has been automatically analyzed based on HR behavioural patterns.
+Further human verification is recommended before final disciplinary action.
 """
-
-    return explanation
 
 
 # ===============================
-# HR LETTER GENERATOR FUNCTION
+# HR LETTER GENERATOR FUNCTION (UPGRADED)
 # ===============================
 def generate_hr_letter(worker, reason, status_type):
 
@@ -284,43 +371,98 @@ def generate_hr_letter(worker, reason, status_type):
     position = worker.position or "N/A"
     date = datetime.utcnow().strftime('%Y-%m-%d')
 
-    if status_type == "deactivated":
-        return f"""
-OKOYA FOOD LTD
-OFFICIAL DISCIPLINARY NOTICE
+    reason_text = reason if reason else "No reason provided"
 
-Employee: {name}
-Code: {code}
+    # =========================
+    # DEACTIVATION LETTER
+    # =========================
+    if status_type in ["deactivated", "suspended"]:
+
+        return f"""
+========================================
+OKOYA FOOD COMPANY LIMITED
+HUMAN RESOURCES DEPARTMENT
+OFFICIAL DISCIPLINARY NOTICE
+========================================
+
+Employee Name: {name}
+Employee Code: {code}
 Position: {position}
 
-STATUS: DEACTIVATED
+STATUS: {status_type.upper()}
 
-Reason:
-{reason or 'No reason provided'}
+REASON FOR ACTION:
+{reason_text}
 
-HR Decision:
-You are temporarily suspended pending review.
+----------------------------------------
+HR DECISION
+----------------------------------------
+Following internal review and company policy guidelines,
+you have been placed under disciplinary action and
+temporarily removed from active duty pending further review.
 
-Date: {date}
+You are advised to report to the HR department for clarification.
 
-HR Department
+Effective Date: {date}
+
+----------------------------------------
+NOTE:
+Failure to comply may lead to permanent termination.
+========================================
+OKOYA FOOD HR MANAGEMENT SYSTEM
 """
 
+    # =========================
+    # REINSTATEMENT LETTER
+    # =========================
+    elif status_type in ["reactivated", "reinstated"]:
+
+        return f"""
+========================================
+OKOYA FOOD COMPANY LIMITED
+HUMAN RESOURCES DEPARTMENT
+REINSTATEMENT NOTICE
+========================================
+
+Employee Name: {name}
+Employee Code: {code}
+Position: {position}
+
+STATUS: REINSTATED
+
+----------------------------------------
+HR DECISION
+----------------------------------------
+After careful review of your case,
+management has approved your return to active duty.
+
+You are expected to resume duties immediately and
+maintain proper conduct going forward.
+
+Effective Date: {date}
+
+----------------------------------------
+HR DEPARTMENT
+OKOYA FOOD COMPANY LIMITED
+========================================
+"""
+
+    # =========================
+    # DEFAULT SAFETY FALLBACK
+    # =========================
     else:
         return f"""
-OKOYA FOOD LTD
-REINSTATEMENT NOTICE
+OKOYA FOOD HR SYSTEM
 
 Employee: {name}
 Code: {code}
 
-STATUS: REACTIVATED
+Status Update: {status_type}
 
-You have been reinstated back to duty.
+No formal HR letter template matched this status.
+Please verify the worker status configuration.
 
 Date: {date}
-
-HR Department
 """
 
 # --- Client Order Model ---
@@ -355,22 +497,67 @@ class Order(db.Model):
     confirmed_at = db.Column(db.DateTime, nullable=True)
 
 class Attendance(db.Model):
+    __tablename__ = 'attendance'
+
     id = db.Column(db.Integer, primary_key=True)
-    worker_id = db.Column(db.Integer, db.ForeignKey('workers.id'), nullable=False)
-    date = db.Column(db.Date, nullable=False, default=db.func.current_date())
+
+    worker_id = db.Column(
+        db.Integer,
+        db.ForeignKey('workers.id', ondelete="CASCADE"),
+        nullable=False,
+        index=True
+    )
+
+    date = db.Column(
+        db.Date,
+        nullable=False,
+        default=db.func.current_date(),
+        index=True
+    )
+
     status = db.Column(db.String(10), nullable=False)
 
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
+
+    updated_at = db.Column(
+        db.DateTime,
+        server_default=db.func.now(),
+        onupdate=db.func.now()
+    )
+
+
+# =========================
+# FIXED SALARY MODEL (OUTSIDE Attendance)
+# =========================
 class Salary(db.Model):
+    __tablename__ = 'salary'
+
     id = db.Column(db.Integer, primary_key=True)
-    worker_id = db.Column(db.Integer, db.ForeignKey('workers.id'), nullable=False)
+
+    worker_id = db.Column(
+        db.Integer,
+        db.ForeignKey('workers.id', ondelete="CASCADE"),
+        nullable=False,
+        index=True
+    )
+
     total_days_present = db.Column(db.Integer, nullable=False)
     daily_rate = db.Column(db.Float, nullable=False, default=0.0)
     amount = db.Column(db.Float, nullable=False)
+
     bank_name = db.Column(db.String(100), nullable=True)
     bank_account = db.Column(db.String(50), nullable=True)
     bank_account_name = db.Column(db.String(100), nullable=True)
-    payment_date = db.Column(db.DateTime, nullable=False, default=db.func.current_timestamp())
 
+    payment_date = db.Column(
+        db.DateTime,
+        nullable=False,
+        default=db.func.current_timestamp(),
+        index=True
+    )
+
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
+    updated_at = db.Column(db.DateTime, server_default=db.func.now(), onupdate=db.func.now())
 # Hardcoded credentials (Not secure! Replace with real auth for production)
 # USERNAME = os.environ.get('ADMIN_USERNAME', 'admin')
 # PASSWORD = os.environ.get('ADMIN_PASSWORD', 'Alayinde001')
@@ -385,90 +572,126 @@ def register_worker():
     if request.method == 'POST':
 
         try:
-            # -------------------------
-            # Collect form data
-            # -------------------------
-            name = request.form.get('name')
-            phone_number = request.form.get('phone_number')
-            date_of_birth_str = request.form.get('date_of_birth')
-            gender = request.form.get('gender')
-            email = request.form.get('email')
-            qualifications = request.form.get('qualifications')
-            position = request.form.get('position')
-            amount_of_salary = float(request.form.get('amount_of_salary', 0))
-            date_of_employment_str = request.form.get('date_of_employment')
-            guarantor = request.form.get('guarantor')
-            national_id = request.form.get('national_id')
-            nationality = request.form.get('nationality')
-            ethnic_group = request.form.get('ethnic_group')
-            disability = request.form.get('disability')
-            home_address = request.form.get('home_address')
-            place_of_residence = request.form.get('place_of_residence')
-            bank_account_name = request.form.get('bank_account_name')
-            bank_name = request.form.get('bank_name')
-            bank_account = request.form.get('bank_account')
+            # ===============================
+            # 1. COLLECT & CLEAN INPUTS
+            # ===============================
+            name = (request.form.get('name') or "").strip()
+            phone_number = (request.form.get('phone_number') or "").strip()
+            gender = (request.form.get('gender') or "").strip().title()
+            email = (request.form.get('email') or "").strip().lower()
 
-            # -------------------------
-            # Convert dates
-            # -------------------------
-            date_of_birth = datetime.strptime(
-                date_of_birth_str,
-                '%Y-%m-%d'
-            ).date()
+            qualifications = (request.form.get('qualifications') or "").strip()
+            position = (request.form.get('position') or "").strip()
 
-            date_of_employment = datetime.strptime(
-                date_of_employment_str,
-                '%Y-%m-%d'
-            ).date()
+            guarantor = (request.form.get('guarantor') or "").strip()
+            national_id = (request.form.get('national_id') or "").strip()
+            nationality = (request.form.get('nationality') or "").strip()
+            ethnic_group = (request.form.get('ethnic_group') or "").strip()
+            disability = (request.form.get('disability') or "").strip()
 
-            # -------------------------
-            # Passport upload handling
-            # -------------------------
-            passport_file = request.files.get('passport')
-            passport_filename = None
+            home_address = (request.form.get('home_address') or "").strip()
+            place_of_residence = (request.form.get('place_of_residence') or "").strip()
 
-            if passport_file and passport_file.filename != "":
+            bank_account_name = (request.form.get('bank_account_name') or "").strip()
+            bank_name = (request.form.get('bank_name') or "").strip()
+            bank_account = (request.form.get('bank_account') or "").strip()
 
-                # Validate image extension
-                if not allowed_file(passport_file.filename):
-                    flash("Only image files are allowed.", "danger")
-                    return redirect(url_for('register_worker'))
+            # salary safe parse
+            try:
+                amount_of_salary = float(request.form.get('amount_of_salary') or 0)
+            except ValueError:
+                amount_of_salary = 0.0
 
-                # Create upload folder
-                passport_folder = app.config['UPLOAD_FOLDER']
-                os.makedirs(passport_folder, exist_ok=True)
+            # ===============================
+            # 2. DATE VALIDATION
+            # ===============================
+            def safe_date(value):
+                try:
+                    return datetime.strptime(value, "%Y-%m-%d").date()
+                except:
+                    return None
 
-                # Secure unique filename
-                passport_filename = (
-                    str(uuid.uuid4()) + "_" +
-                    secure_filename(passport_file.filename)
-                )
+            date_of_birth = safe_date(request.form.get('date_of_birth'))
+            date_of_employment = safe_date(request.form.get('date_of_employment'))
 
-                # Save file
-                passport_file.save(
-                    os.path.join(passport_folder, passport_filename)
-                )
+            # ===============================
+            # 3. BASIC VALIDATION
+            # ===============================
+            if not name or not phone_number or not position:
+                flash("Name, Phone number and Position are required.", "danger")
+                return redirect(url_for('register_worker'))
 
-            # -------------------------
-            # Generate worker code
-            # -------------------------
-            last_worker = Worker.query.order_by(
-                Worker.id.desc()
+            if amount_of_salary < 0:
+                flash("Salary cannot be negative.", "danger")
+                return redirect(url_for('register_worker'))
+
+            # ===============================
+            # 4. DUPLICATE CHECK
+            # ===============================
+            existing_worker = Worker.query.filter(
+                (Worker.phone_number == phone_number) |
+                (Worker.email == email)
             ).first()
 
+            if existing_worker:
+                flash("Worker with this phone or email already exists.", "warning")
+                return redirect(url_for('register_worker'))
+
+            # ===============================
+            # 5. NIN CHECK
+            # ===============================
+            if national_id:
+                existing_nin = Worker.query.filter_by(national_id=national_id).first()
+                if existing_nin:
+                    flash("This National ID is already registered.", "warning")
+                    return redirect(url_for('register_worker'))
+
+            # ===============================
+            # 6. PASSPORT UPLOAD (FIXED)
+            # ===============================
+            passport_filename = None
+            passport_file = request.files.get('passport')
+
+            if passport_file and passport_file.filename.strip():
+
+                if not allowed_file(passport_file.filename):
+                    flash("Only image files (jpg, jpeg, png) allowed.", "danger")
+                    return redirect(url_for('register_worker'))
+
+                # ALWAYS save inside static/uploads
+                upload_folder = os.path.join(app.root_path, 'static', 'uploads')
+                os.makedirs(upload_folder, exist_ok=True)
+
+                original_name = secure_filename(passport_file.filename)
+                unique_name = f"{uuid.uuid4().hex}_{original_name}"
+
+                save_path = os.path.join(upload_folder, unique_name)
+
+                passport_file.save(save_path)
+
+                passport_filename = unique_name
+
+                print(f"[PASSPORT SAVED] {save_path}")
+
+            # ===============================
+            # 7. AUTO WORKER CODE
+            # ===============================
+            last_worker = Worker.query.order_by(Worker.id.desc()).first()
+
             if last_worker and last_worker.worker_code:
-                last_number = int(
-                    last_worker.worker_code.replace("OFCL", "")
-                )
-                new_number = last_number + 1
+                try:
+                    last_number = int(last_worker.worker_code.replace("OFCL", ""))
+                    new_number = last_number + 1
+                except:
+                    new_number = (last_worker.id or 0) + 1
             else:
                 new_number = 1
 
-            worker_code = f"OFCL{new_number:03d}"
+            worker_code = f"OFCL{new_number:04d}"
 
-            # -------------------------
-            # Create worker
-            # -------------------------
+            # ===============================
+            # 8. CREATE WORKER
+            # ===============================
             new_worker = Worker(
                 worker_code=worker_code,
                 name=name,
@@ -490,30 +713,26 @@ def register_worker():
                 bank_account_name=bank_account_name,
                 bank_name=bank_name,
                 bank_account=bank_account,
-                passport=passport_filename
+                passport=passport_filename,
+                is_active=True
             )
 
-            # -------------------------
-            # Save to database
-            # -------------------------
+            # ===============================
+            # 9. SAVE
+            # ===============================
             db.session.add(new_worker)
             db.session.commit()
 
-            flash(
-                f'Worker registered successfully! Worker Code: {worker_code}',
-                'success'
-            )
+            print(f"[WORKER CREATED] {worker_code} - {name}")
+
+            flash(f"Worker registered successfully! Code: {worker_code}", "success")
 
             return redirect(url_for('workers_name'))
 
         except Exception as e:
             db.session.rollback()
-
-            print("REGISTER WORKER ERROR:", str(e))
-            traceback.print_exc()
-
-            flash(f"Error saving worker: {e}", 'danger')
-
+            logging.error(f"REGISTER WORKER ERROR: {e}", exc_info=True)
+            flash("Unexpected error occurred while saving worker.", "danger")
             return redirect(url_for('register_worker'))
 
     return render_template('register_worker.html')
@@ -542,45 +761,68 @@ def workers_name():
 @app.route('/toggle_worker_status/<int:worker_id>', methods=['POST'])
 @login_required(role='admin')
 def toggle_worker_status(worker_id):
+
     worker = Worker.query.get_or_404(worker_id)
+
     reason = request.form.get('reason', '').strip()
-    action = request.form.get('action')  # review or confirm
+
+    if not reason:
+        flash("Reason is required before changing worker status.", "danger")
+        return redirect(url_for('workers_name'))
+
     now = datetime.utcnow()
 
     # =========================
-    # STEP 1: AI REVIEW MODE
+    # TOGGLE STATUS
     # =========================
-    if action == "review":
-        ai_report = ai_offence_review(worker, reason)
+    worker.is_active = not worker.is_active
 
-        return render_template(
-            "offence_review.html",
-            worker=worker,
-            reason=reason,
-            ai_report=ai_report
-        )
-
-    # =========================
-    # STEP 2: CONFIRM DEACTIVATION
-    # =========================
     if worker.is_active:
-        worker.is_active = False
-        worker.status_reason = reason or "No reason provided"
-        worker.status_type = "deactivated"
-        worker.status_date = now
-
-        worker.status_letter = generate_hr_letter(worker, reason, "deactivated")
-
-    else:
-        worker.is_active = True
         worker.status_type = "reactivated"
-        worker.status_reason = None
-        worker.status_date = now
+    else:
+        worker.status_type = "deactivated"
 
-        worker.status_letter = generate_hr_letter(worker, reason, "reactivated")
+    worker.status_reason = reason
+    worker.status_date = now
+
+    # =========================
+    # TRACK ADMIN ACTION
+    # =========================
+    worker.last_action_by = session.get('role')
+    worker.last_action_date = now
+
+    # =========================
+    # WARNING AUTO COUNT
+    # =========================
+    if not worker.is_active:
+        worker.warning_count = (worker.warning_count or 0) + 1
+
+    # =========================
+    # REGENERATE LETTER
+    # =========================
+    worker.status_letter = generate_hr_letter(
+        worker,
+        reason,
+        worker.status_type
+    )
 
     db.session.commit()
+
+    flash(f"{worker.name} status updated successfully.", "success")
+
     return redirect(url_for('workers_name'))
+
+
+@app.route('/worker_history/<int:worker_id>')
+@login_required()
+def worker_history(worker_id):
+
+    worker = Worker.query.get_or_404(worker_id)
+
+    return render_template(
+        'worker_history.html',
+        worker=worker
+    )
 
 
 @app.route('/active-workers')
@@ -777,23 +1019,65 @@ def client_form():
 @app.route('/orders_overview')
 @login_required(role='admin')
 def orders_overview():
+
     if session.get('role') != 'admin':
         return redirect(url_for('login'))
 
     all_orders = Order.query.order_by(Order.created_at.desc()).all()
 
-    # ✅ FLEXIBLE matching (prevents missing records)
+    # -------------------------
+    # PRODUCT GROUPING
+    # -------------------------
     soya_orders = [o for o in all_orders if o.items and "soya" in o.items.lower()]
     cashew_orders = [o for o in all_orders if o.items and "cashew" in o.items.lower()]
     maize_orders = [o for o in all_orders if o.items and "maize" in o.items.lower()]
     rice_orders = [o for o in all_orders if o.items and "rice" in o.items.lower()]
 
+    # -------------------------
+    # ANALYTICS (NEW)
+    # -------------------------
+    total_orders = len(all_orders)
+    total_revenue = sum(o.total_amount or 0 for o in all_orders)
+
+    today = datetime.utcnow().date()
+    today_sales = sum(
+        o.total_amount or 0
+        for o in all_orders
+        if o.created_at and o.created_at.date() == today
+    )
+
+    pending_orders = len([o for o in all_orders if o.status == "Pending"])
+    confirmed_orders = len([o for o in all_orders if o.status == "Confirmed"])
+    delivered_orders = len([o for o in all_orders if o.status == "Delivered"])
+
+    # -------------------------
+    # TOP PRODUCT PERFORMANCE
+    # -------------------------
+    product_stats = {}
+    for o in all_orders:
+        if o.items:
+            key = o.items.lower()
+            product_stats[key] = product_stats.get(key, 0) + 1
+
     return render_template(
         'orders_overview.html',
+
         soya_orders=soya_orders,
         cashew_orders=cashew_orders,
         maize_orders=maize_orders,
         rice_orders=rice_orders,
+
+        all_orders=all_orders,
+
+        # analytics
+        total_orders=total_orders,
+        total_revenue=total_revenue,
+        today_sales=today_sales,
+        pending_orders=pending_orders,
+        confirmed_orders=confirmed_orders,
+        delivered_orders=delivered_orders,
+        product_stats=product_stats,
+
         now=datetime.utcnow()
     )
 
@@ -919,41 +1203,90 @@ def edit_worker(worker_id):
 
     if request.method == 'POST':
         try:
-            # -------------------------
-            # Update worker fields from form
-            # -------------------------
-            worker.name = request.form['name']
-            worker.phone_number = request.form['phone_number']
-            worker.date_of_birth = datetime.strptime(request.form['date_of_birth'], '%Y-%m-%d').date()
-            worker.date_of_employment = datetime.strptime(request.form['date_of_employment'], '%Y-%m-%d').date()
-            worker.gender = request.form['gender']
-            worker.qualifications = request.form['qualifications']
-            worker.position = request.form['position']
-            worker.national_id = request.form['national_id']
-            worker.nationality = request.form['nationality']
-            worker.home_address = request.form['home_address']
-            worker.ethnic_group = request.form['ethnic_group']
-            worker.place_of_residence = request.form['place_of_residence']
-            worker.disability = request.form.get('disability')
-            worker.email = request.form['email']
-            worker.amount_of_salary = float(request.form.get('amount_of_salary', 0))
-            worker.bank_name = request.form.get('bank_name')
-            worker.bank_account = request.form.get('bank_account')
-            worker.guarantor = request.form.get('guarantor')
-            worker.bank_account_name = request.form.get('bank_account_name')
+            # =========================
+            # UPDATE FIELDS
+            # =========================
+            worker.name = (request.form.get('name') or "").strip()
+            worker.phone_number = (request.form.get('phone_number') or "").strip()
+            worker.gender = (request.form.get('gender') or "").strip()
+            worker.email = (request.form.get('email') or "").strip().lower()
 
-            # -------------------------
-            # Handle passport update
-            # -------------------------
+            worker.qualifications = (request.form.get('qualifications') or "").strip()
+            worker.position = (request.form.get('position') or "").strip()
+
+            worker.national_id = (request.form.get('national_id') or "").strip()
+            worker.nationality = (request.form.get('nationality') or "").strip()
+
+            worker.home_address = (request.form.get('home_address') or "").strip()
+            worker.ethnic_group = (request.form.get('ethnic_group') or "").strip()
+            worker.place_of_residence = (request.form.get('place_of_residence') or "").strip()
+
+            worker.disability = (request.form.get('disability') or "").strip()
+
+            worker.bank_name = (request.form.get('bank_name') or "").strip()
+            worker.bank_account = (request.form.get('bank_account') or "").strip()
+            worker.bank_account_name = (request.form.get('bank_account_name') or "").strip()
+
+            worker.guarantor = (request.form.get('guarantor') or "").strip()
+
+            try:
+                worker.amount_of_salary = float(request.form.get('amount_of_salary') or 0)
+            except ValueError:
+                worker.amount_of_salary = 0
+
+            # =========================
+            # SAFE DATE
+            # =========================
+            def safe_date(value):
+                try:
+                    return datetime.strptime(value, "%Y-%m-%d").date()
+                except:
+                    return None
+
+            worker.date_of_birth = safe_date(request.form.get('date_of_birth'))
+            worker.date_of_employment = safe_date(request.form.get('date_of_employment'))
+
+            # =========================
+            # PASSPORT UPDATE
+            # =========================
             passport_file = request.files.get('passport')
-            if passport_file and passport_file.filename != "":
-                passport_filename = str(uuid.uuid4()) + "_" + secure_filename(passport_file.filename)
-                passport_folder = app.config['UPLOAD_FOLDER']
-                os.makedirs(passport_folder, exist_ok=True)
-                passport_file.save(os.path.join(passport_folder, passport_filename))
-                worker.passport = passport_filename  # update database field
 
+            if passport_file and passport_file.filename:
+
+                if allowed_file(passport_file.filename):
+
+                    upload_folder = app.config.get('UPLOAD_FOLDER', 'static/uploads')
+                    os.makedirs(upload_folder, exist_ok=True)
+
+                    # delete old file
+                    if worker.passport:
+                        old_file = os.path.join(upload_folder, worker.passport)
+                        if os.path.exists(old_file):
+                            try:
+                                os.remove(old_file)
+                            except:
+                                pass
+
+                    # save new file
+                    safe_name = secure_filename(passport_file.filename)
+                    new_filename = f"{uuid.uuid4().hex}_{safe_name}"
+
+                    passport_file.save(
+                        os.path.join(upload_folder, new_filename)
+                    )
+
+                    worker.passport = new_filename
+                    worker.updated_at = datetime.utcnow()
+    
+                else:
+                    flash("Only jpg, jpeg and png files allowed.", "danger")
+                    return redirect(url_for('edit_worker', worker_id=worker.id))
+
+            # =========================
+            # SAVE
+            # =========================
             db.session.commit()
+
             flash('Worker details updated successfully.', 'success')
             return redirect(url_for('workers_name'))
 
@@ -964,13 +1297,109 @@ def edit_worker(worker_id):
     return render_template('edit_worker.html', worker=worker)
 
 
+@app.route('/worker_id_card/<int:worker_id>')
+@login_required(role='admin')
+def worker_id_card(worker_id):
+
+    worker = Worker.query.get_or_404(worker_id)
+
+    # ============================
+    # PASSPORT URL (NEW FIX)
+    # ============================
+    passport_url = get_passport_url(worker)
+
+    # ============================
+    # BUILD VERIFICATION PAYLOAD
+    # ============================
+    verify_url = url_for(
+        'verify_worker',
+        worker_code=worker.worker_code,
+        _external=True
+    )
+
+    qr_data = {
+        "company": "OKOYA FOOD COMPANY LIMITED",
+        "worker_code": worker.worker_code,
+        "name": worker.name,
+        "position": worker.position,
+        "phone": worker.phone_number or "N/A",
+        "status": "Active" if worker.is_active else "Inactive",
+        "verify_url": verify_url
+    }
+
+    qr_string = json.dumps(qr_data, ensure_ascii=False)
+
+    # ============================
+    # GENERATE QR CODE
+    # ============================
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_H,
+        box_size=4,
+        border=2
+    )
+
+    qr.add_data(qr_string)
+    qr.make(fit=True)
+
+    img = qr.make_image(fill_color="black", back_color="white")
+
+    buffer = BytesIO()
+    img.save(buffer, format="PNG")
+    buffer.seek(0)
+
+    qr_base64 = base64.b64encode(buffer.read()).decode('utf-8')
+
+    return render_template(
+        'worker_id_card.html',
+        worker=worker,
+        qr_code=qr_base64,
+        passport_url=passport_url
+    )
+
+
+@app.route('/verify/<worker_code>')
+def verify_worker(worker_code):
+
+    worker = Worker.query.filter_by(worker_code=worker_code).first_or_404()
+
+    return render_template('verify_worker.html', worker=worker)
+
+
+@app.route('/routes')
+def routes():
+    import urllib
+    return "<br>".join(sorted(str(r) for r in app.url_map.iter_rules()))
+
+
 @app.route('/delete_worker/<int:worker_id>', methods=['POST'])
 @login_required(role='admin')
 def delete_worker(worker_id):
+
     worker = Worker.query.get_or_404(worker_id)
-    db.session.delete(worker)
-    db.session.commit()
-    flash('Worker deleted successfully.')
+
+    try:
+        # 1. delete passport file safely
+        if worker.passport:
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], worker.passport)
+            if os.path.exists(file_path):
+                os.remove(file_path)
+
+        # 2. delete related records FIRST (safe cascade alternative)
+        db.session.query(EmailLog).filter_by(worker_id=worker.id).delete()
+        db.session.query(Attendance).filter_by(worker_id=worker.id).delete()
+        db.session.query(Salary).filter_by(worker_id=worker.id).delete()
+
+        # 3. delete worker
+        db.session.delete(worker)
+        db.session.commit()
+
+        flash('Worker deleted successfully.', 'success')
+
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error deleting worker: {str(e)}', 'danger')
+
     return redirect(url_for('workers_name'))
 
 
@@ -986,48 +1415,105 @@ def secretary_attendance():
 def attendance():
 
     workers = Worker.query.filter_by(is_active=True).all()
-    secretary = session.get('role') == 'secretary'  # detect if secretary
+    secretary = session.get('role') == 'secretary'
+
+    today = date.today()
+
+    # 🔥 DAILY SUMMARY (useful for dashboard analytics later)
+    total_workers = len(workers)
+    today_present_count = Attendance.query.filter_by(
+        date=today,
+        status="Present"
+    ).count()
+
+    today_absent_count = Attendance.query.filter_by(
+        date=today,
+        status="Absent"
+    ).count()
 
     if request.method == 'POST':
+
         worker_id = request.form.get('worker_id')
         status = request.form.get('attendance_status')
 
-        if worker_id and status:
-            today = date.today()
-            try:
-                worker_id_int = int(worker_id)
-            except ValueError:
-                flash("Invalid worker ID.", "error")
-                return redirect(url_for('attendance'))
+        # 🔐 Validation
+        if not worker_id or not status:
+            flash("Missing attendance data.", "error")
+            return redirect(url_for('attendance'))
 
-            existing = Attendance.query.filter_by(worker_id=worker_id_int, date=today).first()
-            if existing:
-                flash('Attendance already submitted for this worker today.', 'warning')
-            else:
-                attendance = Attendance(worker_id=worker_id_int, status=status, date=today)
-                db.session.add(attendance)
-                db.session.commit()
-                flash('Attendance marked successfully.', 'success')
+        try:
+            worker_id = int(worker_id)
+        except ValueError:
+            flash("Invalid worker ID.", "error")
+            return redirect(url_for('attendance'))
+
+        worker = Worker.query.get(worker_id)
+
+        if not worker:
+            flash("Worker not found.", "error")
+            return redirect(url_for('attendance'))
+
+        # 🚫 Prevent duplicate attendance per day
+        existing = Attendance.query.filter_by(
+            worker_id=worker_id,
+            date=today
+        ).first()
+
+        if existing:
+            flash(f"{worker.name} already marked for today.", "warning")
+            return redirect(url_for('attendance'))
+
+        try:
+            new_attendance = Attendance(
+                worker_id=worker_id,
+                status=status,
+                date=today
+            )
+
+            db.session.add(new_attendance)
+            db.session.commit()
+
+            flash(f"Attendance marked for {worker.name}.", "success")
+
+        except Exception as e:
+            db.session.rollback()
+            logging.error(f"Attendance error: {e}")
+            flash("System error while saving attendance.", "error")
 
         return redirect(url_for('attendance'))
 
-    return render_template('attendance.html', workers=workers, secretary=secretary)
+    return render_template(
+        'attendance.html',
+        workers=workers,
+        secretary=secretary,
+        total_workers=total_workers,
+        today_present_count=today_present_count,
+        today_absent_count=today_absent_count,
+        today=today
+    )
 
 
 @app.route('/salary', methods=['GET', 'POST'])
-@login_required(role='admin')  # Only admin can access
+@login_required(role='admin')
 def salary():
+
     workers = Worker.query.filter_by(is_active=True).all()
+
     today = datetime.today()
     current_year = today.year
     current_month = today.month
+
     total_days_in_month = monthrange(current_year, current_month)[1]
 
-    if total_days_in_month == 0:
+    if total_days_in_month < 1:
         total_days_in_month = 1
 
     salary_data = []
+
+    total_payroll = 0  # 🔥 future analytics
+
     for worker in workers:
+
         total_days_present = Attendance.query.filter(
             Attendance.worker_id == worker.id,
             Attendance.status == "Present",
@@ -1035,7 +1521,11 @@ def salary():
             extract('month', Attendance.date) == current_month
         ).count()
 
-        calculated_salary = (total_days_present / total_days_in_month) * worker.amount_of_salary
+        daily_rate = (worker.amount_of_salary or 0) / total_days_in_month
+
+        calculated_salary = total_days_present * daily_rate
+
+        total_payroll += calculated_salary
 
         salary_data.append({
             'id': worker.id,
@@ -1048,9 +1538,27 @@ def salary():
         })
 
     if request.method == 'POST':
+
         try:
             worker_id = int(request.form.get('worker_id'))
             worker = Worker.query.get(worker_id)
+
+            if not worker:
+                flash("Worker not found.", "error")
+                return redirect(url_for('salary'))
+
+            # 🚫 Prevent duplicate salary for same month
+            existing_salary = Salary.query.filter_by(
+                worker_id=worker_id
+            ).filter(
+                extract('year', Salary.payment_date) == current_year,
+                extract('month', Salary.payment_date) == current_month
+            ).first()
+
+            if existing_salary:
+                flash(f"Salary already recorded for {worker.name} this month.", "warning")
+                return redirect(url_for('salary_history'))
+
             total_days_present = Attendance.query.filter(
                 Attendance.worker_id == worker.id,
                 Attendance.status == "Present",
@@ -1058,27 +1566,39 @@ def salary():
                 extract('month', Attendance.date) == current_month
             ).count()
 
-            calculated_salary = (total_days_present / total_days_in_month) * worker.amount_of_salary
+            daily_rate = (worker.amount_of_salary or 0) / total_days_in_month
+            calculated_salary = total_days_present * daily_rate
 
             new_salary = Salary(
                 worker_id=worker.id,
                 total_days_present=total_days_present,
-                daily_rate=worker.amount_of_salary / total_days_in_month,
+                daily_rate=daily_rate,
                 amount=round(calculated_salary, 2),
                 bank_name=worker.bank_name,
                 bank_account=worker.bank_account,
-                bank_account_name=worker.bank_account_name
+                bank_account_name=worker.bank_account_name,
+                payment_date=datetime.now()
             )
+
             db.session.add(new_salary)
             db.session.commit()
-            flash(f"Salary for {worker.name} recorded successfully.")
+
+            flash(f"Salary recorded successfully for {worker.name}.", "success")
+
             return redirect(url_for('salary_history'))
+
         except Exception as e:
             db.session.rollback()
-            logging.error(f"Error recording salary: {e}")
-            flash("There was an error recording the salary. Please try again.", "error")
+            logging.error(f"Salary error: {e}")
+            flash("Error recording salary. Try again.", "error")
 
-    return render_template('salary.html', salary_data=salary_data)
+    return render_template(
+        'salary.html',
+        salary_data=salary_data,
+        total_payroll=round(total_payroll, 2),
+        current_month=current_month,
+        current_year=current_year
+    )
 
 
 @app.route('/attendance_history')
@@ -1174,6 +1694,23 @@ def salary_history():
         now=now
     )
 
+
+@app.route("/backup-now")
+@login_required(role='admin')
+def backup_now():
+
+    db_url = app.config['SQLALCHEMY_DATABASE_URI']
+
+    file_path = create_backup(db_url)
+
+    if file_path:
+        flash("Backup created successfully!", "success")
+        return send_file(file_path, as_attachment=True)
+
+    flash("Backup failed!", "danger")
+    return redirect(url_for("admin_dashboard"))
+
+
 # ===============================
 # UNIVERSAL LOGIN + DASHBOARDS
 # ===============================
@@ -1252,6 +1789,30 @@ def test_routes():
 # ------------------------------
 # Create database tables safely
 # ------------------------------
+@app.errorhandler(Exception)
+def handle_exception(e):
+    import traceback
+    traceback.print_exc()
+    return f"<pre>{traceback.format_exc()}</pre>", 500
+
+
+def auto_backup_loop():
+    while True:
+        try:
+            print("Running auto backup...")
+
+            db_url = app.config['SQLALCHEMY_DATABASE_URI']
+            create_backup(db_url)
+
+            print("Backup completed")
+
+        except Exception as e:
+            print("Backup error:", e)
+
+        time.sleep(86400)  # 24 hours
+        
+threading.Thread(target=auto_backup_loop, daemon=True).start()
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()

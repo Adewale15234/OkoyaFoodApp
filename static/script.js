@@ -1,101 +1,106 @@
-// Attendance page
-function calculateTotalDaysPresent(workerId) {
-    // Assuming you have a way to get the attendance records for a worker
-    const attendanceRecords = getAttendanceRecords(workerId);
+// ===============================
+// SAFE HELPER FUNCTIONS (FLASK FRIENDLY)
+// ===============================
+
+// Placeholder API functions (replace with Flask endpoints later)
+async function getAttendanceRecords(workerId = null) {
+    // TODO: Replace with real API call
+    return [];
+}
+
+async function getSalaryRecords() {
+    // TODO: Replace with real API call
+    return [];
+}
+
+// ===============================
+// ATTENDANCE CALCULATION
+// ===============================
+async function calculateTotalDaysPresent(workerId) {
+    const attendanceRecords = await getAttendanceRecords(workerId);
+
     let totalDaysPresent = 0;
+
     attendanceRecords.forEach(record => {
-        if (record.status === 'Present') {
+        if (record.status && record.status.toLowerCase() === 'present') {
             totalDaysPresent++;
         }
     });
+
     return totalDaysPresent;
 }
 
-// Salary page
-function calculateSalary(workerId, dailyRate) {
-    const totalDaysPresent = calculateTotalDaysPresent(workerId);
-    const salary = totalDaysPresent * dailyRate;
-    return salary;
+// ===============================
+// SALARY CALCULATION
+// ===============================
+async function calculateSalary(workerId, dailyRate) {
+    const totalDaysPresent = await calculateTotalDaysPresent(workerId);
+    return totalDaysPresent * dailyRate;
 }
 
-// Move to attendance history button
-document.getElementById('move-to-attendance-history').addEventListener('click', () => {
-    // Assuming you have a way to get the current month and year
-    const currentMonth = getMonth();
-    const currentYear = getYear();
-    // Send AJAX request to move attendance records to history
+// ===============================
+// MOVE TO ATTENDANCE HISTORY
+// ===============================
+document.addEventListener("DOMContentLoaded", function () {
+    const attendanceBtn = document.getElementById('move-to-attendance-history');
+
+    if (attendanceBtn) {
+        attendanceBtn.addEventListener('click', async () => {
+            try {
+                const currentMonth = new Date().getMonth() + 1;
+                const currentYear = new Date().getFullYear();
+
+                // TODO: Replace with Flask route call
+                console.log("Moving attendance:", currentMonth, currentYear);
+
+            } catch (error) {
+                console.error("Attendance history error:", error);
+            }
+        });
+    }
+
+    // ===============================
+    // MOVE TO SALARY HISTORY
+    // ===============================
+    const salaryBtn = document.getElementById('move-to-salary-history');
+
+    if (salaryBtn) {
+        salaryBtn.addEventListener('click', async () => {
+            try {
+                const currentMonth = new Date().getMonth() + 1;
+                const currentYear = new Date().getFullYear();
+
+                console.log("Moving salary:", currentMonth, currentYear);
+
+            } catch (error) {
+                console.error("Salary history error:", error);
+            }
+        });
+    }
 });
 
-// Move to salary history button
-document.getElementById('move-to-salary-history').addEventListener('click', () => {
-    // Assuming you have a way to get the current month and year
-    const currentMonth = getMonth();
-    const currentYear = getYear();
-    // Send AJAX request to move salary records to history
-});
+// ===============================
+// FILTER ATTENDANCE
+// ===============================
+async function filterAttendanceRecords(name = "", month = "", workerId = "") {
+    const attendanceRecords = await getAttendanceRecords();
 
-// Filter attendance records
-function filterAttendanceRecords(name, month, workerId) {
-    // Assuming you have a way to get the attendance records
-    const attendanceRecords = getAttendanceRecords();
-    const filteredRecords = attendanceRecords.filter(record => {
+    return attendanceRecords.filter(record => {
         if (name && record.workerName !== name) return false;
         if (month && record.month !== month) return false;
         if (workerId && record.workerId !== workerId) return false;
         return true;
     });
-    return filteredRecords;
 }
 
-// Filter salary records
-function filterSalaryRecords(month) {
-    // Assuming you have a way to get the salary records
-    const salaryRecords = getSalaryRecords();
-    const filteredRecords = salaryRecords.filter(record => {
+// ===============================
+// FILTER SALARY
+// ===============================
+async function filterSalaryRecords(month = "") {
+    const salaryRecords = await getSalaryRecords();
+
+    return salaryRecords.filter(record => {
         if (month && record.month !== month) return false;
         return true;
     });
-    return filteredRecords;
-} and styles.css ia:
-body {
-    font-family: Arial, sans-serif;
 }
-
-table {
-    border-collapse: collapse;
-    width: 100%;
-}
-
-th, td {
-    border: 1px solid #ddd;
-    padding: 10px;
-    text-align: left;
-}
-
-th {
-    background-color: #f0f0f0;
-}
-
-nav ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-}
-
-nav li {
-    margin-right: 20px;
-}
-
-nav a {
-    text-decoration: none;
-    color: #337ab7;
-}
-
-nav a:hover {
-    color: #23527c;
-}
-  and requirements.txt is:
-Flask
-Flask-SQLAchemy
-Werkzeug and login.html is:

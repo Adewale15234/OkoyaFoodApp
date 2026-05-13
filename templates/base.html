@@ -2,88 +2,222 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}OKOYA FOOD STAFF MANAGER{% endblock %}</title>
 
-    <title>{% block title %}Staff Management{% endblock %}</title>
-
-    <!-- FAVICON -->
+    <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
 
-    <!-- CSS -->
+    <!-- Main CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
-    <!-- =========================
-         GLOBAL PRINT SYSTEM (IMPORTANT FIX)
-    ========================== -->
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
     <style>
-        /* GLOBAL PRINT CONTROL */
-        @media print {
-            body {
-                background: white !important;
+        :root{
+            --okoya-green:#0f5132;
+            --okoya-green-light:#198754;
+            --okoya-green-soft:#d1e7dd;
+            --okoya-bg:#f4f8f5;
+            --okoya-dark:#0b2e1e;
+            --okoya-card:#ffffff;
+            --danger:#dc3545;
+            --warning:#ffc107;
+            --shadow:0 8px 25px rgba(0,0,0,0.08);
+        }
+
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family:'Poppins',sans-serif;
+        }
+
+        body{
+            background: linear-gradient(135deg,#eef7f1,#ffffff,#eaf5ef);
+            min-height:100vh;
+            color:#1c1c1c;
+        }
+
+        .topbar{
+            width:100%;
+            background:linear-gradient(90deg,var(--okoya-dark),var(--okoya-green));
+            color:white;
+            padding:16px 24px;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            box-shadow:var(--shadow);
+            position:sticky;
+            top:0;
+            z-index:999;
+        }
+
+        .brand{
+            display:flex;
+            align-items:center;
+            gap:12px;
+        }
+
+        .brand h1{
+            font-size:20px;
+            font-weight:700;
+            letter-spacing:.5px;
+        }
+
+        .brand span{
+            font-size:12px;
+            opacity:.85;
+        }
+
+        .main-container{
+            max-width:1400px;
+            margin:25px auto;
+            padding:20px;
+        }
+
+        .content-card{
+            background:var(--okoya-card);
+            border-radius:18px;
+            box-shadow:var(--shadow);
+            padding:25px;
+            animation:fadeIn .35s ease;
+        }
+
+        @keyframes fadeIn{
+            from{opacity:0;transform:translateY(8px);}
+            to{opacity:1;transform:translateY(0);}
+        }
+
+        .flash-wrapper{
+            margin-bottom:18px;
+        }
+
+        .flash-messages{
+            list-style:none;
+            padding:0;
+        }
+
+        .flash-messages li{
+            background:#fff;
+            border-left:5px solid var(--okoya-green);
+            padding:14px 16px;
+            margin-bottom:10px;
+            border-radius:10px;
+            box-shadow:0 2px 8px rgba(0,0,0,0.05);
+            font-size:14px;
+        }
+
+        .footer{
+            text-align:center;
+            padding:25px;
+            font-size:13px;
+            color:#555;
+        }
+
+        .footer strong{
+            color:var(--okoya-green);
+        }
+
+        @media (max-width:768px){
+            .topbar{
+                flex-direction:column;
+                align-items:flex-start;
+                gap:10px;
             }
 
-            .no-print {
-                display: none !important;
+            .brand h1{
+                font-size:17px;
             }
 
-            .print-container {
-                width: 100%;
-                margin: 0;
-                padding: 15mm;
-                box-shadow: none !important;
+            .main-container{
+                padding:12px;
             }
 
-            @page {
-                size: A4;
-                margin: 15mm;
+            .content-card{
+                padding:16px;
+                border-radius:14px;
             }
         }
 
-        /* FLASH MESSAGE STYLING (PREVENT UI BREAKS) */
-        .flash-messages {
-            list-style: none;
-            padding: 10px;
-            margin: 0;
-            background: #fff3cd;
-            color: #856404;
-            border-bottom: 1px solid #ffeeba;
-        }
+        /* Print safe */
+        @media print{
+            body{
+                background:white !important;
+            }
 
-        .flash-messages li {
-            margin: 5px 0;
+            .no-print,
+            .topbar,
+            .footer{
+                display:none !important;
+            }
+
+            .content-card{
+                box-shadow:none !important;
+                border:none !important;
+                padding:0 !important;
+            }
+
+            @page{
+                size:A4;
+                margin:12mm;
+            }
         }
     </style>
 </head>
 
 <body>
 
-    <!-- FLASH MESSAGES -->
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            <ul class="flash-messages no-print">
-                {% for msg in messages %}
-                    <li>{{ msg }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-    {% endwith %}
+    <!-- HEADER -->
+    <header class="topbar no-print">
+        <div class="brand">
+            <div>
+                <h1>OKOYA FOOD COMPANY LIMITED</h1>
+                <span>Staff Management & HR Department</span>
+            </div>
+        </div>
+    </header>
 
-    <!-- MAIN CONTENT -->
-    <main>
-        {% block content %}{% endblock %}
-    </main>
+    <!-- MAIN BODY -->
+    <section class="main-container">
 
-    <!-- THEME SCRIPT -->
+        <!-- FLASH -->
+        <div class="flash-wrapper no-print">
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <ul class="flash-messages">
+                        {% for msg in messages %}
+                            <li>{{ msg }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            {% endwith %}
+        </div>
+
+        <!-- PAGE CONTENT -->
+        <div class="content-card">
+            {% block content %}{% endblock %}
+        </div>
+
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer no-print">
+        <p>© {{ now.year if now else '2026' }} <strong>Okoya Food Ltd</strong> — Enterprise HR & Operations System</p>
+    </footer>
+
     <script>
-        function setTheme(theme) {
-            const body = document.body;
-            body.classList.remove("light-theme", "dark-theme", "blue-theme", "red-theme");
-            body.classList.add(`${theme}-theme`);
-            localStorage.setItem("selectedTheme", theme);
+        function setTheme(theme){
+            document.body.setAttribute("data-theme", theme);
+            localStorage.setItem("okoyaTheme", theme);
         }
 
-        window.onload = function () {
-            const savedTheme = localStorage.getItem("selectedTheme");
-            if (savedTheme) setTheme(savedTheme);
+        window.onload = function(){
+            const saved = localStorage.getItem("okoyaTheme");
+            if(saved){
+                document.body.setAttribute("data-theme", saved);
+            }
         };
     </script>
 

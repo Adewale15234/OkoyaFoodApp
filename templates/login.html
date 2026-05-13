@@ -1,47 +1,250 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login | Okoya Food Co.</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Login | Okoya Food Co.</title>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+<style>
+
+/* =========================
+   LOGIN MODERN UPGRADE
+========================= */
+
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(135deg,#022c22,#065f46,#0f766e);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* WRAPPER */
+.login-wrapper {
+    width: 100%;
+    padding: 20px;
+}
+
+/* CARD */
+.login-card {
+    max-width: 480px;
+    margin: auto;
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(12px);
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    padding: 30px;
+    animation: fadeIn 0.6s ease-in-out;
+}
+
+/* HEADER */
+.login-header {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.login-logo {
+    width: 90px;
+    height: 90px;
+    object-fit: contain;
+    margin-bottom: 10px;
+}
+
+.company-name {
+    font-size: 1.3rem;
+    color: #065f46;
+    margin: 5px 0;
+    font-weight: 800;
+}
+
+.company-motto {
+    font-size: 0.75rem;
+    color: goldenrod;
+    font-weight: 700;
+    margin: 5px 0;
+}
+
+.company-address {
+    font-size: 0.75rem;
+    background: #111;
+    color: #fff;
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 8px;
+    margin-top: 5px;
+}
+
+/* TITLES */
+.login-title {
+    text-align: center;
+    font-size: 1.4rem;
+    margin-top: 20px;
+    color: #0f172a;
+}
+
+.login-subtitle {
+    text-align: center;
+    font-size: 0.85rem;
+    color: #64748b;
+    margin-bottom: 20px;
+}
+
+/* ERROR */
+.login-error {
+    background: #fee2e2;
+    color: #991b1b;
+    padding: 10px;
+    border-radius: 10px;
+    text-align: center;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+/* FORM */
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.form-group label {
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: #0f172a;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid #cbd5e1;
+    outline: none;
+    font-size: 0.95rem;
+    transition: 0.3s;
+}
+
+.form-group input:focus {
+    border-color: #10b981;
+    box-shadow: 0 0 0 4px rgba(16,185,129,0.15);
+}
+
+/* BUTTON */
+.login-btn {
+    background: linear-gradient(135deg,#059669,#10b981);
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: 0.3s;
+    font-size: 1rem;
+}
+
+.login-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(16,185,129,0.3);
+}
+
+/* FOOTER */
+.footer {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 0.75rem;
+    color: #64748b;
+}
+
+/* ANIMATION */
+@keyframes fadeIn {
+    from {opacity: 0; transform: translateY(10px);}
+    to {opacity: 1; transform: translateY(0);}
+}
+
+/* MOBILE */
+@media(max-width:500px){
+    .login-card {
+        padding: 20px;
+    }
+}
+
+</style>
+
 </head>
+
 <body>
+
 <div class="login-wrapper">
+
     <div class="login-card">
-        <!-- Company Header -->
+
+        <!-- HEADER -->
         <div class="login-header">
-            <img src="{{ url_for('static', filename='android-chrome-512x512.png') }}" alt="Company Logo" class="login-logo">
+
+            <img src="{{ url_for('static', filename='android-chrome-512x512.png') }}"
+                 alt="Company Logo"
+                 class="login-logo">
+
             <h1 class="company-name">OKOYA FOOD COMPANY LIMITED</h1>
-            <h2 class="company-motto">POVERTY ERADICATION • REDUCE INEQUALITY • LEAVE NO ONE BEHIND</h2>
-            <p class="company-address">KM 7 Idi APA Community, Along Ilesha Ibaruba Expressway, Saki, Oyo State, Nigeria</p>
+
+            <h2 class="company-motto">
+                POVERTY ERADICATION • REDUCE INEQUALITY • LEAVE NO ONE BEHIND
+            </h2>
+
+            <p class="company-address">
+                KM 7 Idi APA Community, Saki, Oyo State, Nigeria
+            </p>
+
         </div>
 
-        <!-- Page Title -->
+        <!-- TITLE -->
         <h2 class="login-title">Staff Login Portal</h2>
-        <p class="login-subtitle">Enter your username and password to continue</p>
+        <p class="login-subtitle">Secure access for authorized personnel only</p>
 
+        <!-- ERROR -->
         {% if error %}
             <p class="login-error">{{ error }}</p>
         {% endif %}
 
-        <!-- Login Form -->
-        <form method="POST" action="{{ url_for('login') }}" class="login-form">
+        <!-- FORM -->
+        <form method="POST"
+              action="{{ url_for('login') }}"
+              class="login-form">
+
             <div class="form-group">
-                <label for="username">Username</label>
-                <input type="text" id="username" name="username" placeholder="Enter username" required>
+                <label>Username</label>
+                <input type="text"
+                       name="username"
+                       placeholder="Enter username"
+                       required>
             </div>
+
             <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" placeholder="Enter password" required>
+                <label>Password</label>
+                <input type="password"
+                       name="password"
+                       placeholder="Enter password"
+                       required>
             </div>
-            <button type="submit" class="login-btn">Login</button>
+
+            <button type="submit" class="login-btn">
+                🔐 Login
+            </button>
+
         </form>
 
         <!-- FOOTER -->
-    <div class="footer">
-      © {{ current_year | default(2026) }} OKOYA FOOD COMPANY LIMITED
+        <div class="footer">
+            © {{ current_year | default(2026) }} OKOYA FOOD COMPANY LIMITED
+        </div>
+
     </div>
+
 </div>
+
 </body>
 </html>

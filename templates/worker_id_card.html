@@ -1,0 +1,511 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<!-- ================= FRONT CARD ================= -->
+<!-- ================= FRONT CARD (PRODUCTION REDESIGN) ================= -->
+<div class="card front">
+
+    <div class="watermark"></div>
+
+    <!-- HEADER -->
+    <div class="top-bar">
+        <img src="{{ url_for('static', filename='logo.png') }}" class="logo">
+        <div class="company-text">
+            <h2>OKOYA FOOD COMPANY LIMITED</h2>
+            <p>STAFF IDENTIFICATION CARD</p>
+        </div>
+    </div>
+
+    <!-- BODY GRID -->
+    <div class="front-body">
+
+        <!-- PHOTO -->
+        <div class="photo-box">
+            <img src="{{ passport_url if passport_url else url_for('static', filename='default.png') }}">
+        </div>
+
+        <!-- DETAILS -->
+        <div class="details-box">
+            <div class="row"><span>ID:</span> {{ worker.worker_code }}</div>
+            <div class="row"><span>Name:</span> {{ worker.name }}</div>
+            <div class="row"><span>Position:</span> {{ worker.position }}</div>
+            <div class="row"><span>Phone:</span> {{ worker.phone_number }}</div>
+
+            <div class="status">
+                <span class="{{ 'active' if worker.is_active else 'inactive' }}">
+                    {{ "ACTIVE" if worker.is_active else "INACTIVE" }}
+                </span>
+            </div>
+        </div>
+
+        <!-- QR -->
+        <div class="qr-box">
+            <img src="data:image/png;base64,{{ qr_code }}">
+            <small>Scan Verify</small>
+        </div>
+
+    </div>
+
+    <!-- FOOTER -->
+    <div class="address">
+        KM 7 Idi APA Community, Saki, Oyo State, Nigeria
+    </div>
+
+</div>
+
+<!-- ================= BACK CARD ================= -->
+<div class="card back">
+
+    <div class="watermark"></div>
+
+    <h3>IMPORTANT NOTICE</h3>
+
+    <p>
+        If this ID card is found, kindly return it to the nearest police station
+        or contact OKOYA FOOD COMPANY LIMITED immediately.
+    </p>
+
+    <p>
+        This card remains the property of OKOYA FOOD COMPANY LIMITED.
+        Unauthorized use or duplication is strictly prohibited.
+    </p>
+
+    <div class="contact">
+        <p><strong>Company Address:</strong></p>
+        <p>KM 7 Idi APA Community, Saki, Oyo State, Nigeria</p>
+    </div>
+
+    <div class="signature">
+        <div>
+            ____________________<br>
+            HR Manager
+        </div>
+
+        <div>
+            ____________________<br>
+            Managing Director
+        </div>
+    </div>
+
+</div>
+
+<!-- ================= PRINT BUTTON ================= -->
+<div class="actions">
+    <button onclick="openPrintModal()">🖨 Print ID Card</button>
+</div>
+
+<!-- ================= PRINT MODAL ================= -->
+<div id="printModal" class="print-modal">
+    <div class="modal-box">
+        <h3>Select Print Side</h3>
+
+        <button onclick="printSide('front')">Front Only</button>
+        <button onclick="printSide('back')">Back Only</button>
+
+        <button onclick="closePrintModal()" class="cancel">Cancel</button>
+    </div>
+</div>
+
+<style>
+
+body{
+    background:#eef2f7;
+    font-family:Arial;
+}
+
+.id-page{
+    max-width:900px;
+    margin:auto;
+    padding:30px;
+}
+
+/* CARD COMMON */
+/* ===== PRODUCTION CARD SIZE (CR80 STANDARD) ===== */
+.card{
+    width: 3.37in;
+    height: 2.12in;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+/* ===== HEADER ===== */
+.top-bar{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:6px 10px;
+    background:#0f5132;
+    color:white;
+}
+
+.logo{
+    width:35px;
+    height:35px;
+    background:white;
+    padding:2px;
+    border-radius:6px;
+}
+
+.company-text h2{
+    font-size:11px;
+    margin:0;
+    line-height:1.2;
+}
+
+.company-text p{
+    font-size:9px;
+    margin:0;
+    opacity:0.9;
+}
+
+/* ===== BODY GRID (PROFESSIONAL LAYOUT) ===== */
+.front-body{
+    display:grid;
+    grid-template-columns: 0.9fr 1.4fr 0.7fr;
+    gap:6px;
+    padding:8px;
+    align-items:center;
+}
+
+/* PHOTO */
+.photo-box img{
+    width:70px;
+    height:85px;
+    object-fit:cover;
+    border-radius:6px;
+    border:1.5px solid #ccc;
+}
+
+/* DETAILS */
+.details-box{
+    font-size:9.5px;
+    line-height:1.6;
+}
+
+.details-box .row{
+    display:flex;
+    justify-content:space-between;
+    border-bottom:1px dotted #ddd;
+    padding:1px 0;
+}
+
+.details-box span{
+    font-weight:bold;
+}
+
+/* STATUS */
+.status{
+    margin-top:4px;
+}
+
+.status span{
+    font-size:9px;
+    padding:2px 6px;
+    border-radius:4px;
+    font-weight:bold;
+}
+
+.status .active{
+    background:#d1e7dd;
+    color:#0f5132;
+}
+
+.status .inactive{
+    background:#f8d7da;
+    color:#842029;
+}
+
+/* QR */
+.qr-box{
+    text-align:center;
+}
+
+.qr-box img{
+    width:55px;
+    height:55px;
+}
+
+.qr-box small{
+    font-size:8px;
+}
+
+/* FOOTER */
+.address{
+    position:absolute;
+    bottom:0;
+    width:100%;
+    background:#0f5132;
+    color:white;
+    font-size:8px;
+    text-align:center;
+    padding:3px;
+}
+
+/* WATERMARK LOGO */
+.watermark{
+    position:absolute;
+    width:200px;
+    height:200px;
+    background:url("{{ url_for('static', filename='logo.png') }}") no-repeat center;
+    background-size:contain;
+    opacity:0.05;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+}
+
+/* FRONT */
+.top-bar{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:10px;
+    background:#0f5132;
+    color:white;
+}
+
+.logo{
+    width:45px;
+    height:45px;
+    background:white;
+    padding:3px;
+    border-radius:8px;
+}
+
+.body{
+    display:flex;
+    padding:10px;
+    gap:10px;
+}
+
+.photo img{
+    width:80px;
+    height:95px;
+    object-fit:cover;
+    border-radius:8px;
+    border:2px solid #ccc;
+}
+
+.info{
+    font-size:12px;
+    line-height:1.6;
+}
+
+.qr{
+    text-align:center;
+    font-size:10px;
+}
+
+.qr img{
+    width:70px;
+    height:70px;
+}
+
+.address{
+    position:absolute;
+    bottom:0;
+    width:100%;
+    background:#0f5132;
+    color:white;
+    font-size:10px;
+    text-align:center;
+    padding:5px;
+}
+
+/* BACK */
+.back{
+    padding:15px;
+    text-align:center;
+}
+
+.back h3{
+    color:#0f5132;
+}
+
+.back p{
+    font-size:12px;
+    line-height:1.5;
+}
+
+.contact{
+    margin-top:10px;
+    font-size:11px;
+}
+
+.signature{
+    display:flex;
+    justify-content:space-between;
+    margin-top:20px;
+    font-size:11px;
+}
+
+/* PRINT */
+.actions{
+    text-align:center;
+    margin-top:20px;
+}
+
+.actions button{
+    padding:10px 18px;
+    background:#0f5132;
+    color:white;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+@media print {
+
+    @page {
+        size: auto;
+        margin: 0;
+    }
+
+    body {
+        background: white !important;
+        margin: 0;
+        padding: 0;
+    }
+
+    .actions,
+    .print-modal {
+        display: none !important;
+    }
+
+    /* Hide everything by default */
+    .card {
+        display: none !important;
+    }
+
+    /* =========================
+       CR80 ID CARD SIZE FIX
+       ========================= */
+    .card {
+        width: 85.6mm !important;   /* standard ID card width */
+        height: 54mm !important;    /* standard ID card height */
+        box-shadow: none !important;
+        border-radius: 4px !important;
+        overflow: hidden;
+        page-break-inside: avoid;
+    }
+
+    /* CENTER CARD ON PAGE */
+    body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    /* FRONT ONLY */
+    body[data-print="front"] .front {
+        display: block !important;
+    }
+
+    /* BACK ONLY */
+    body[data-print="back"] .back {
+        display: block !important;
+    }
+
+    /* FULL PRINT (both pages) */
+    body[data-print="all"] .front,
+    body[data-print="all"] .back {
+        display: block !important;
+    }
+
+    /* Ensure no overlap issues */
+    .front, .back {
+        margin: 0 auto !important;
+    }
+}
+
+.print-modal{
+    display:none;
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.6);
+    justify-content:center;
+    align-items:center;
+}
+
+.modal-box{
+    background:white;
+    padding:20px;
+    border-radius:10px;
+    text-align:center;
+    width:250px;
+}
+
+.modal-box button{
+    display:block;
+    width:100%;
+    margin:10px 0;
+    padding:10px;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+    background:#0f5132;
+    color:white;
+}
+
+.modal-box .cancel{
+    background:#999;
+}
+
+/* ================= PRINT MODE CONTROL ================= */
+
+/* Default show both */
+body[data-print="front"] .back {
+    display: none !important;
+}
+
+body[data-print="back"] .front {
+    display: none !important;
+}
+
+/* A4 mode override */
+@media print {
+    body[data-print="front"] .back {
+        display: none !important;
+    }
+
+    body[data-print="back"] .front {
+        display: none !important;
+    }
+}
+
+</style>
+
+<script>
+function openPrintModal() {
+    document.getElementById("printModal").style.display = "flex";
+}
+
+function closePrintModal() {
+    document.getElementById("printModal").style.display = "none";
+}
+
+function printSide(side) {
+
+    document.body.setAttribute("data-print", side);
+
+    closePrintModal();
+
+    setTimeout(() => {
+        window.print();
+
+        // reset after printing
+        setTimeout(() => {
+            document.body.removeAttribute("data-print");
+        }, 500);
+
+    }, 200);
+}
+</script>
+
+{% endblock %}

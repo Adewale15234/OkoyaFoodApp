@@ -1,183 +1,349 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<!-- Sticky Header -->
-<div class="sticky-header">
-    <h1>Edit Worker Details</h1>
-    <a href="{{ url_for('workers_name') }}" class="back-link">← Back to Registered Workers</a>
+
+<!-- ================= STICKY HEADER ================= -->
+<div class="sticky-header upgrade-header">
+
+    <div class="header-left">
+        <h1>👤 Edit Worker Profile</h1>
+        <p>Update staff information securely</p>
+    </div>
+
+    <div class="header-right">
+        <a href="{{ url_for('workers_name') }}" class="back-link">
+            ← Back to Workers
+        </a>
+    </div>
+
 </div>
 
-<!-- Form Container -->
-<div class="register-container">
-    <form method="POST" class="register-form">
-        <div class="form-grid">
-            <div><label>Name:</label><input type="text" name="name" value="{{ worker.name }}" class="green-input" required></div>
-            <div><label>Phone:</label><input type="text" name="phone_number" value="{{ worker.phone_number }}" class="green-input" required></div>
-            <div><label>Date of Birth:</label><input type="date" name="date_of_birth" value="{{ worker.date_of_birth.strftime('%Y-%m-%d') }}" required></div>
-            <div><label>Gender:</label><input type="text" name="gender" value="{{ worker.gender }}" required></div>
-            <div><label>Email:</label><input type="email" name="email" value="{{ worker.email }}" required></div>
-            <div><label>Qualifications:</label><input type="text" name="qualifications" value="{{ worker.qualifications }}" required></div>
-            <div><label>Position:</label><input type="text" name="position" value="{{ worker.position }}" required></div>
-            <div><label>Amount of Salary:</label><input type="number" name="amount_of_salary" value="{{ worker.amount_of_salary }}" required></div>
-            <div><label>Date of Employment:</label><input type="date" name="date_of_employment" value="{{ worker.date_of_employment.strftime('%Y-%m-%d') }}" required></div>
-            <div><label>Guarantor:</label><input type="text" name="guarantor" value="{{ worker.guarantor }}" required></div>
-            <div><label>National ID:</label><input type="text" name="national_id" value="{{ worker.national_id }}" required></div>
-            <div><label>Nationality:</label><input type="text" name="nationality" value="{{ worker.nationality }}" required></div>
-            <div><label>Ethnic Group:</label><input type="text" name="ethnic_group" value="{{ worker.ethnic_group }}" required></div>
-            <div><label>Disability:</label><input type="text" name="disability" value="{{ worker.disability }}"></div>
-            <div><label>Home Address:</label><input type="text" name="home_address" value="{{ worker.home_address }}" required></div>
-            <div><label>Place of Residence:</label><input type="text" name="place_of_residence" value="{{ worker.place_of_residence }}" required></div>
-            <div><label>Bank Account Name:</label><input type="text" name="bank_account_name" value="{{ worker.bank_account_name }}" required></div>
-            <div><label>Bank Name:</label><input type="text" name="bank_name" value="{{ worker.bank_name }}" required></div>
-            <div><label>Bank Account:</label><input type="number" name="bank_account" value="{{ worker.bank_account }}" required></div>
+<!-- ================= PAGE WRAPPER ================= -->
+<div class="edit-wrapper">
+
+    <!-- ================= FORM CARD ================= -->
+    <div class="edit-card">
+
+        <!-- ================= PASSPORT PREVIEW ================= -->
+        <div class="passport-section">
+
+            <div class="passport-box">
+                <img src="{{ url_for('static', filename='uploads/' ~ worker.passport) if worker.passport else url_for('static', filename='default.png') }}"
+                     id="passportPreview"
+                     alt="Passport Photo">
+            </div>
+
+            <form method="POST" enctype="multipart/form-data" class="edit-form">
+
+    <div class="passport-section">
+
+        <div class="passport-box">
+            <img src="{{ url_for('static', filename='uploads/' ~ worker.passport) if worker.passport else url_for('static', filename='default.png') }}?v={{ worker.id }}"
+                 id="passportPreview">
         </div>
 
-        <div class="form-submit">
-            <input type="submit" value="Update Worker">
+        <div class="passport-upload">
+            <label>Update Passport Photo</label>
+            <input type="file" id="passportInput" name="passport" accept="image/*">
         </div>
-    </form>
+
+    </div>
+
+            <!-- ===== BASIC INFO ===== -->
+            <div class="section-title">Basic Information</div>
+
+            <div class="grid">
+
+                <div>
+                    <label>Name</label>
+                    <input type="text" name="name" value="{{ worker.name }}" required>
+                </div>
+
+                <div>
+                    <label>Phone</label>
+                    <input type="text" name="phone_number" value="{{ worker.phone_number }}" required>
+                </div>
+
+                <div>
+                    <label>Email</label>
+                    <input type="email" name="email" value="{{ worker.email }}">
+                </div>
+
+                <div>
+                    <label>Gender</label>
+                    <input type="text" name="gender" value="{{ worker.gender }}">
+                </div>
+
+            </div>
+
+            <!-- ===== EMPLOYMENT ===== -->
+            <div class="section-title">Employment Details</div>
+
+            <div class="grid">
+
+                <div>
+                    <label>Position</label>
+                    <input type="text" name="position" value="{{ worker.position }}">
+                </div>
+
+                <div>
+                    <label>Salary</label>
+                    <input type="number" name="amount_of_salary" value="{{ worker.amount_of_salary }}">
+                </div>
+
+                <div>
+                    <label>Date of Employment</label>
+                    <input type="date" name="date_of_employment"
+                           value="{{ worker.date_of_employment.strftime('%Y-%m-%d') }}">
+                </div>
+
+                <div>
+                    <label>Qualifications</label>
+                    <input type="text" name="qualifications" value="{{ worker.qualifications }}">
+                </div>
+
+            </div>
+
+            <!-- ===== PERSONAL INFO ===== -->
+            <div class="section-title">Personal Information</div>
+
+            <div class="grid">
+
+                <div>
+                    <label>Date of Birth</label>
+                    <input type="date" name="date_of_birth"
+                           value="{{ worker.date_of_birth.strftime('%Y-%m-%d') }}">
+                </div>
+
+                <div>
+                    <label>Nationality</label>
+                    <input type="text" name="nationality" value="{{ worker.nationality }}">
+                </div>
+
+                <div>
+                    <label>Ethnic Group</label>
+                    <input type="text" name="ethnic_group" value="{{ worker.ethnic_group }}">
+                </div>
+
+                <div>
+                    <label>Disability</label>
+                    <input type="text" name="disability" value="{{ worker.disability }}">
+                </div>
+
+            </div>
+
+            <!-- ===== ADDRESS ===== -->
+            <div class="section-title">Address Information</div>
+
+            <div class="grid">
+
+                <div>
+                    <label>Home Address</label>
+                    <input type="text" name="home_address" value="{{ worker.home_address }}">
+                </div>
+
+                <div>
+                    <label>Place of Residence</label>
+                    <input type="text" name="place_of_residence" value="{{ worker.place_of_residence }}">
+                </div>
+
+            </div>
+
+            <!-- ===== BANK DETAILS ===== -->
+            <div class="section-title">Bank Details</div>
+
+            <div class="grid">
+
+                <div>
+                    <label>Bank Name</label>
+                    <input type="text" name="bank_name" value="{{ worker.bank_name }}">
+                </div>
+
+                <div>
+                    <label>Account Name</label>
+                    <input type="text" name="bank_account_name" value="{{ worker.bank_account_name }}">
+                </div>
+
+                <div>
+                    <label>Account Number</label>
+                    <input type="number" name="bank_account" value="{{ worker.bank_account }}">
+                </div>
+
+                <div>
+                    <label>National ID</label>
+                    <input type="text" name="national_id" value="{{ worker.national_id }}">
+                </div>
+
+            </div>
+
+            <!-- ===== GUARDIAN ===== -->
+            <div class="section-title">Emergency / Guarantor</div>
+
+            <div class="grid">
+
+                <div>
+                    <label>Guarantor</label>
+                    <input type="text" name="guarantor" value="{{ worker.guarantor }}">
+                </div>
+
+            </div>
+
+            <!-- ================= SAVE BAR ================= -->
+            <div class="save-bar">
+
+                <button type="submit" class="save-btn">
+                    💾 Save Changes
+                </button>
+
+                <a href="{{ url_for('workers_name') }}" class="cancel-btn">
+                    Cancel
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+
 </div>
 
-<!-- Custom CSS -->
+<!-- ================= STYLES ================= -->
 <style>
-/* Reset page spacing */
+
 body {
-    margin: 0;
-    padding: 0;
-    overflow-x: hidden;
-    font-family: 'Poppins', sans-serif;
+    background: #f4f7fb;
+    font-family: Arial, sans-serif;
 }
 
-/* Sticky header */
-.sticky-header {
+/* HEADER */
+.upgrade-header {
     position: sticky;
     top: 0;
-    width: 100%;
     background: #004080;
-    color: #fff;
+    color: white;
     padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
     z-index: 1000;
+}
+
+.upgrade-header h1 {
+    margin: 0;
+    font-size: 1.4rem;
+}
+
+.back-link {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+/* WRAPPER */
+.edit-wrapper {
+    max-width: 1100px;
+    margin: auto;
+    padding: 20px;
+}
+
+/* CARD */
+.edit-card {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+/* PASSPORT */
+.passport-section {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    flex-wrap: wrap;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-    box-sizing: border-box;
+    margin-bottom: 25px;
 }
 
-/* Header content */
-.sticky-header h1 {
-    margin: 0;
-    font-size: 1.8rem;
+.passport-box img {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 2px solid #004080;
 }
 
-.sticky-header .back-link {
-    color: #fff;
+/* SECTION TITLE */
+.section-title {
+    margin-top: 25px;
     font-weight: bold;
+    color: #004080;
+    border-left: 5px solid #004080;
+    padding-left: 10px;
+}
+
+/* GRID */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-top: 10px;
+}
+
+label {
+    font-weight: bold;
+    font-size: 0.85rem;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+
+/* SAVE BAR */
+.save-bar {
+    margin-top: 30px;
+    display: flex;
+    gap: 10px;
+}
+
+.save-btn {
+    background: green;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.cancel-btn {
+    background: #dc2626;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
     text-decoration: none;
 }
 
-.sticky-header .back-link:hover {
-    text-decoration: underline;
-}
-
-/* Form container */
-.register-container {
-    margin-top: 90px; /* ensures form starts clearly below sticky header */
-    max-width: 1000px;
-    margin-left: auto;
-    margin-right: auto;
-    padding: 25px;
-    border-radius: 10px;
-    background: #ffffff;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    overflow-y: auto;
-    min-height: calc(100vh - 90px); /* ensures it stretches full height below header */
-}
-
-/* Form grid */
-.form-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 20px 40px;
-    margin-bottom: 20px;
-}
-
-.form-grid label {
-    display: block;
-    font-weight: 600;
-    margin-bottom: 4px;
-    color: #004080;
-}
-
-.form-grid input {
-    border: none;
-    border-bottom: 2px solid #004080;
-    width: 100%;
-    padding: 6px 5px;
-    background: transparent;
-    outline: none;
-    color: #000;
-    font-weight: 500;
-    transition: border-color 0.3s;
-}
-
-.form-grid input:focus {
-    border-color: #0a8a43;
-}
-
-.form-grid input.green-input {
-    color: green;
-}
-
-/* Submit button */
-.form-submit {
-    text-align: center;
-    margin-top: 25px;
-}
-
-.form-submit input {
-    padding: 12px 30px;
-    font-size: 16px;
-    font-weight: 600;
-    background: #004080;
-    color: #fff;
-    border: none;
-    cursor: pointer;
-    border-radius: 8px;
-    transition: background 0.3s ease, transform 0.2s;
-}
-
-.form-submit input:hover {
-    background: #0066cc;
-    transform: scale(1.05);
-}
-
-/* Mobile responsiveness */
-@media (max-width: 768px) {
-    .sticky-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
-    }
-
-    .register-container {
-        margin-top: 120px; /* slightly more space on mobile */
-        padding: 15px;
-    }
-
-    .form-grid {
+/* MOBILE */
+@media(max-width:768px){
+    .grid {
         grid-template-columns: 1fr;
     }
-}
 
-/* Landscape orientation fix */
-@media screen and (orientation: landscape) {
-    .register-container {
-        max-height: calc(100vh - 90px);
-        overflow-y: auto; /* enable vertical scrolling if fields overflow */
-        padding-bottom: 30px;
+    .passport-section {
+        flex-direction: column;
+        gap: 10px;
     }
 }
+
 </style>
+
+<!-- ================= JS ================= -->
+<script>
+document.getElementById('passportInput').addEventListener('change', function(e){
+    const file = e.target.files[0];
+    if(file){
+        document.getElementById('passportPreview').src = URL.createObjectURL(file);
+    }
+});
+</script>
+
 {% endblock %}
