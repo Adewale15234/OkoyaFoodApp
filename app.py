@@ -9,7 +9,6 @@ from sqlalchemy import func
 from io import BytesIO
 from backup_manager import create_backup
 import os
-import pandas as pd
 import logging
 import psycopg2
 import uuid
@@ -1165,30 +1164,39 @@ def export_all_orders():
 
     orders = Order.query.order_by(Order.created_at.desc()).all()
 
-    data = []
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "All Orders"
+
+    ws.append([
+        "Client Name", "Email", "Phone", "Item",
+        "Description", "Kilograms", "Unit Price",
+        "Total", "Driver", "Vehicle",
+        "Account Number", "Bank", "Date",
+        "Status", "Created At"
+    ])
+
     for order in orders:
-        data.append({
-            "Client Name": order.name,
-            "Email": order.email,
-            "Phone": order.phone_number,
-            "Item": order.items,
-            "Description": order.description,
-            "Kilograms": order.kilograms,
-            "Unit Price": order.unit_price,
-            "Total": order.total_amount,
-            "Driver": order.driver_name,
-            "Vehicle": order.vehicle_plate_number,
-            "Account Number": order.account_number,
-            "Bank": order.account_bank_name,
-            "Date": order.date_needed,
-            "Status": order.status,
-            "Created At": order.created_at.strftime('%Y-%m-%d %H:%M')
-        })
+        ws.append([
+            order.name,
+            order.email,
+            order.phone_number,
+            order.items,
+            order.description,
+            order.kilograms,
+            order.unit_price,
+            order.total_amount,
+            order.driver_name,
+            order.vehicle_plate_number,
+            order.account_number,
+            order.account_bank_name,
+            str(order.date_needed) if order.date_needed else "",
+            order.status,
+            order.created_at.strftime('%Y-%m-%d %H:%M') if order.created_at else ""
+        ])
 
-    df = pd.DataFrame(data)
-
-    output = io.BytesIO()
-    df.to_excel(output, index=False)
+    output = BytesIO()
+    wb.save(output)
     output.seek(0)
 
     return send_file(
