@@ -130,6 +130,7 @@ input, select, textarea {
     outline: none;
     font-size: 14px;
     box-sizing: border-box;
+    background: #fff;
 }
 
 textarea {
@@ -216,34 +217,34 @@ input:focus, select:focus, textarea:focus {
     display: none;
 }
 
-.print-summary.summary-grid {
+.print-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 10px 20px;
     margin-top: 15px;
 }
 
-.print-summary.summary-item {
-    margin-bottom: 10px;
+.print-field {
     break-inside: avoid;
     page-break-inside: avoid;
 }
 
-.print-summary.summary-label {
+.print-label {
     font-weight: bold;
-    font-size: 10pt;
+    font-size: 11pt;
     color: #111;
     margin-bottom: 3px;
 }
 
-.print-summary.summary-value {
-    font-size: 10pt;
-    color: #000;
-    padding: 6px;
+.print-value {
+    width: 100%;
+    padding: 6px 8px;
     border: 1px solid #bbb;
     border-radius: 6px;
-    min-height: 20px;
-    background: #f9fbfd;
+    font-size: 11pt;
+    background: #fff;
+    min-height: 22px;
+    box-sizing: border-box;
 }
 
 .print-success {
@@ -269,7 +270,6 @@ input:focus, select:focus, textarea:focus {
     html, body {
         width: 100%;
         height: auto;
-        overflow: visible;
         background: white;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
@@ -289,19 +289,19 @@ input:focus, select:focus, textarea:focus {
 .register-container {
         width: 100%;
         max-width: 210mm;
-        margin: 0 auto;
+        margin: 0;
         padding: 0;
         box-shadow: none;
         border: none;
         border-radius: 0;
+        background: white;
     }
 
 .official-header-row {
         border-bottom: 1px solid #000;
         padding-bottom: 8px;
-        margin-bottom: 8px;
+        margin-bottom: 10px;
         break-inside: avoid;
-        page-break-inside: avoid;
     }
 
 .company-logo img,
@@ -312,27 +312,30 @@ input:focus, select:focus, textarea:focus {
 
 .company-name {
         font-size: 14pt;
-        margin: 0;
+        color: #000;
     }
 
 .company-motto {
         font-size: 8pt;
-        margin: 2px 0;
+        color: #000;
     }
 
 .company-address {
         font-size: 7pt;
+        background: #000;
+        color: #fff;
         padding: 3px 6px;
     }
 
 h3 {
         font-size: 10pt;
         margin: 4px 0;
+        color: #000;
     }
 
 .form-section-title {
         grid-column: span 2;
-        font-size: 10pt;
+        font-size: 11pt;
         color: #000;
         border-left: 2px solid #000;
         margin-top: 12px;
@@ -342,23 +345,23 @@ h3 {
         page-break-after: avoid;
     }
 
-.print-summary.summary-grid {
+.print-grid {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
         gap: 8px 18px;
     }
 
-.print-summary.summary-value {
+.print-value {
+        background: #fff;
         border: 1px solid #999;
-        background: white;
-        padding: 4px 6px;
+        padding: 5px 7px;
     }
 }
 
 /* Responsive */
 @media (max-width: 900px) {
 .form-grid,
-.print-summary.summary-grid {
+.print-grid {
         grid-template-columns: repeat(2, 1fr);
     }
 .form-section-title {
@@ -368,7 +371,7 @@ h3 {
 
 @media (max-width: 600px) {
 .form-grid,
-.print-summary.summary-grid {
+.print-grid {
         grid-template-columns: 1fr;
     }
 .form-section-title {
@@ -435,88 +438,88 @@ h3 {
 
     <div class="form-section-title">Registered Worker Information</div>
 
-    <div class="summary-grid">
-        <div class="summary-item">
-            <div class="summary-label">Full Name</div>
-            <div class="summary-value">{{ worker.name }}</div>
+    <div class="print-grid">
+        <div class="print-field">
+            <div class="print-label">Full Name</div>
+            <div class="print-value">{{ worker.name }}</div>
         </div>
-        <div class="summary-item">
-            <div class="summary-label">Phone Number</div>
-            <div class="summary-value">{{ worker.phone_number }}</div>
+        <div class="print-field">
+            <div class="print-label">Phone Number</div>
+            <div class="print-value">{{ worker.phone_number }}</div>
         </div>
-        <div class="summary-item">
-            <div class="summary-label">Email</div>
-            <div class="summary-value">{{ worker.email }}</div>
+        <div class="print-field">
+            <div class="print-label">Email</div>
+            <div class="print-value">{{ worker.email }}</div>
         </div>
-        <div class="summary-item">
-            <div class="summary-label">Date of Birth</div>
-            <div class="summary-value">{{ worker.date_of_birth }}</div>
+        <div class="print-field">
+            <div class="print-label">Date of Birth</div>
+            <div class="print-value">{{ worker.date_of_birth }}</div>
         </div>
-        <div class="summary-item">
-            <div class="summary-label">Gender</div>
-            <div class="summary-value">{{ worker.gender }}</div>
+        <div class="print-field">
+            <div class="print-label">Gender</div>
+            <div class="print-value">{{ worker.gender }}</div>
         </div>
-        <div class="summary-item">
-            <div class="summary-label">Nationality</div>
-            <div class="summary-value">{{ worker.nationality }}</div>
+        <div class="print-field">
+            <div class="print-label">Nationality</div>
+            <div class="print-value">{{ worker.nationality }}</div>
         </div>
-        <div class="summary-item">
-            <div class="summary-label">Ethnic Group</div>
-            <div class="summary-value">{{ worker.ethnic_group or '-' }}</div>
+        <div class="print-field">
+            <div class="print-label">Ethnic Group</div>
+            <div class="print-value">{{ worker.ethnic_group or '-' }}</div>
         </div>
-        <div class="summary-item">
-            <div class="summary-label">Home Address</div>
-            <div class="summary-value">{{ worker.home_address }}</div>
+        <div class="print-field">
+            <div class="print-label">Home Address</div>
+            <div class="print-value">{{ worker.home_address }}</div>
         </div>
-        <div class="summary-item">
-            <div class="summary-label">Place of Residence</div>
-            <div class="summary-value">{{ worker.place_of_residence }}</div>
+        <div class="print-field">
+            <div class="print-label">Place of Residence</div>
+            <div class="print-value">{{ worker.place_of_residence }}</div>
         </div>
-        <div class="summary-item">
-            <div class="summary-label">Disability</div>
-            <div class="summary-value">{{ worker.disability or 'None' }}</div>
+        <div class="print-field">
+            <div class="print-label">Disability</div>
+            <div class="print-value">{{ worker.disability or 'None' }}</div>
         </div>
-        <div class="summary-item">
-            <div class="summary-label">National ID / NIN</div>
-            <div class="summary-value">{{ worker.national_id }}</div>
+        <div class="print-field">
+            <div class="print-label">National ID / NIN</div>
+            <div class="print-value">{{ worker.national_id }}</div>
         </div>
-        <div class="summary-item">
-            <div class="summary-label">Qualifications</div>
-            <div class="summary-value">{{ worker.qualifications }}</div>
+        <div class="print-field">
+            <div class="print-label">Qualifications</div>
+            <div class="print-value">{{ worker.qualifications }}</div>
         </div>
-        <div class="summary-item">
-            <div class="summary-label">Guarantor Name</div>
-            <div class="summary-value">{{ worker.guarantor }}</div>
+        <div class="print-field">
+            <div class="print-label">Guarantor Name</div>
+            <div class="print-value">{{ worker.guarantor }}</div>
         </div>
-        <div class="summary-item">
-            <div class="summary-label">Position</div>
-            <div class="summary-value">{{ worker.position }}</div>
+        <div class="print-field">
+            <div class="print-label">Position</div>
+            <div class="print-value">{{ worker.position }}</div>
         </div>
-        <div class="summary-item">
-            <div class="summary-label">Monthly Salary</div>
-            <div class="summary-value">₦{{ "{:,.2f}".format(worker.amount_of_salary) }}</div>
+        <div class="print-field">
+            <div class="print-label">Monthly Salary</div>
+            <div class="print-value">₦{{ "{:,.2f}".format(worker.amount_of_salary) }}</div>
         </div>
-        <div class="summary-item">
-            <div class="summary-label">Date of Employment</div>
-            <div class="summary-value">{{ worker.date_of_employment }}</div>
+        <div class="print-field">
+            <div class="print-label">Date of Employment</div>
+            <div class="print-value">{{ worker.date_of_employment }}</div>
         </div>
-        <div class="summary-item">
-            <div class="summary-label">Bank Name</div>
-            <div class="summary-value">{{ worker.bank_name or '-' }}</div>
+        <div class="print-field">
+            <div class="print-label">Bank Name</div>
+            <div class="print-value">{{ worker.bank_name or '-' }}</div>
         </div>
-        <div class="summary-item">
-            <div class="summary-label">Account Number</div>
-            <div class="summary-value">{{ worker.bank_account or '-' }}</div>
+        <div class="print-field">
+            <div class="print-label">Account Number</div>
+            <div class="print-value">{{ worker.bank_account or '-' }}</div>
         </div>
-        <div class="summary-item">
-            <div class="summary-label">Account Name</div>
-            <div class="summary-value">{{ worker.bank_account_name or '-' }}</div>
+        <div class="print-field">
+            <div class="print-label">Account Name</div>
+            <div class="print-value">{{ worker.bank_account_name or '-' }}</div>
         </div>
     </div>
 
     {% else %}
     <div class="form-section-title">Worker Registration Details</div>
-    <div class="summary-grid" id="summaryGrid">
+    <div class="print-grid" id="printGrid">
     </div>
     {% endif %}
 
@@ -665,7 +668,7 @@ h3 {
 <!-- ================= SCRIPT ================= -->
 <script>
 // PASSPORT PREVIEW
-document.getElementById('passport').addEventListener('change', function(e){
+document.getElementById('passport')?.addEventListener('change', function(e){
     const file = e.target.files[0];
     if(file){
         if(file.size > 5 * 1024 * 1024) {
@@ -678,7 +681,7 @@ document.getElementById('passport').addEventListener('change', function(e){
 });
 
 // AGE CALCULATION
-document.getElementById('dob').addEventListener('change', function(){
+document.getElementById('dob')?.addEventListener('change', function(){
     let dob = new Date(this.value);
     if(!isNaN(dob)) {
         let today = new Date();
@@ -692,7 +695,7 @@ document.getElementById('dob').addEventListener('change', function(){
 });
 
 // NIN VALIDATION
-document.getElementById('nin').addEventListener('input', function(){
+document.getElementById('nin')?.addEventListener('input', function(){
     let val = this.value;
     if(val.length === 11 && /^\d+$/.test(val)){
         this.classList.add("valid");
@@ -709,7 +712,7 @@ document.getElementById('nin').addEventListener('input', function(){
 });
 
 // ACCOUNT VALIDATION
-document.getElementById('acc').addEventListener('input', function(){
+document.getElementById('acc')?.addEventListener('input', function(){
     if(this.value.length >= 10 && /^\d+$/.test(this.value)){
         this.style.border = "2px solid green";
     } else if(this.value.length > 0) {
@@ -738,8 +741,8 @@ document.getElementById('printBtn').addEventListener('click', function(e) {
     }
 
     {% if not worker %}
-    const summaryGrid = document.getElementById('summaryGrid');
-    summaryGrid.innerHTML = '';
+    const printGrid = document.getElementById('printGrid');
+    printGrid.innerHTML = '';
 
     const fields = [
         ['Full Name', form.querySelector('[name="name"]').value],
@@ -766,9 +769,9 @@ document.getElementById('printBtn').addEventListener('click', function(e) {
     fields.forEach(([label, value]) => {
         if(value && value.trim()!== '') {
             const item = document.createElement('div');
-            item.className = 'summary-item';
-            item.innerHTML = `<div class="summary-label">${label}</div><div class="summary-value">${value}</div>`;
-            summaryGrid.appendChild(item);
+            item.className = 'print-field';
+            item.innerHTML = `<div class="print-label">${label}</div><div class="print-value">${value}</div>`;
+            printGrid.appendChild(item);
         }
     });
     {% endif %}
