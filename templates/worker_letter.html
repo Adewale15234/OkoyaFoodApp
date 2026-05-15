@@ -403,35 +403,57 @@ body {
 
 /* PRINT */
 @media print {
-    .no-print { display: none !important; }
+    @page {
+        size: A4;
+        margin: 15mm 15mm; /* 15mm all round = no cutting */
+    }
 
     html, body {
         background: white !important;
         margin: 0 !important;
         padding: 0 !important;
         height: auto !important;
+        font-size: 11pt !important;
     }
+
+    .no-print { display: none !important; }
 
     .letter-page {
         padding: 0 !important;
         margin: 0 auto !important;
-        width: 210mm !important;
-        max-width: 210mm !important;
-        min-height: 297mm !important;
+        width: 100% !important;
+        max-width: none !important;
+        min-height: auto !important;
         box-sizing: border-box !important;
     }
 
     .letter-container {
         box-shadow: none !important;
-        padding: 15mm !important;
+        padding: 0 !important;
         margin: 0 !important;
         width: 100% !important;
         background: white !important;
+        border-radius: 0 !important;
+    }
+
+    .company-header img {
+        width: 80px !important;
+        height: 80px !important;
+    }
+
+    .company-header h1 {
+        font-size: 16pt !important;
+    }
+
+    .letter-title {
+        font-size: 13pt !important;
+        margin: 15px 0 !important;
     }
 
     .meta-bar, .info-box, .letter-content {
         background: white !important;
         color: black !important;
+        border: 1px solid #ccc !important;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
     }
@@ -440,6 +462,32 @@ body {
         border-left: 3px solid black !important;
         white-space: pre-wrap !important;
         word-wrap: break-word !important;
+        font-size: 11pt !important;
+        line-height: 1.7 !important;
+        padding: 15px !important;
+    }
+
+    .info-box {
+        padding: 15px !important;
+    }
+
+    .info-box p {
+        font-size: 11pt !important;
+        margin: 5px 0 !important;
+    }
+
+    .worker-passport {
+        width: 90px !important;
+        height: 90px !important;
+    }
+
+    .signature {
+        margin-top: 40px !important;
+    }
+
+    .signature-line {
+        margin-top: 35px !important;
+        width: 180px !important;
     }
 
     .info-box, .letter-content, .signature, .company-header {
@@ -452,11 +500,6 @@ body {
         height: auto !important;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
-    }
-
-    @page {
-        size: A4;
-        margin: 0;
     }
 }
 
