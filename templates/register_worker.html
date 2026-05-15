@@ -219,40 +219,42 @@ input:focus, select:focus, textarea:focus {
 .print-summary.summary-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 6px 18px;
-    margin-top: 10px;
+    gap: 10px 20px;
+    margin-top: 15px;
 }
 
 .print-summary.summary-item {
-    margin-bottom: 4px;
+    margin-bottom: 10px;
     break-inside: avoid;
     page-break-inside: avoid;
 }
 
 .print-summary.summary-label {
     font-weight: bold;
-    font-size: 9pt;
-    color: #000;
+    font-size: 10pt;
+    color: #111;
+    margin-bottom: 3px;
 }
 
 .print-summary.summary-value {
-    font-size: 9pt;
+    font-size: 10pt;
     color: #000;
-    border-bottom: 1px solid #ccc;
-    min-height: 16px;
-    padding-bottom: 1px;
+    padding: 6px;
+    border: 1px solid #bbb;
+    border-radius: 6px;
+    min-height: 20px;
+    background: #f9fbfd;
 }
 
 .print-success {
     background: #d4edda;
     color: #155724;
-    padding: 8px;
+    padding: 10px;
     border-radius: 6px;
     border: 1px solid #c3e6cb;
-    margin-bottom: 12px;
+    margin-bottom: 15px;
     text-align: center;
     font-weight: bold;
-    font-size: 10pt;
 }
 
 /* =========================
@@ -309,20 +311,16 @@ input:focus, select:focus, textarea:focus {
     }
 
 .company-name {
-        color: #000;
         font-size: 14pt;
         margin: 0;
     }
 
 .company-motto {
-        color: #000;
         font-size: 8pt;
         margin: 2px 0;
     }
 
 .company-address {
-        background: #000;
-        color: #fff;
         font-size: 7pt;
         padding: 3px 6px;
     }
@@ -337,8 +335,8 @@ h3 {
         font-size: 10pt;
         color: #000;
         border-left: 2px solid #000;
-        margin-top: 10px;
-        margin-bottom: 4px;
+        margin-top: 12px;
+        margin-bottom: 6px;
         padding-left: 5px;
         break-after: avoid;
         page-break-after: avoid;
@@ -347,13 +345,13 @@ h3 {
 .print-summary.summary-grid {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
-        gap: 5px 15px;
-        margin-top: 8px;
+        gap: 8px 18px;
     }
 
-.print-summary.summary-item {
-        break-inside: avoid;
-        page-break-inside: avoid;
+.print-summary.summary-value {
+        border: 1px solid #999;
+        background: white;
+        padding: 4px 6px;
     }
 }
 
@@ -428,7 +426,7 @@ h3 {
   {% endif %}
 {% endwith %}
 
-<!-- PRINTABLE SUMMARY - SHOWS AFTER SUBMISSION OR BEFORE PRINT -->
+<!-- PRINTABLE SUMMARY -->
 <div class="print-summary" id="printSummary">
     {% if worker %}
     <div class="print-success">
@@ -439,113 +437,80 @@ h3 {
 
     <div class="summary-grid">
         <div class="summary-item">
-            <div class="summary-label">Worker Code</div>
-            <div class="summary-value">{{ worker.worker_code }}</div>
-        </div>
-
-        <div class="summary-item">
             <div class="summary-label">Full Name</div>
             <div class="summary-value">{{ worker.name }}</div>
         </div>
-
         <div class="summary-item">
             <div class="summary-label">Phone Number</div>
             <div class="summary-value">{{ worker.phone_number }}</div>
         </div>
-
         <div class="summary-item">
             <div class="summary-label">Email</div>
             <div class="summary-value">{{ worker.email }}</div>
         </div>
-
         <div class="summary-item">
             <div class="summary-label">Date of Birth</div>
             <div class="summary-value">{{ worker.date_of_birth }}</div>
         </div>
-
         <div class="summary-item">
             <div class="summary-label">Gender</div>
             <div class="summary-value">{{ worker.gender }}</div>
         </div>
-
         <div class="summary-item">
             <div class="summary-label">Nationality</div>
             <div class="summary-value">{{ worker.nationality }}</div>
         </div>
-
         <div class="summary-item">
             <div class="summary-label">Ethnic Group</div>
             <div class="summary-value">{{ worker.ethnic_group or '-' }}</div>
         </div>
-
         <div class="summary-item">
             <div class="summary-label">Home Address</div>
             <div class="summary-value">{{ worker.home_address }}</div>
         </div>
-
         <div class="summary-item">
             <div class="summary-label">Place of Residence</div>
             <div class="summary-value">{{ worker.place_of_residence }}</div>
         </div>
-
         <div class="summary-item">
             <div class="summary-label">Disability</div>
             <div class="summary-value">{{ worker.disability or 'None' }}</div>
         </div>
-
         <div class="summary-item">
             <div class="summary-label">National ID / NIN</div>
             <div class="summary-value">{{ worker.national_id }}</div>
         </div>
-
         <div class="summary-item">
             <div class="summary-label">Qualifications</div>
             <div class="summary-value">{{ worker.qualifications }}</div>
         </div>
-
         <div class="summary-item">
             <div class="summary-label">Guarantor Name</div>
             <div class="summary-value">{{ worker.guarantor }}</div>
         </div>
-
         <div class="summary-item">
             <div class="summary-label">Position</div>
             <div class="summary-value">{{ worker.position }}</div>
         </div>
-
         <div class="summary-item">
             <div class="summary-label">Monthly Salary</div>
             <div class="summary-value">₦{{ "{:,.2f}".format(worker.amount_of_salary) }}</div>
         </div>
-
         <div class="summary-item">
             <div class="summary-label">Date of Employment</div>
             <div class="summary-value">{{ worker.date_of_employment }}</div>
         </div>
-
         <div class="summary-item">
             <div class="summary-label">Bank Name</div>
             <div class="summary-value">{{ worker.bank_name or '-' }}</div>
         </div>
-
         <div class="summary-item">
             <div class="summary-label">Account Number</div>
             <div class="summary-value">{{ worker.bank_account or '-' }}</div>
         </div>
-
         <div class="summary-item">
             <div class="summary-label">Account Name</div>
             <div class="summary-value">{{ worker.bank_account_name or '-' }}</div>
-        </div>
-
-        <div class="summary-item">
-            <div class="summary-label">Status</div>
-            <div class="summary-value">{{ 'Active' if worker.is_active else 'Inactive' }}</div>
-        </div>
-
-        <div class="summary-item">
-            <div class="summary-label">Registration Date</div>
-            <div class="summary-value">{{ worker.created_at.strftime('%d %B %Y') if worker.created_at else '-' }}</div>
         </div>
     </div>
 
@@ -555,7 +520,7 @@ h3 {
     </div>
     {% endif %}
 
-    <div style="margin-top: 25px; text-align: center;">
+    <div style="margin-top: 35px; text-align: center;">
         <p>_________________________ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; _________________________</p>
         <p>HR Manager &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Managing Director</p>
     </div>
@@ -754,7 +719,7 @@ document.getElementById('acc').addEventListener('input', function(){
     }
 });
 
-// PRINT FUNCTION - COPIES FORM VALUES TO PRINT SUMMARY BEFORE PRINTING
+// PRINT FUNCTION
 document.getElementById('printBtn').addEventListener('click', function(e) {
     const form = document.getElementById('registerForm');
     const requiredFields = form.querySelectorAll('input[required], select[required], textarea[required]');
@@ -772,7 +737,6 @@ document.getElementById('printBtn').addEventListener('click', function(e) {
         return;
     }
 
-    // Only build summary from form if we don't have worker data
     {% if not worker %}
     const summaryGrid = document.getElementById('summaryGrid');
     summaryGrid.innerHTML = '';
@@ -809,7 +773,6 @@ document.getElementById('printBtn').addEventListener('click', function(e) {
     });
     {% endif %}
 
-    // Now print
     window.print();
 });
 </script>
