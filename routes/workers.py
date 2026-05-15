@@ -179,7 +179,7 @@ def register_worker():
 
             print(f"[WORKER CREATED] {worker_code} - {name}")
             flash(f"Worker registered successfully! Code: {worker_code}", "success")
-            return redirect(url_for('workers.workers_name', new_id=new_worker.id))
+               return render_template('register_worker.html', worker=new_worker)
 
         except Exception as e:
             db.session.rollback()

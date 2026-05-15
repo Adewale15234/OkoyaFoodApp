@@ -210,6 +210,49 @@ input:focus, select:focus, textarea:focus {
 }
 
 /* =========================
+   PRINTABLE SUMMARY - NEW
+========================= */
+.print-summary {
+    display: none;
+}
+
+.print-summary.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px 20px;
+    margin-top: 15px;
+}
+
+.print-summary.summary-item {
+    margin-bottom: 8px;
+}
+
+.print-summary.summary-label {
+    font-weight: bold;
+    font-size: 10pt;
+    color: #000;
+}
+
+.print-summary.summary-value {
+    font-size: 10pt;
+    color: #000;
+    border-bottom: 1px solid #ccc;
+    min-height: 18px;
+    padding-bottom: 2px;
+}
+
+.print-success {
+    background: #d4edda;
+    color: #155724;
+    padding: 12px;
+    border-radius: 6px;
+    border: 1px solid #c3e6cb;
+    margin-bottom: 20px;
+    text-align: center;
+    font-weight: bold;
+}
+
+/* =========================
    PRINT MODE - A4 FIX
 ========================= */
 @media print {
@@ -227,46 +270,51 @@ input:focus, select:focus, textarea:focus {
         print-color-adjust: exact;
     }
 
-   .back-dashboard,
-   .no-print,
-   .form-submit {
+  .back-dashboard,
+  .no-print,
+  .form-submit,
+   #registerForm {
         display: none!important;
     }
 
-   .register-container {
+  .print-summary {
+        display: block!important;
+    }
+
+  .register-container {
         width: 100%;
-        max-width: 100%;
-        margin: 0;
+        max-width: 210mm;
+        margin: 0 auto;
         padding: 0;
         box-shadow: none;
         border: none;
         border-radius: 0;
     }
 
-   .official-header-row {
+  .official-header-row {
         border-bottom: 2px solid #000;
         padding-bottom: 10px;
         break-inside: avoid;
         page-break-inside: avoid;
     }
 
-   .company-name {
+  .company-name {
         color: #000;
         font-size: 18pt;
     }
 
-   .company-motto {
+  .company-motto {
         color: #000;
         font-size: 10pt;
     }
 
-   .company-address {
+  .company-address {
         background: #000;
         color: #fff;
         font-size: 9pt;
     }
 
-   .info-box {
+  .info-box {
         background: #f5f5f5;
         border-left: 3px solid #000;
         font-size: 10pt;
@@ -274,14 +322,14 @@ input:focus, select:focus, textarea:focus {
         break-inside: avoid;
     }
 
-   .form-grid {
+  .form-grid {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
         gap: 8px 15px;
         margin-top: 15px;
     }
 
-   .form-section-title {
+  .form-section-title {
         grid-column: span 3;
         font-size: 12pt;
         color: #000;
@@ -306,13 +354,15 @@ input:focus, select:focus, textarea:focus {
     }
 
     /* Prevent breaking inside sections */
-   .form-grid > div {
+  .form-grid > div,
+  .summary-grid > div,
+  .print-summary.summary-item {
         break-inside: avoid;
         page-break-inside: avoid;
     }
 
     /* Force page breaks only between sections */
-   .form-section-title {
+  .form-section-title {
         break-before: auto;
         page-break-before: auto;
     }
@@ -329,7 +379,7 @@ input:focus, select:focus, textarea:focus {
     }
 
     /* Passport preview in print */
-   .passport-preview img {
+  .passport-preview img {
         width: 90px;
         height: 90px;
         border: 1px solid #000;
@@ -340,7 +390,8 @@ input:focus, select:focus, textarea:focus {
         break-inside: avoid;
     }
 
-   .form-grid,
+  .form-grid,
+  .summary-grid,
     table,
     tr,
     td {
@@ -351,19 +402,22 @@ input:focus, select:focus, textarea:focus {
 
 /* Responsive */
 @media (max-width: 900px) {
-  .form-grid {
+ .form-grid,
+ .print-summary.summary-grid {
         grid-template-columns: repeat(2, 1fr);
     }
-  .form-section-title {
+ .form-section-title {
         grid-column: span 2;
     }
 }
 
 @media (max-width: 600px) {
-  .form-grid {
+ .form-grid,
+ .print-summary.summary-grid {
+        grid-column: span 1;
         grid-template-columns: 1fr;
     }
-  .form-section-title {
+ .form-section-title {
         grid-column: span 1;
     }
 }
@@ -392,7 +446,11 @@ input:focus, select:focus, textarea:focus {
     </div>
 
     <div class="passport-preview">
+        {% if worker and worker.passport %}
+        <img src="{{ url_for('static', filename='uploads/' ~ worker.passport) }}" alt="Passport">
+        {% else %}
         <img id="passportPreview" alt="Passport Preview">
+        {% endif %}
     </div>
 </div>
 
@@ -413,6 +471,134 @@ input:focus, select:focus, textarea:focus {
     {% endfor %}
   {% endif %}
 {% endwith %}
+
+<!-- PRINTABLE SUMMARY - SHOWS AFTER SUBMISSION -->
+{% if worker %}
+<div class="print-summary">
+    <div class="print-success">
+        ✓ Worker Registered Successfully - Worker Code: {{ worker.worker_code }}
+    </div>
+
+    <div class="form-section-title">Registered Worker Information</div>
+
+    <div class="summary-grid">
+        <div class="summary-item">
+            <div class="summary-label">Worker Code</div>
+            <div class="summary-value">{{ worker.worker_code }}</div>
+        </div>
+
+        <div class="summary-item">
+            <div class="summary-label">Full Name</div>
+            <div class="summary-value">{{ worker.name }}</div>
+        </div>
+
+        <div class="summary-item">
+            <div class="summary-label">Phone Number</div>
+            <div class="summary-value">{{ worker.phone_number }}</div>
+        </div>
+
+        <div class="summary-item">
+            <div class="summary-label">Email</div>
+            <div class="summary-value">{{ worker.email }}</div>
+        </div>
+
+        <div class="summary-item">
+            <div class="summary-label">Date of Birth</div>
+            <div class="summary-value">{{ worker.date_of_birth }}</div>
+        </div>
+
+        <div class="summary-item">
+            <div class="summary-label">Gender</div>
+            <div class="summary-value">{{ worker.gender }}</div>
+        </div>
+
+        <div class="summary-item">
+            <div class="summary-label">Nationality</div>
+            <div class="summary-value">{{ worker.nationality }}</div>
+        </div>
+
+        <div class="summary-item">
+            <div class="summary-label">Ethnic Group</div>
+            <div class="summary-value">{{ worker.ethnic_group or '-' }}</div>
+        </div>
+
+        <div class="summary-item">
+            <div class="summary-label">Home Address</div>
+            <div class="summary-value">{{ worker.home_address }}</div>
+        </div>
+
+        <div class="summary-item">
+            <div class="summary-label">Place of Residence</div>
+            <div class="summary-value">{{ worker.place_of_residence }}</div>
+        </div>
+
+        <div class="summary-item">
+            <div class="summary-label">Disability</div>
+            <div class="summary-value">{{ worker.disability or 'None' }}</div>
+        </div>
+
+        <div class="summary-item">
+            <div class="summary-label">National ID / NIN</div>
+            <div class="summary-value">{{ worker.national_id }}</div>
+        </div>
+
+        <div class="summary-item">
+            <div class="summary-label">Qualifications</div>
+            <div class="summary-value">{{ worker.qualifications }}</div>
+        </div>
+
+        <div class="summary-item">
+            <div class="summary-label">Guarantor Name</div>
+            <div class="summary-value">{{ worker.guarantor }}</div>
+        </div>
+
+        <div class="summary-item">
+            <div class="summary-label">Position</div>
+            <div class="summary-value">{{ worker.position }}</div>
+        </div>
+
+        <div class="summary-item">
+            <div class="summary-label">Monthly Salary</div>
+            <div class="summary-value">₦{{ "{:,.2f}".format(worker.amount_of_salary) }}</div>
+        </div>
+
+        <div class="summary-item">
+            <div class="summary-label">Date of Employment</div>
+            <div class="summary-value">{{ worker.date_of_employment }}</div>
+        </div>
+
+        <div class="summary-item">
+            <div class="summary-label">Bank Name</div>
+            <div class="summary-value">{{ worker.bank_name or '-' }}</div>
+        </div>
+
+        <div class="summary-item">
+            <div class="summary-label">Account Number</div>
+            <div class="summary-value">{{ worker.bank_account or '-' }}</div>
+        </div>
+
+        <div class="summary-item">
+            <div class="summary-label">Account Name</div>
+            <div class="summary-value">{{ worker.bank_account_name or '-' }}</div>
+        </div>
+
+        <div class="summary-item">
+            <div class="summary-label">Status</div>
+            <div class="summary-value">{{ 'Active' if worker.is_active else 'Inactive' }}</div>
+        </div>
+
+        <div class="summary-item">
+            <div class="summary-label">Registration Date</div>
+            <div class="summary-value">{{ worker.created_at.strftime('%d %B %Y') if worker.created_at else '-' }}</div>
+        </div>
+    </div>
+
+    <div style="margin-top: 40px; text-align: center;">
+        <p>_________________________ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; _________________________</p>
+        <p>HR Manager &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Managing Director</p>
+    </div>
+</div>
+{% endif %}
 
 <!-- FORM -->
 <form method="POST" action="{{ url_for('workers.register_worker') }}" enctype="multipart/form-data" id="registerForm">
