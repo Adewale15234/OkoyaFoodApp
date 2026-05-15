@@ -210,7 +210,7 @@ input:focus, select:focus, textarea:focus {
 }
 
 /* =========================
-   PRINTABLE SUMMARY - NEW
+   PRINTABLE SUMMARY
 ========================= */
 .print-summary {
     display: none;
@@ -225,6 +225,8 @@ input:focus, select:focus, textarea:focus {
 
 .print-summary.summary-item {
     margin-bottom: 8px;
+    break-inside: avoid;
+    page-break-inside: avoid;
 }
 
 .print-summary.summary-label {
@@ -270,18 +272,22 @@ input:focus, select:focus, textarea:focus {
         print-color-adjust: exact;
     }
 
-  .back-dashboard,
-  .no-print,
-  .form-submit,
-   #registerForm {
+.back-dashboard,
+.no-print,
+.form-submit {
         display: none!important;
     }
 
-  .print-summary {
+ /* Hide form only if we have worker data to show instead */
+.has-worker #registerForm {
+        display: none!important;
+    }
+
+.print-summary {
         display: block!important;
     }
 
-  .register-container {
+.register-container {
         width: 100%;
         max-width: 210mm;
         margin: 0 auto;
@@ -291,45 +297,30 @@ input:focus, select:focus, textarea:focus {
         border-radius: 0;
     }
 
-  .official-header-row {
+.official-header-row {
         border-bottom: 2px solid #000;
         padding-bottom: 10px;
         break-inside: avoid;
         page-break-inside: avoid;
     }
 
-  .company-name {
+.company-name {
         color: #000;
         font-size: 18pt;
     }
 
-  .company-motto {
+.company-motto {
         color: #000;
         font-size: 10pt;
     }
 
-  .company-address {
+.company-address {
         background: #000;
         color: #fff;
         font-size: 9pt;
     }
 
-  .info-box {
-        background: #f5f5f5;
-        border-left: 3px solid #000;
-        font-size: 10pt;
-        padding: 8px;
-        break-inside: avoid;
-    }
-
-  .form-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 8px 15px;
-        margin-top: 15px;
-    }
-
-  .form-section-title {
+.form-section-title {
         grid-column: span 3;
         font-size: 12pt;
         color: #000;
@@ -340,91 +331,38 @@ input:focus, select:focus, textarea:focus {
         page-break-after: avoid;
     }
 
-    label {
-        font-size: 9pt;
-        color: #000;
-        font-weight: 600;
-    }
-
-    input, select, textarea {
-        font-size: 10pt;
-        border: 1px solid #999;
-        padding: 4px 6px;
-        background: transparent;
-    }
-
-    /* Prevent breaking inside sections */
-  .form-grid > div,
-  .summary-grid > div,
-  .print-summary.summary-item {
-        break-inside: avoid;
-        page-break-inside: avoid;
-    }
-
-    /* Force page breaks only between sections */
-  .form-section-title {
-        break-before: auto;
-        page-break-before: auto;
-    }
-
-    /* Make sure filled values show */
-    input, textarea, select {
-        -webkit-appearance: none;
-        appearance: none;
-    }
-
-    input::placeholder,
-    textarea::placeholder {
-        color: transparent;
-    }
-
-    /* Passport preview in print */
-  .passport-preview img {
-        width: 90px;
-        height: 90px;
-        border: 1px solid #000;
-    }
-
-    /* Ensure table-like layout doesn't split */
-    * {
-        break-inside: avoid;
-    }
-
-  .form-grid,
-  .summary-grid,
-    table,
-    tr,
-    td {
-        break-inside: avoid;
-        page-break-inside: avoid;
+.print-summary.summary-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px 15px;
+        margin-top: 15px;
     }
 }
 
 /* Responsive */
 @media (max-width: 900px) {
- .form-grid,
- .print-summary.summary-grid {
+.form-grid,
+.print-summary.summary-grid {
         grid-template-columns: repeat(2, 1fr);
     }
- .form-section-title {
+.form-section-title {
         grid-column: span 2;
     }
 }
 
 @media (max-width: 600px) {
- .form-grid,
- .print-summary.summary-grid {
-        grid-column: span 1;
+.form-grid,
+.print-summary.summary-grid {
         grid-template-columns: 1fr;
     }
- .form-section-title {
+.form-section-title {
         grid-column: span 1;
     }
 }
 </style>
 </head>
 
-<body>
+<body {% if worker %}class="has-worker"{% endif %}>
 
 <div class="back-dashboard no-print">
     <a href="{{ url_for('admin.admin_dashboard') }}">← Back to Dashboard</a>
@@ -472,9 +410,9 @@ input:focus, select:focus, textarea:focus {
   {% endif %}
 {% endwith %}
 
-<!-- PRINTABLE SUMMARY - SHOWS AFTER SUBMISSION -->
-{% if worker %}
-<div class="print-summary">
+<!-- PRINTABLE SUMMARY - SHOWS AFTER SUBMISSION OR BEFORE PRINT -->
+<div class="print-summary" id="printSummary">
+    {% if worker %}
     <div class="print-success">
         ✓ Worker Registered Successfully - Worker Code: {{ worker.worker_code }}
     </div>
@@ -593,12 +531,17 @@ input:focus, select:focus, textarea:focus {
         </div>
     </div>
 
+    {% else %}
+    <div class="form-section-title">Worker Registration Details</div>
+    <div class="summary-grid" id="summaryGrid">
+    </div>
+    {% endif %}
+
     <div style="margin-top: 40px; text-align: center;">
         <p>_________________________ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; _________________________</p>
         <p>HR Manager &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Managing Director</p>
     </div>
 </div>
-{% endif %}
 
 <!-- FORM -->
 <form method="POST" action="{{ url_for('workers.register_worker') }}" enctype="multipart/form-data" id="registerForm">
@@ -727,7 +670,7 @@ input:focus, select:focus, textarea:focus {
 
 <!-- BUTTONS -->
 <div class="form-submit no-print">
-    <button type="button" onclick="window.print()">Print Form</button>
+    <button type="button" id="printBtn">Print Form</button>
     <button type="submit">Register Worker</button>
     <button type="button" class="btn-cancel" onclick="window.history.back()">Cancel</button>
 </div>
@@ -793,10 +736,12 @@ document.getElementById('acc').addEventListener('input', function(){
     }
 });
 
-// Prevent print if form not filled
-document.querySelector('button[onclick="window.print()"]').addEventListener('click', function(e) {
-    const requiredFields = document.querySelectorAll('input[required], select[required], textarea[required]');
+// PRINT FUNCTION - COPIES FORM VALUES TO PRINT SUMMARY BEFORE PRINTING
+document.getElementById('printBtn').addEventListener('click', function(e) {
+    const form = document.getElementById('registerForm');
+    const requiredFields = form.querySelectorAll('input[required], select[required], textarea[required]');
     let empty = false;
+
     requiredFields.forEach(field => {
         if(!field.value.trim()) {
             field.style.border = '2px solid red';
@@ -806,8 +751,48 @@ document.querySelector('button[onclick="window.print()"]').addEventListener('cli
 
     if(empty) {
         alert('Please fill all required fields before printing.');
-        e.preventDefault();
+        return;
     }
+
+    // Only build summary from form if we don't have worker data
+    {% if not worker %}
+    const summaryGrid = document.getElementById('summaryGrid');
+    summaryGrid.innerHTML = '';
+
+    const fields = [
+        ['Full Name', form.querySelector('[name="name"]').value],
+        ['Phone Number', form.querySelector('[name="phone_number"]').value],
+        ['Email', form.querySelector('[name="email"]').value],
+        ['Date of Birth', form.querySelector('[name="date_of_birth"]').value],
+        ['Gender', form.querySelector('[name="gender"]').value],
+        ['Nationality', form.querySelector('[name="nationality"]').value],
+        ['Ethnic Group', form.querySelector('[name="ethnic_group"]').value],
+        ['Home Address', form.querySelector('[name="home_address"]').value],
+        ['Place of Residence', form.querySelector('[name="place_of_residence"]').value],
+        ['Disability', form.querySelector('[name="disability"]').value || 'None'],
+        ['National ID / NIN', form.querySelector('[name="national_id"]').value],
+        ['Qualifications', form.querySelector('[name="qualifications"]').value],
+        ['Guarantor Name', form.querySelector('[name="guarantor"]').value],
+        ['Position', form.querySelector('[name="position"]').value],
+        ['Monthly Salary', '₦' + form.querySelector('[name="amount_of_salary"]').value],
+        ['Date of Employment', form.querySelector('[name="date_of_employment"]').value],
+        ['Bank Name', form.querySelector('[name="bank_name"]').value],
+        ['Account Number', form.querySelector('[name="bank_account"]').value],
+        ['Account Name', form.querySelector('[name="bank_account_name"]').value]
+    ];
+
+    fields.forEach(([label, value]) => {
+        if(value && value.trim()!== '') {
+            const item = document.createElement('div');
+            item.className = 'summary-item';
+            item.innerHTML = `<div class="summary-label">${label}</div><div class="summary-value">${value}</div>`;
+            summaryGrid.appendChild(item);
+        }
+    });
+    {% endif %}
+
+    // Now print
+    window.print();
 });
 </script>
 
