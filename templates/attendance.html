@@ -1,4 +1,6 @@
 {% extends 'base.html' %}
+{% block title %}Attendance | Okoya Food{% endblock %}
+
 {% block content %}
 
 <div class="attendance-page">
@@ -12,18 +14,26 @@
             <div class="company-text">
                 <h1>Attendance Management System</h1>
                 <p>OKOYA FOOD COMPANY LIMITED — Daily Staff Monitoring Portal</p>
-                <span id="liveDateTime"></span>
+                <div class="time-row">
+                    <span id="liveDateTime"></span>
+                    <span class="dot">•</span>
+                    <span id="sessionTimer">Session: 00:00</span>
+                </div>
             </div>
         </div>
 
         <div class="header-right">
-            {% if secretary %}
-                <a href="{{ url_for('secretary_dashboard') }}" class="top-btn">← Dashboard</a>
-            {% else %}
-                <a href="{{ url_for('admin_dashboard') }}" class="top-btn">← Dashboard</a>
-            {% endif %}
+            <div class="header-actions">
+                <button class="theme-toggle" id="themeToggle" title="Toggle Theme">🌓</button>
+                
+                {% if secretary %}
+                    <a href="{{ url_for('secretary.secretary_dashboard') }}" class="top-btn">← Dashboard</a>
+                {% else %}
+                    <a href="{{ url_for('admin.admin_dashboard') }}" class="top-btn">← Dashboard</a>
+                {% endif %}
 
-            <a href="{{ url_for('logout') }}" class="top-btn logout-btn">Logout</a>
+                <a href="{{ url_for('auth.logout') }}" class="top-btn logout-btn">Logout</a>
+            </div>
         </div>
 
     </section>
@@ -34,21 +44,25 @@
         <div class="summary-card green">
             <p>Total Workers</p>
             <h2>{{ workers|length }}</h2>
+            <small class="trend up">Active: {{ workers|selectattr('is_active', 'equalto', true)|list|length }}</small>
         </div>
 
         <div class="summary-card blue">
             <p>Attendance Day</p>
             <h2>Today</h2>
+            <small>{{ today.strftime('%d %b %Y') if today else 'N/A' }}</small>
         </div>
 
         <div class="summary-card gold">
-            <p>Department</p>
-            <h2>General</h2>
+            <p>Marked</p>
+            <h2 id="markedCount">0</h2>
+            <small id="markedPercent">0% complete</small>
         </div>
 
         <div class="summary-card red">
             <p>Status</p>
-            <h2>ACTIVE</h2>
+            <h2 class="status-live">ACTIVE</h2>
+            <small>System Online</small>
         </div>
 
     </section>
@@ -57,13 +71,16 @@
     <section class="control-panel no-print">
 
         <div class="search-box">
-            <input type="text" id="searchInput" placeholder="Search worker..." onkeyup="searchWorkers()">
+            <input type="text" id="searchInput" placeholder="Search worker by name..." onkeyup="searchWorkers()">
+            <span class="search-icon">🔍</span>
         </div>
 
         <div class="quick-actions">
             <button onclick="markAllPresent()" class="control-btn">✔ All Present</button>
             <button onclick="markAllAbsent()" class="control-btn danger">✖ All Absent</button>
+            <button onclick="clearAll()" class="control-btn warning">⟲ Reset</button>
             <button onclick="window.print()" class="control-btn print">🖨 Print</button>
+            <button onclick="exportCSV()" class="control-btn export">⬇ Export CSV</button>
         </div>
 
     </section>
@@ -79,6 +96,7 @@
                     <tr>
                         <th>#</th>
                         <th>Worker Name</th>
+                        <th>Position</th>
                         <th>Status</th>
                         <th>Action</th>
                     </tr>
@@ -86,23 +104,34 @@
 
                 <tbody>
                 {% for worker in workers %}
-                    <tr>
+                    <tr data-worker-id="{{ worker.id }}">
 
                         <td>{{ loop.index }}</td>
 
-                        <td class="worker-name">{{ worker.name }}</td>
+                        <td class="worker-name">
+                            <div class="worker-info">
+                                <img src="{{ url_for('static', filename='uploads/' ~ worker.passport) if worker.passport else url_for('static', filename='default.png') }}" 
+                                     class="worker-avatar" alt="{{ worker.name }}">
+                                <span>{{ worker.name }}</span>
+                            </div>
+                        </td>
+
+                        <td class="worker-position">{{ worker.position or '—' }}</td>
 
                         <td>
-                            <form method="post" class="attendance-form">
+                            <form method="post" class="attendance-form" data-worker-id="{{ worker.id }}">
 
-                                <select name="attendance_status" class="attendance-select">
+                                <select name="attendance_status" class="attendance-select" onchange="updateStatus(this)">
+                                    <option value="">Select</option>
                                     <option value="Present">Present</option>
                                     <option value="Absent">Absent</option>
+                                    <option value="Late">Late</option>
+                                    <option value="Leave">Leave</option>
                                 </select>
 
                                 <input type="hidden" name="worker_name" value="{{ worker.name }}">
                                 <input type="hidden" name="worker_id" value="{{ worker.id }}">
-
+                                <span class="status-badge" id="badge-{{ worker.id }}"></span>
                         </td>
 
                         <td>
@@ -118,6 +147,11 @@
 
             </table>
 
+        </div>
+
+        <div class="table-footer">
+            <span id="selectionInfo">0 workers selected</span>
+            <button class="save-all-btn" onclick="saveAll()">💾 Save All Marked</button>
         </div>
 
     </section>
@@ -150,42 +184,148 @@
 </div>
 
 <script>
+document.addEventListener('DOMContentLoaded', function() {
 
-function updateTime() {
-    const now = new Date();
-    document.getElementById("liveDateTime").innerHTML = now.toLocaleString();
+    // Live time
+    function updateTime() {
+        const now = new Date();
+        document.getElementById("liveDateTime").innerHTML = now.toLocaleString('en-US', {
+            weekday: 'short',
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        });
+    }
+    updateTime();
+    setInterval(updateTime, 1000);
+
+    // Session timer
+    let seconds = 0;
+    setInterval(() => {
+        seconds++;
+        const mins = Math.floor(seconds / 60).toString().padStart(2, '0');
+        const secs = (seconds % 60).toString().padStart(2, '0');
+        document.getElementById("sessionTimer").textContent = `Session: ${mins}:${secs}`;
+    }, 1000);
+
+    // Theme toggle
+    const themeToggle = document.getElementById("themeToggle");
+    themeToggle.addEventListener("click", () => {
+        document.body.classList.toggle("light-mode");
+        localStorage.setItem("theme", document.body.classList.contains("light-mode") ? "light" : "dark");
+    });
+    if(localStorage.getItem("theme") === "light") {
+        document.body.classList.add("light-mode");
+    }
+
+    // Update marked count
+    updateMarkedCount();
+});
+
+function updateStatus(select) {
+    const row = select.closest('tr');
+    const badge = row.querySelector('.status-badge');
+    const value = select.value;
+    
+    badge.className = 'status-badge';
+    if(value) {
+        badge.classList.add(value.toLowerCase());
+        badge.textContent = value;
+    } else {
+        badge.textContent = '';
+    }
+    
+    updateMarkedCount();
 }
-setInterval(updateTime, 1000);
-updateTime();
+
+function updateMarkedCount() {
+    const selects = document.querySelectorAll('.attendance-select');
+    const marked = Array.from(selects).filter(s => s.value !== '').length;
+    const total = selects.length;
+    const percent = total > 0 ? Math.round((marked / total) * 100) : 0;
+    
+    document.getElementById('markedCount').textContent = marked;
+    document.getElementById('markedPercent').textContent = `${percent}% complete`;
+    document.getElementById('selectionInfo').textContent = `${marked} of ${total} workers marked`;
+}
 
 function searchWorkers() {
     let input = document.getElementById("searchInput").value.toLowerCase();
-    let table = document.getElementById("attendanceTable");
-    let rows = table.getElementsByTagName("tr");
+    let rows = document.querySelectorAll("#attendanceTable tbody tr");
 
-    for (let i = 1; i < rows.length; i++) {
-        let td = rows[i].getElementsByClassName("worker-name")[0];
-        if (td) {
-            let txt = td.textContent || td.innerText;
-            rows[i].style.display = txt.toLowerCase().includes(input) ? "" : "none";
-        }
-    }
+    rows.forEach(row => {
+        let name = row.querySelector('.worker-name').textContent.toLowerCase();
+        let position = row.querySelector('.worker-position').textContent.toLowerCase();
+        row.style.display = (name.includes(input) || position.includes(input)) ? "" : "none";
+    });
 }
 
 function markAllPresent() {
-    let selects = document.querySelectorAll(".attendance-select");
-    selects.forEach(select => {
+    document.querySelectorAll(".attendance-select").forEach(select => {
         select.value = "Present";
+        updateStatus(select);
     });
 }
 
 function markAllAbsent() {
-    let selects = document.querySelectorAll(".attendance-select");
-    selects.forEach(select => {
+    document.querySelectorAll(".attendance-select").forEach(select => {
         select.value = "Absent";
+        updateStatus(select);
     });
 }
 
+function clearAll() {
+    if(confirm('Clear all selections?')) {
+        document.querySelectorAll(".attendance-select").forEach(select => {
+            select.value = "";
+            updateStatus(select);
+        });
+    }
+}
+
+function saveAll() {
+    const forms = document.querySelectorAll('.attendance-form');
+    let saved = 0;
+    
+    forms.forEach(form => {
+        const select = form.querySelector('.attendance-select');
+        if(select.value) {
+            // Submit via fetch for smoother UX
+            const formData = new FormData(form);
+            fetch(form.action || window.location.href, {
+                method: 'POST',
+                body: formData
+            });
+            saved++;
+        }
+    });
+    
+    if(saved > 0) {
+        alert(`${saved} attendance records saved!`);
+    } else {
+        alert('No records to save. Please mark attendance first.');
+    }
+}
+
+function exportCSV() {
+    let csv = 'Name,Position,Status\n';
+    document.querySelectorAll('#attendanceTable tbody tr').forEach(row => {
+        const name = row.querySelector('.worker-name span').textContent.trim();
+        const position = row.querySelector('.worker-position').textContent.trim();
+        const status = row.querySelector('.attendance-select').value || 'Not Marked';
+        csv += `"${name}","${position}","${status}"\n`;
+    });
+    
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `attendance_${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+}
 </script>
 
 <style>
@@ -196,6 +336,11 @@ body{
     padding:0;
     font-family:'Poppins',sans-serif;
     background:linear-gradient(135deg,#edfdf5,#d4f8e8,#bdf6d6);
+    transition: background 0.3s ease;
+}
+
+body.light-mode {
+    background: linear-gradient(135deg,#f0fdf4,#dcfce7,#bbf7d0);
 }
 
 .attendance-page{
@@ -243,18 +388,41 @@ body{
     opacity:.95;
 }
 
-.company-text span{
+.time-row{
+    display:flex;
+    gap:8px;
+    align-items:center;
     font-size:.95rem;
-    font-weight:600;
     background:rgba(255,255,255,.15);
     padding:6px 12px;
     border-radius:8px;
+    width: fit-content;
 }
 
 .header-right{
     display:flex;
     gap:10px;
     flex-wrap:wrap;
+}
+
+.header-actions{
+    display:flex;
+    gap:10px;
+    align-items:center;
+}
+
+.theme-toggle{
+    background:rgba(255,255,255,.15);
+    border:none;
+    padding:10px 12px;
+    border-radius:10px;
+    cursor:pointer;
+    font-size:18px;
+    transition:0.2s;
+}
+
+.theme-toggle:hover{
+    background:rgba(255,255,255,.25);
 }
 
 .top-btn{
@@ -269,11 +437,16 @@ body{
 
 .top-btn:hover{
     transform:translateY(-2px);
+    box-shadow:0 4px 12px rgba(0,0,0,0.2);
 }
 
 .logout-btn{
     background:#dc2626;
     color:white;
+}
+
+.logout-btn:hover{
+    background:#b91c1c;
 }
 
 /* ================= SUMMARY ================= */
@@ -290,17 +463,41 @@ body{
     border-radius:16px;
     text-align:center;
     box-shadow:0 6px 16px rgba(0,0,0,.08);
+    transition:0.3s;
+}
+
+.summary-card:hover{
+    transform:translateY(-5px);
+    box-shadow:0 10px 25px rgba(0,0,0,.15);
 }
 
 .summary-card p{
     margin:0;
     color:#555;
     font-size:.95rem;
+    font-weight:600;
 }
 
 .summary-card h2{
     margin-top:10px;
-    font-size:1.8rem;
+    font-size:2rem;
+    color:#03492c;
+}
+
+.summary-card small{
+    display:block;
+    margin-top:8px;
+    color:#64748b;
+    font-size:0.85rem;
+}
+
+.trend.up{
+    color:#16a34a;
+    font-weight:700;
+}
+
+.status-live{
+    color:#16a34a !important;
 }
 
 .green{border-left:6px solid #16a34a;}
@@ -317,13 +514,34 @@ body{
     gap:15px;
 }
 
+.search-box{
+    position:relative;
+    flex:1;
+    min-width:280px;
+}
+
 .search-box input{
-    width:320px;
-    max-width:100%;
-    padding:12px 15px;
+    width:100%;
+    padding:12px 15px 12px 45px;
     border-radius:10px;
-    border:1px solid #ccc;
+    border:2px solid #e2e8f0;
     font-size:15px;
+    outline:none;
+    transition:0.2s;
+}
+
+.search-box input:focus{
+    border-color:#03492c;
+    box-shadow:0 0 0 3px rgba(3,73,44,0.1);
+}
+
+.search-icon{
+    position:absolute;
+    left:15px;
+    top:50%;
+    transform:translateY(-50%);
+    font-size:18px;
+    opacity:0.6;
 }
 
 .quick-actions{
@@ -340,18 +558,28 @@ body{
     border-radius:10px;
     font-weight:700;
     cursor:pointer;
+    transition:0.2s;
 }
 
 .control-btn:hover{
     transform:translateY(-2px);
+    box-shadow:0 4px 12px rgba(0,0,0,0.2);
 }
 
 .control-btn.danger{
     background:#dc2626;
 }
 
-.control-btn.print{
+.control-btn.warning{
     background:#f59e0b;
+}
+
+.control-btn.print{
+    background:#8b5cf6;
+}
+
+.control-btn.export{
+    background:#0ea5e9;
 }
 
 /* ================= TABLE ================= */
@@ -363,29 +591,31 @@ body{
     background:white;
     border-radius:18px;
     overflow:auto;
-    max-height:75vh;
+    max-height:70vh;
     box-shadow:0 8px 22px rgba(0,0,0,.08);
 }
 
 .attendance-table{
     width:100%;
-    min-width:850px;
+    min-width:950px;
     border-collapse:collapse;
 }
 
 .attendance-table th{
     background:#03492c;
     color:white;
-    padding:14px;
+    padding:16px;
     position:sticky;
     top:0;
     z-index:5;
+    font-size:0.9rem;
+    text-transform:uppercase;
 }
 
 .attendance-table td{
-    padding:12px;
+    padding:14px 12px;
     text-align:center;
-    border-bottom:1px solid #ddd;
+    border-bottom:1px solid #e2e8f0;
 }
 
 .attendance-table tbody tr:nth-child(even){
@@ -396,17 +626,73 @@ body{
     background:#d7ffe9;
 }
 
-.worker-name{
-    font-weight:700;
+.worker-info{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    text-align:left;
 }
 
-/* ================= SELECT ================= */
+.worker-avatar{
+    width:40px;
+    height:40px;
+    border-radius:50%;
+    object-fit:cover;
+    border:2px solid #e2e8f0;
+}
+
+.worker-name{
+    font-weight:700;
+    color:#1e293b;
+}
+
+.worker-position{
+    color:#64748b;
+    font-size:0.9rem;
+}
+
+/* ================= SELECT & BADGE ================= */
 .attendance-select{
     padding:10px 14px;
     border-radius:8px;
-    border:1px solid #ccc;
+    border:2px solid #e2e8f0;
     font-weight:600;
     min-width:130px;
+    outline:none;
+    transition:0.2s;
+}
+
+.attendance-select:focus{
+    border-color:#03492c;
+}
+
+.status-badge{
+    display:inline-block;
+    margin-left:8px;
+    padding:4px 10px;
+    border-radius:20px;
+    font-size:0.8rem;
+    font-weight:700;
+}
+
+.status-badge.present{
+    background:#d1fae5;
+    color:#065f46;
+}
+
+.status-badge.absent{
+    background:#fee2e2;
+    color:#991b1b;
+}
+
+.status-badge.late{
+    background:#fef3c7;
+    color:#92400e;
+}
+
+.status-badge.leave{
+    background:#dbeafe;
+    color:#1e40af;
 }
 
 /* ================= SUBMIT ================= */
@@ -418,10 +704,38 @@ body{
     border-radius:8px;
     font-weight:700;
     cursor:pointer;
+    transition:0.2s;
 }
 
 .submit-btn:hover{
     transform:scale(1.05);
+    box-shadow:0 4px 12px rgba(34,197,94,0.3);
+}
+
+.table-footer{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:15px 20px;
+    background:#f8fafc;
+    border-radius:0 0 18px 18px;
+    border-top:1px solid #e2e8f0;
+}
+
+.save-all-btn{
+    background:linear-gradient(135deg,#03492c,#0b7a49);
+    color:white;
+    border:none;
+    padding:12px 24px;
+    border-radius:10px;
+    font-weight:700;
+    cursor:pointer;
+    transition:0.2s;
+}
+
+.save-all-btn:hover{
+    transform:translateY(-2px);
+    box-shadow:0 6px 15px rgba(3,73,44,0.3);
 }
 
 /* ================= FUTURE ================= */
@@ -437,11 +751,18 @@ body{
     padding:22px;
     border-radius:16px;
     box-shadow:0 5px 14px rgba(0,0,0,.08);
+    transition:0.3s;
+}
+
+.future-card:hover{
+    transform:translateY(-4px);
+    box-shadow:0 8px 20px rgba(0,0,0,.12);
 }
 
 .future-card h3{
     margin-top:0;
     color:#03492c;
+    font-size:1.1rem;
 }
 
 /* ================= MOBILE ================= */
@@ -474,12 +795,17 @@ body{
         flex-direction:column;
     }
 
-    .search-box input{
-        width:100%;
+    .search-box{
+        min-width:100%;
     }
 
     .quick-actions{
         justify-content:center;
+    }
+
+    .table-footer{
+        flex-direction:column;
+        gap:10px;
     }
 
 }
@@ -489,7 +815,8 @@ body{
 
     .no-print,
     .header-right,
-    .control-panel{
+    .control-panel,
+    .table-footer{
         display:none !important;
     }
 
@@ -510,6 +837,11 @@ body{
     @page{
         size:A4 landscape;
         margin:1cm;
+    }
+
+    .attendance-table th{
+        background:#000 !important;
+        color:#fff !important;
     }
 
 }

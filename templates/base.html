@@ -80,7 +80,7 @@
         .content-card{
             background:var(--okoya-card);
             border-radius:18px;
-            box-shadow:var(--shadow);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
             padding:25px;
             animation:fadeIn .35s ease;
         }
@@ -108,6 +108,11 @@
             box-shadow:0 2px 8px rgba(0,0,0,0.05);
             font-size:14px;
         }
+
+        .flash-messages li.success{ border-left-color:#198754; }
+        .flash-messages li.danger{ border-left-color:#dc3545; }
+        .flash-messages li.warning{ border-left-color:#ffc107; }
+        .flash-messages li.info{ border-left-color:#0dcaf0; }
 
         .footer{
             text-align:center;
@@ -184,11 +189,11 @@
 
         <!-- FLASH -->
         <div class="flash-wrapper no-print">
-            {% with messages = get_flashed_messages() %}
+            {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
                     <ul class="flash-messages">
-                        {% for msg in messages %}
-                            <li>{{ msg }}</li>
+                        {% for category, msg in messages %}
+                            <li class="{{ category }}">{{ msg }}</li>
                         {% endfor %}
                     </ul>
                 {% endif %}

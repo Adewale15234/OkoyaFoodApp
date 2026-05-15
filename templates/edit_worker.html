@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% block title %}Edit Worker | Okoya Food{% endblock %}
 
 {% block content %}
 
@@ -8,12 +9,16 @@
     <div class="header-left">
         <h1>👤 Edit Worker Profile</h1>
         <p>Update staff information securely</p>
+        <small class="worker-code">Code: {{ worker.worker_code or 'N/A' }}</small>
     </div>
 
     <div class="header-right">
-        <a href="{{ url_for('workers_name') }}" class="back-link">
-            ← Back to Workers
-        </a>
+        <div class="header-actions">
+            <button type="button" id="saveDraftBtn" class="draft-btn">💾 Save Draft</button>
+            <a href="{{ url_for('workers.workers_name') }}" class="back-link">
+                ← Back to Workers
+            </a>
+        </div>
     </div>
 
 </div>
@@ -28,76 +33,89 @@
         <div class="passport-section">
 
             <div class="passport-box">
-                <img src="{{ url_for('static', filename='uploads/' ~ worker.passport) if worker.passport else url_for('static', filename='default.png') }}"
+                <img src="{{ url_for('static', filename='uploads/' ~ worker.passport) if worker.passport else url_for('static', filename='default.png') }}?v={{ worker.id }}"
                      id="passportPreview"
                      alt="Passport Photo">
+                <div class="passport-meta">
+                    <span>{{ worker.name }}</span>
+                    <small>Last updated: {{ worker.updated_at.strftime('%d %b %Y %H:%M') if worker.updated_at else 'Never' }}</small>
+                </div>
             </div>
 
-            <form method="POST" enctype="multipart/form-data" class="edit-form">
+            <form method="POST" enctype="multipart/form-data" class="edit-form" id="editWorkerForm">
 
-    <div class="passport-section">
-
-        <div class="passport-box">
-            <img src="{{ url_for('static', filename='uploads/' ~ worker.passport) if worker.passport else url_for('static', filename='default.png') }}?v={{ worker.id }}"
-                 id="passportPreview">
-        </div>
-
-        <div class="passport-upload">
-            <label>Update Passport Photo</label>
-            <input type="file" id="passportInput" name="passport" accept="image/*">
-        </div>
-
-    </div>
-
-            <!-- ===== BASIC INFO ===== -->
-            <div class="section-title">Basic Information</div>
-
-            <div class="grid">
-
-                <div>
-                    <label>Name</label>
-                    <input type="text" name="name" value="{{ worker.name }}" required>
+                <div class="passport-upload">
+                    <label>Update Passport Photo</label>
+                    <input type="file" id="passportInput" name="passport" accept="image/*">
+                    <small>Accepted: JPG, PNG, WEBP. Max 5MB</small>
+                    <div class="upload-actions">
+                        <button type="button" id="removePhotoBtn" class="small-btn danger" {% if not worker.passport %}disabled{% endif %}>
+                            Remove Photo
+                        </button>
+                    </div>
                 </div>
 
-                <div>
-                    <label>Phone</label>
+            <!-- ===== BASIC INFO ===== -->
+            <div class="section-title">
+                <span>Basic Information</span>
+                <button type="button" class="collapse-btn" data-target="basicGrid">−</button>
+            </div>
+
+            <div class="grid" id="basicGrid">
+
+                <div class="input-wrap">
+                    <label>Name <span class="req">*</span></label>
+                    <input type="text" name="name" value="{{ worker.name }}" required>
+                    <small class="hint">Full legal name</small>
+                </div>
+
+                <div class="input-wrap">
+                    <label>Phone <span class="req">*</span></label>
                     <input type="text" name="phone_number" value="{{ worker.phone_number }}" required>
                 </div>
 
-                <div>
+                <div class="input-wrap">
                     <label>Email</label>
                     <input type="email" name="email" value="{{ worker.email }}">
                 </div>
 
-                <div>
+                <div class="input-wrap">
                     <label>Gender</label>
-                    <input type="text" name="gender" value="{{ worker.gender }}">
+                    <select name="gender">
+                        <option value="">Select</option>
+                        <option value="Male" {% if worker.gender == 'Male' %}selected{% endif %}>Male</option>
+                        <option value="Female" {% if worker.gender == 'Female' %}selected{% endif %}>Female</option>
+                        <option value="Other" {% if worker.gender == 'Other' %}selected{% endif %}>Other</option>
+                    </select>
                 </div>
 
             </div>
 
             <!-- ===== EMPLOYMENT ===== -->
-            <div class="section-title">Employment Details</div>
+            <div class="section-title">
+                <span>Employment Details</span>
+                <button type="button" class="collapse-btn" data-target="empGrid">−</button>
+            </div>
 
-            <div class="grid">
+            <div class="grid" id="empGrid">
 
-                <div>
+                <div class="input-wrap">
                     <label>Position</label>
                     <input type="text" name="position" value="{{ worker.position }}">
                 </div>
 
-                <div>
-                    <label>Salary</label>
-                    <input type="number" name="amount_of_salary" value="{{ worker.amount_of_salary }}">
+                <div class="input-wrap">
+                    <label>Salary (₦)</label>
+                    <input type="number" step="0.01" name="amount_of_salary" value="{{ worker.amount_of_salary }}">
                 </div>
 
-                <div>
+                <div class="input-wrap">
                     <label>Date of Employment</label>
                     <input type="date" name="date_of_employment"
-                           value="{{ worker.date_of_employment.strftime('%Y-%m-%d') }}">
+                           value="{{ worker.date_of_employment.strftime('%Y-%m-%d') if worker.date_of_employment else '' }}">
                 </div>
 
-                <div>
+                <div class="input-wrap">
                     <label>Qualifications</label>
                     <input type="text" name="qualifications" value="{{ worker.qualifications }}">
                 </div>
@@ -105,27 +123,30 @@
             </div>
 
             <!-- ===== PERSONAL INFO ===== -->
-            <div class="section-title">Personal Information</div>
+            <div class="section-title">
+                <span>Personal Information</span>
+                <button type="button" class="collapse-btn" data-target="personalGrid">−</button>
+            </div>
 
-            <div class="grid">
+            <div class="grid" id="personalGrid">
 
-                <div>
+                <div class="input-wrap">
                     <label>Date of Birth</label>
                     <input type="date" name="date_of_birth"
-                           value="{{ worker.date_of_birth.strftime('%Y-%m-%d') }}">
+                           value="{{ worker.date_of_birth.strftime('%Y-%m-%d') if worker.date_of_birth else '' }}">
                 </div>
 
-                <div>
+                <div class="input-wrap">
                     <label>Nationality</label>
                     <input type="text" name="nationality" value="{{ worker.nationality }}">
                 </div>
 
-                <div>
+                <div class="input-wrap">
                     <label>Ethnic Group</label>
                     <input type="text" name="ethnic_group" value="{{ worker.ethnic_group }}">
                 </div>
 
-                <div>
+                <div class="input-wrap">
                     <label>Disability</label>
                     <input type="text" name="disability" value="{{ worker.disability }}">
                 </div>
@@ -133,16 +154,19 @@
             </div>
 
             <!-- ===== ADDRESS ===== -->
-            <div class="section-title">Address Information</div>
+            <div class="section-title">
+                <span>Address Information</span>
+                <button type="button" class="collapse-btn" data-target="addressGrid">−</button>
+            </div>
 
-            <div class="grid">
+            <div class="grid" id="addressGrid">
 
-                <div>
+                <div class="input-wrap">
                     <label>Home Address</label>
                     <input type="text" name="home_address" value="{{ worker.home_address }}">
                 </div>
 
-                <div>
+                <div class="input-wrap">
                     <label>Place of Residence</label>
                     <input type="text" name="place_of_residence" value="{{ worker.place_of_residence }}">
                 </div>
@@ -150,26 +174,29 @@
             </div>
 
             <!-- ===== BANK DETAILS ===== -->
-            <div class="section-title">Bank Details</div>
+            <div class="section-title">
+                <span>Bank Details</span>
+                <button type="button" class="collapse-btn" data-target="bankGrid">−</button>
+            </div>
 
-            <div class="grid">
+            <div class="grid" id="bankGrid">
 
-                <div>
+                <div class="input-wrap">
                     <label>Bank Name</label>
                     <input type="text" name="bank_name" value="{{ worker.bank_name }}">
                 </div>
 
-                <div>
+                <div class="input-wrap">
                     <label>Account Name</label>
                     <input type="text" name="bank_account_name" value="{{ worker.bank_account_name }}">
                 </div>
 
-                <div>
+                <div class="input-wrap">
                     <label>Account Number</label>
                     <input type="number" name="bank_account" value="{{ worker.bank_account }}">
                 </div>
 
-                <div>
+                <div class="input-wrap">
                     <label>National ID</label>
                     <input type="text" name="national_id" value="{{ worker.national_id }}">
                 </div>
@@ -177,11 +204,14 @@
             </div>
 
             <!-- ===== GUARDIAN ===== -->
-            <div class="section-title">Emergency / Guarantor</div>
+            <div class="section-title">
+                <span>Emergency / Guarantor</span>
+                <button type="button" class="collapse-btn" data-target="guardGrid">−</button>
+            </div>
 
-            <div class="grid">
+            <div class="grid" id="guardGrid">
 
-                <div>
+                <div class="input-wrap">
                     <label>Guarantor</label>
                     <input type="text" name="guarantor" value="{{ worker.guarantor }}">
                 </div>
@@ -195,9 +225,11 @@
                     💾 Save Changes
                 </button>
 
-                <a href="{{ url_for('workers_name') }}" class="cancel-btn">
+                <a href="{{ url_for('workers.workers_name') }}" class="cancel-btn">
                     Cancel
                 </a>
+
+                <span class="autosave-status" id="autosaveStatus"></span>
 
             </div>
 
@@ -211,138 +243,455 @@
 <style>
 
 body {
-    background: #f4f7fb;
-    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #f4f7fb, #e8f0ff);
+    font-family: 'Poppins', Arial, sans-serif;
+    transition: background 0.3s ease;
 }
 
 /* HEADER */
 .upgrade-header {
     position: sticky;
     top: 0;
-    background: #004080;
+    background: linear-gradient(135deg, #004080, #0066cc);
     color: white;
-    padding: 15px 20px;
+    padding: 18px 25px;
     display: flex;
     justify-content: space-between;
+    align-items:center;
     z-index: 1000;
+    box-shadow: 0 8px 25px rgba(0,64,128,0.25);
 }
 
 .upgrade-header h1 {
     margin: 0;
-    font-size: 1.4rem;
+    font-size: 1.5rem;
+    font-weight: 800;
+}
+
+.upgrade-header p {
+    margin: 4px 0 0;
+    opacity: 0.9;
+    font-size: 0.9rem;
+}
+
+.worker-code {
+    display: inline-block;
+    margin-top: 6px;
+    background: rgba(255,255,255,0.2);
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+}
+
+.header-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.draft-btn {
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: white;
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+.draft-btn:hover {
+    background: rgba(255,255,255,0.25);
 }
 
 .back-link {
     color: white;
     text-decoration: none;
     font-weight: bold;
+    background: rgba(255,255,255,0.15);
+    padding: 8px 14px;
+    border-radius: 8px;
+    transition: 0.2s;
+}
+
+.back-link:hover {
+    background: rgba(255,255,255,0.25);
 }
 
 /* WRAPPER */
 .edit-wrapper {
-    max-width: 1100px;
+    max-width: 1200px;
     margin: auto;
-    padding: 20px;
+    padding: 25px 20px;
 }
 
 /* CARD */
 .edit-card {
     background: white;
-    padding: 25px;
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.12);
 }
 
 /* PASSPORT */
 .passport-section {
     display: flex;
     justify-content: space-between;
+    align-items: flex-start;
+    gap: 25px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+
+.passport-box {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
     align-items: center;
-    margin-bottom: 25px;
 }
 
 .passport-box img {
-    width: 120px;
-    height: 120px;
+    width: 140px;
+    height: 140px;
     object-fit: cover;
+    border-radius: 12px;
+    border: 3px solid #004080;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+}
+
+.passport-meta {
+    text-align: center;
+}
+
+.passport-meta span {
+    font-weight: 700;
+    color: #004080;
+    display: block;
+}
+
+.passport-meta small {
+    color: #666;
+}
+
+.passport-upload {
+    flex: 1;
+    min-width: 250px;
+}
+
+.passport-upload label {
+    display: block;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #004080;
+}
+
+.passport-upload input[type="file"] {
+    width: 100%;
+    padding: 10px;
+    border: 2px dashed #ccc;
     border-radius: 10px;
-    border: 2px solid #004080;
+    background: #fafafa;
+    cursor: pointer;
+}
+
+.upload-actions {
+    margin-top: 10px;
+}
+
+.small-btn {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.small-btn.danger {
+    background: #dc2626;
+    color: white;
+}
+
+.small-btn.danger:disabled {
+    background: #ccc;
+    cursor: not-allowed;
 }
 
 /* SECTION TITLE */
 .section-title {
-    margin-top: 25px;
-    font-weight: bold;
+    margin-top: 30px;
+    font-weight: 800;
     color: #004080;
     border-left: 5px solid #004080;
-    padding-left: 10px;
+    padding-left: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.05rem;
+}
+
+.collapse-btn {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: #004080;
 }
 
 /* GRID */
 .grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
-    margin-top: 10px;
+    gap: 18px;
+    margin-top: 15px;
+    transition: all 0.3s ease;
+}
+
+.grid.collapsed {
+    display: none;
+}
+
+.input-wrap {
+    display: flex;
+    flex-direction: column;
 }
 
 label {
-    font-weight: bold;
-    font-size: 0.85rem;
+    font-weight: 700;
+    font-size: 0.88rem;
+    color: #333;
+    margin-bottom: 6px;
 }
 
-input {
+.req {
+    color: #dc2626;
+}
+
+input, select {
     width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
+    padding: 11px 12px;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    transition: 0.2s;
+    outline: none;
+}
+
+input:focus, select:focus {
+    border-color: #004080;
+    box-shadow: 0 0 0 3px rgba(0,64,128,0.1);
+}
+
+.hint {
+    font-size: 0.75rem;
+    color: #64748b;
+    margin-top: 4px;
 }
 
 /* SAVE BAR */
 .save-bar {
-    margin-top: 30px;
+    margin-top: 35px;
     display: flex;
-    gap: 10px;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+    padding-top: 20px;
+    border-top: 2px solid #f1f5f9;
 }
 
 .save-btn {
-    background: green;
+    background: linear-gradient(135deg, #16a34a, #22c55e);
     color: white;
-    padding: 12px 20px;
+    padding: 13px 28px;
     border: none;
-    border-radius: 8px;
+    border-radius: 10px;
     cursor: pointer;
+    font-weight: 700;
+    font-size: 0.95rem;
+    transition: 0.2s;
+    box-shadow: 0 6px 15px rgba(34,197,94,0.3);
+}
+
+.save-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(34,197,94,0.4);
 }
 
 .cancel-btn {
     background: #dc2626;
     color: white;
-    padding: 12px 20px;
-    border-radius: 8px;
+    padding: 13px 28px;
+    border-radius: 10px;
     text-decoration: none;
+    font-weight: 700;
+    transition: 0.2s;
+}
+
+.cancel-btn:hover {
+    background: #b91c1c;
+}
+
+.autosave-status {
+    color: #64748b;
+    font-size: 0.85rem;
+    margin-left: auto;
 }
 
 /* MOBILE */
 @media(max-width:768px){
-    .grid {
+   .grid {
         grid-template-columns: 1fr;
     }
 
-    .passport-section {
+   .passport-section {
         flex-direction: column;
-        gap: 10px;
+        align-items: center;
     }
+
+   .upgrade-header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+
+   .header-actions {
+        width: 100%;
+        justify-content: center;
+    }
+
+   .edit-card {
+        padding: 20px;
+    }
+}
+
+/* VALIDATION STATES */
+input.invalid, select.invalid {
+    border-color: #dc2626;
+}
+
+.error-text {
+    color: #dc2626;
+    font-size: 0.8rem;
+    margin-top: 4px;
 }
 
 </style>
 
 <!-- ================= JS ================= -->
 <script>
-document.getElementById('passportInput').addEventListener('change', function(e){
-    const file = e.target.files[0];
-    if(file){
-        document.getElementById('passportPreview').src = URL.createObjectURL(file);
+document.addEventListener('DOMContentLoaded', function() {
+
+    const form = document.getElementById('editWorkerForm');
+    const passportInput = document.getElementById('passportInput');
+    const passportPreview = document.getElementById('passportPreview');
+    const removePhotoBtn = document.getElementById('removePhotoBtn');
+    const saveDraftBtn = document.getElementById('saveDraftBtn');
+    const autosaveStatus = document.getElementById('autosaveStatus');
+
+    // Passport preview
+    passportInput.addEventListener('change', function(e){
+        const file = e.target.files[0];
+        if(file){
+            if(file.size > 5 * 1024 * 1024) {
+                alert('File too large. Max 5MB allowed.');
+                this.value = '';
+                return;
+            }
+            passportPreview.src = URL.createObjectURL(file);
+            removePhotoBtn.disabled = false;
+        }
+    });
+
+    // Remove photo - clears input
+    removePhotoBtn.addEventListener('click', function() {
+        if(confirm('Remove passport photo? This will take effect on save.')) {
+            passportInput.value = '';
+            passportPreview.src = "{{ url_for('static', filename='default.png') }}";
+            this.disabled = true;
+        }
+    });
+
+    // Section collapse
+    document.querySelectorAll('.collapse-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const target = document.getElementById(this.dataset.target);
+            target.classList.toggle('collapsed');
+            this.textContent = target.classList.contains('collapsed')? '+' : '−';
+        });
+    });
+
+    // Autosave draft to localStorage
+    const DRAFT_KEY = 'worker_draft_{{ worker.id }}';
+
+    function saveDraft() {
+        const formData = new FormData(form);
+        const data = {};
+        for(let [key, value] of formData.entries()) {
+            if(key!== 'passport') data[key] = value;
+        }
+        localStorage.setItem(DRAFT_KEY, JSON.stringify(data));
+        autosaveStatus.textContent = 'Draft saved ' + new Date().toLocaleTimeString();
+        setTimeout(() => autosaveStatus.textContent = '', 3000);
     }
+
+    saveDraftBtn.addEventListener('click', saveDraft);
+
+    // Load draft on page load
+    const draft = localStorage.getItem(DRAFT_KEY);
+    if(draft) {
+        if(confirm('You have an unsaved draft. Load it?')) {
+            const data = JSON.parse(draft);
+            Object.keys(data).forEach(key => {
+                const field = form.querySelector(`[name="${key}"]`);
+                if(field) field.value = data[key];
+            });
+        }
+    }
+
+    // Autosave every 30 seconds on change
+    let typingTimer;
+    form.addEventListener('input', function() {
+        clearTimeout(typingTimer);
+        typingTimer = setTimeout(saveDraft, 30000);
+    });
+
+    // Clear draft on successful submit
+    form.addEventListener('submit', function() {
+        localStorage.removeItem(DRAFT_KEY);
+    });
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+        if((e.ctrlKey || e.metaKey) && e.key === 's') {
+            e.preventDefault();
+            form.requestSubmit();
+        }
+        if(e.key === 'Escape') {
+            if(confirm('Discard changes and go back?')) {
+                window.location.href = "{{ url_for('workers.workers_name') }}";
+            }
+        }
+    });
+
+    // Client-side validation
+    form.addEventListener('submit', function(e) {
+        let valid = true;
+        form.querySelectorAll('input[required]').forEach(input => {
+            if(!input.value.trim()) {
+                input.classList.add('invalid');
+                valid = false;
+            } else {
+                input.classList.remove('invalid');
+            }
+        });
+
+        if(!valid) {
+            e.preventDefault();
+            alert('Please fill all required fields marked with *');
+            form.querySelector('.invalid').scrollIntoView({behavior: 'smooth', block: 'center'});
+        }
+    });
+
 });
 </script>
 
