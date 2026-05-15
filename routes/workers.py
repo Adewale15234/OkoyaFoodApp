@@ -14,6 +14,7 @@ from io import BytesIO
 
 workers_bp = Blueprint('workers', __name__, url_prefix='/workers')
 
+
 @workers_bp.route('/register_worker', methods=['GET', 'POST'])
 @login_required(role='admin')
 def register_worker():
@@ -179,7 +180,7 @@ def register_worker():
 
             print(f"[WORKER CREATED] {worker_code} - {name}")
             flash(f"Worker registered successfully! Code: {worker_code}", "success")
-               return render_template('register_worker.html', worker=new_worker)
+            return render_template('register_worker.html', worker=new_worker)
 
         except Exception as e:
             db.session.rollback()
