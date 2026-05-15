@@ -264,7 +264,7 @@ input:focus, select:focus, textarea:focus {
 @media print {
     @page {
         size: A4;
-        margin: 12mm 10mm;
+        margin: 8mm 8mm; /* tight margins to fit A4 */
     }
 
     html, body {
@@ -273,6 +273,7 @@ input:focus, select:focus, textarea:focus {
         background: white;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
+        font-size: 9pt; /* shrink base font for print */
     }
 
 .back-dashboard,
@@ -284,11 +285,12 @@ input:focus, select:focus, textarea:focus {
 
 .print-summary {
         display: block!important;
+        width: 100%;
     }
 
 .register-container {
         width: 100%;
-        max-width: 210mm;
+        max-width: none;
         margin: 0;
         padding: 0;
         box-shadow: none;
@@ -299,48 +301,53 @@ input:focus, select:focus, textarea:focus {
 
 .official-header-row {
         border-bottom: 1px solid #000;
-        padding-bottom: 8px;
-        margin-bottom: 10px;
+        padding-bottom: 5px;
+        margin-bottom: 6px;
+        gap: 8px;
         break-inside: avoid;
+        page-break-inside: avoid;
     }
 
 .company-logo img,
 .passport-preview img {
-        width: 80px;
-        height: 80px;
+        width: 60px;
+        height: 60px;
     }
 
 .company-name {
-        font-size: 14pt;
+        font-size: 12pt;
+        margin: 0;
         color: #000;
     }
 
 .company-motto {
-        font-size: 8pt;
+        font-size: 7pt;
+        margin: 1px 0;
         color: #000;
     }
 
 .company-address {
-        font-size: 7pt;
+        font-size: 6pt;
         background: #000;
         color: #fff;
-        padding: 3px 6px;
+        padding: 2px 5px;
+        border-radius: 3px;
     }
 
 h3 {
-        font-size: 10pt;
-        margin: 4px 0;
+        font-size: 9pt;
+        margin: 2px 0;
         color: #000;
     }
 
 .form-section-title {
         grid-column: span 2;
-        font-size: 11pt;
+        font-size: 10pt;
         color: #000;
         border-left: 2px solid #000;
-        margin-top: 12px;
-        margin-bottom: 6px;
-        padding-left: 5px;
+        margin-top: 8px;
+        margin-bottom: 4px;
+        padding-left: 4px;
         break-after: avoid;
         page-break-after: avoid;
     }
@@ -348,13 +355,43 @@ h3 {
 .print-grid {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
-        gap: 8px 18px;
+        gap: 6px 14px;
+        margin-top: 8px;
+    }
+
+.print-field {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+
+.print-label {
+        font-weight: bold;
+        font-size: 8pt;
+        color: #111;
+        margin-bottom: 2px;
     }
 
 .print-value {
-        background: #fff;
+        width: 100%;
+        padding: 4px 6px;
         border: 1px solid #999;
-        padding: 5px 7px;
+        border-radius: 4px;
+        font-size: 8pt;
+        background: #fff;
+        min-height: 18px;
+        box-sizing: border-box;
+    }
+
+.print-success {
+        background: #e8f5e9;
+        color: #1b5e20;
+        padding: 6px;
+        border-radius: 4px;
+        border: 1px solid #a5d6a7;
+        margin-bottom: 8px;
+        text-align: center;
+        font-weight: bold;
+        font-size: 9pt;
     }
 }
 
@@ -523,7 +560,7 @@ h3 {
     </div>
     {% endif %}
 
-    <div style="margin-top: 35px; text-align: center;">
+    <div style="margin-top: 25px; text-align: center;">
         <p>_________________________ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; _________________________</p>
         <p>HR Manager &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Managing Director</p>
     </div>
