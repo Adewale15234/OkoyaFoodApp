@@ -10,11 +10,9 @@ def ai_offence_review(worker, reason):
     medium_severity_words = ["absent", "lateness", "late", "insult", "disrespect", "warning"]
 
     score = 0
-
     for word in high_severity_words:
         if word in reason_lower:
             score += 3
-
     for word in medium_severity_words:
         if word in reason_lower:
             score += 1
@@ -31,8 +29,8 @@ def ai_offence_review(worker, reason):
 
     escalation = "HR Director Review Required" if severity == "HIGH" else "Supervisor Review"
 
-    return f"""
-
+    return {
+        "report": f"""
 AI OFFENCE REVIEW REPORT
 
 Worker Name: {worker.name}
@@ -54,7 +52,11 @@ SUMMARY
 
 This case has been automatically analyzed based on HR behavioural patterns.
 Further human verification is recommended before final disciplinary action.
-"""
+""",
+        "severity": severity.lower(),
+        "recommendation": recommendation,
+        "risk_score": score
+    }
 
 def generate_hr_letter(worker, reason, status_type):
     name = worker.name or "Unknown"
@@ -63,12 +65,8 @@ def generate_hr_letter(worker, reason, status_type):
     date = datetime.utcnow().strftime('%Y-%m-%d')
     reason_text = reason if reason else "No reason provided"
 
-    offence_review = ai_offence_review(worker, reason)
-
     if status_type in ["deactivated", "suspended"]:
-        letter_body = f"""
-
-OKOYA FOOD COMPANY LIMITED
+        letter_body = f"""OKOYA FOOD COMPANY LIMITED
 HUMAN RESOURCES DEPARTMENT
 OFFICIAL DISCIPLINARY NOTICE
 
@@ -96,12 +94,8 @@ Failure to comply may lead to permanent termination.
 
 OKOYA FOOD HR MANAGEMENT SYSTEM
 """
-        return letter_body + "\n" + offence_review
-
     elif status_type in ["reactivated", "reinstated"]:
-        letter_body = f"""
-
-OKOYA FOOD COMPANY LIMITED
+        letter_body = f"""OKOYA FOOD COMPANY LIMITED
 HUMAN RESOURCES DEPARTMENT
 REINSTATEMENT NOTICE
 
@@ -124,11 +118,8 @@ Effective Date: {date}
 HR DEPARTMENT
 OKOYA FOOD COMPANY LIMITED
 """
-        return letter_body + "\n" + offence_review
-
     else:
-        letter_body = f"""
-OKOYA FOOD HR SYSTEM
+        letter_body = f"""OKOYA FOOD HR SYSTEM
 
 Employee: {name}
 Code: {code}
@@ -140,4 +131,4 @@ Please verify the worker status configuration.
 
 Date: {date}
 """
-        return letter_body + "\n" + offence_review
+    return letter_body
