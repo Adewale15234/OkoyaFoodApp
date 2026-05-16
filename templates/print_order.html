@@ -1,476 +1,490 @@
 {% extends 'base.html' %}
-
-{% block title %}Worker Letter | {{ worker.name }} | Okoya Food{% endblock %}
-
+{% block title %}Order #{{ order.id }} | Okoya Food{% endblock %}
 {% block content %}
 
-<div class="letter-page" id="print-area">
+<section class="hero">
 
-    <header class="letter-header no-print">
-        <div class="header-left">
-            <img src="{{ url_for('static', filename='logo.png') }}" class="letter-logo" alt="Logo">
-            <div>
-                <h1>HR Letter Center</h1>
-                <p>Official Disciplinary & Reinstatement Letters</p>
-            </div>
+<div class="register-container print-area">
+
+   <!-- ================= HEADER ================= -->
+<div class="official-header-row">
+
+    <!-- COMPANY LOGO -->
+    <div class="company-logo-box">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Company Logo" class="company-logo">
+    </div>
+
+    <!-- COMPANY TEXT -->
+    <div class="official-header">
+
+        <h1>OKOYA FOOD COMPANY LIMITED</h1>
+
+        <h3>POVERTY ERADICATION, REDUCE INEQUALITY AND LEAVE NO ONE BEHIND</h3>
+
+        <p>KM 7 Idi APA community, along Ilesha Ibaruba express way, Shaki, Oyo State, Nigeria</p>
+
+        <div class="document-title">
+            CLIENT ORDER RECORD
         </div>
 
-        <div class="header-actions">
-            <button onclick="window.print()" class="btn print-btn">🖨 Print</button>
-            <a href="{{ url_for('workers.workers_name') }}" class="btn back-btn">← Back to Workers</a>
-        </div>
-    </header>
-
-    <div class="letter-container">
-
-        <div class="meta-bar">
-            <span><strong>Worker ID:</strong> {{ worker.worker_code }}</span>
-            <span><strong>Dept:</strong> HR Department - OKOYA FOOD LTD</span>
-            <span><strong>Date:</strong> {{ current_date if current_date else now.strftime('%d %B %Y') if now else '' }}</span>
-        </div>
-
-        <div class="company-header">
-            <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo">
-            <h1>OKOYA FOOD COMPANY LIMITED</h1>
-            <p>Staff Management & HR Department</p>
-
-            {% if worker.status_type %}
-                <div class="status-badge status-{{ worker.status_type|lower }}">
-                    {{ worker.status_type|upper }}
-                </div>
+        <div class="document-meta">
+            Generated: {{ order.created_at.strftime('%d %B %Y') if order.created_at else '—' }}
+            |
+            Order ID: #{{ order.id }}
+            |
+            Status:
+            {% if order.status == 'Confirmed' %}
+                CONFIRMED
+            {% else %}
+                PENDING
             {% endif %}
         </div>
 
-        <div class="letter-title">
-            OFFICIAL HR DISCIPLINARY / REINSTATEMENT LETTER
+    </div>
+
+</div>
+
+    <!-- ================= SECTION 1 ================= -->
+    <div class="section-card">
+
+        <div class="section-title">
+            CLIENT INFORMATION
         </div>
 
-        <div class="info-box">
-            <div class="info-grid">
-                <div>
-                    <p><strong>Name:</strong> {{ worker.name }}</p>
-                    <p><strong>Code:</strong> {{ worker.worker_code }}</p>
-                    <p><strong>Position:</strong> {{ worker.position or '—' }}</p>
-                    <p><strong>Phone:</strong> {{ worker.phone_number or '—' }}</p>
-                    <p><strong>Department:</strong> {{ worker.department or '—' }}</p>
-                </div>
+        <div class="form-grid">
 
-                <div class="passport-box">
-                    {% if worker.passport %}
-                        <img src="{{ url_for('static', filename='uploads/' ~ worker.passport) }}?v={{ worker.updated_at.timestamp() if worker.updated_at else worker.id }}"
-                            class="worker-passport"
-                            alt="{{ worker.name }}"
-                            onerror="this.src='{{ url_for('static', filename='logo.png') }}'">
-                    {% else %}
-                        <img src="{{ url_for('static', filename='logo.png') }}" class="worker-passport" alt="Default">
-                    {% endif %}
-                </div>
-            </div>
-        </div>          
-
-        <hr class="divider">
-
-        {% if worker.status_letter %}
-            <div class="letter-content">
-                {{ worker.status_letter }}
-            </div>
-        {% else %}
-            <div class="empty-state">
-                <h3>No HR letter generated yet</h3>
-                <p>Generate a letter from the worker profile to view it here.</p>
-            </div>
-        {% endif %}
-
-        <div class="signature">
-            <div class="sig-box">
-                <div class="signature-line"></div>
-                <span>HR Manager</span>
+            <div class="field">
+                <label>Client Name</label>
+                <input value="{{ order.name or '—' }}" readonly>
             </div>
 
-            <div class="sig-box">
-                <div class="signature-line"></div>
-                <span>Managing Director</span>
+            <div class="field">
+                <label>Email Address</label>
+                <input value="{{ order.email or '—' }}" readonly>
             </div>
-        </div>
 
-        <div class="btn-area no-print">
-            <button class="btn print-btn" onclick="window.print()">🖨 Print Letter</button>
-            <a href="{{ url_for('workers.workers_name') }}" class="btn back-btn">← Back to Workers</a>
-            <form action="{{ url_for('workers.send_worker_letter', worker_id=worker.id) }}" method="POST" style="display:inline;">
-                <button type="submit" class="btn email-btn">📧 Send Email</button>
-            </form>
+            <div class="field">
+                <label>Phone Number</label>
+                <input value="{{ order.phone_number or '—' }}" readonly>
+            </div>
+
+            <div class="field">
+                <label>Date Needed</label>
+                <input value="{{ order.date_needed.strftime('%Y-%m-%d') if order.date_needed else '—' }}" readonly>
+            </div>
+
         </div>
 
     </div>
+
+    <!-- ================= SECTION 2 ================= -->
+    <div class="section-card">
+
+        <div class="section-title">
+            PRODUCT DETAILS
+        </div>
+
+        <div class="form-grid">
+
+            <div class="field">
+                <label>Product</label>
+                <input value="{{ order.items or '—' }}" readonly>
+            </div>
+
+            <div class="field">
+                <label>Quantity (KG)</label>
+                <input value="{{ order.kilograms or 0 }}" readonly>
+            </div>
+
+            <div class="field">
+                <label>Unit Price (₦)</label>
+                <input value="{{ '%.2f'|format(order.unit_price or 0) }}" readonly>
+            </div>
+
+            <div class="field">
+                <label>Total Amount (₦)</label>
+                <input class="highlight" value="{{ '%.2f'|format(order.total_amount or 0) }}" readonly>
+            </div>
+
+            <div class="field full">
+                <label>Description</label>
+                <textarea rows="3" readonly>{{ order.description or 'No Description' }}</textarea>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ================= SECTION 3 ================= -->
+    <div class="section-card">
+
+        <div class="section-title">
+            TRANSPORT / DELIVERY
+        </div>
+
+        <div class="form-grid">
+
+            <div class="field">
+                <label>Driver Name</label>
+                <input value="{{ order.driver_name or '—' }}" readonly>
+            </div>
+
+            <div class="field">
+                <label>Vehicle Plate</label>
+                <input value="{{ order.vehicle_plate_number or '—' }}" readonly>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ================= SECTION 4 ================= -->
+    <div class="section-card">
+
+        <div class="section-title">
+            PAYMENT DETAILS
+        </div>
+
+        <div class="form-grid">
+
+            <div class="field">
+                <label>Payer Bank</label>
+                <input value="{{ order.bank_name or '—' }}" readonly>
+            </div>
+
+            <div class="field">
+                <label>Account Number</label>
+                <input value="{{ order.account_number or '—' }}" readonly>
+            </div>
+
+            <div class="field full">
+                <label>Account Name</label>
+                <input value="{{ order.account_bank_name or '—' }}" readonly>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ================= SIGNATURE ================= -->
+    <div class="signature-zone">
+
+        <div class="sign-box">
+            ___________________________
+            <br>
+            Client Signature
+        </div>
+
+        <div class="sign-box">
+            ___________________________
+            <br>
+            Management Approval
+        </div>
+
+    </div>
+
+    <!-- ================= ACTIONS ================= -->
+    <div class="no-print action-bar">
+
+        <a href="{{ url_for('orders.orders_overview') }}" class="btn secondary-btn">
+           ← Back to Order Overview
+        </a>
+
+        <button onclick="window.print()" class="print-btn">
+            🖨 Print Order
+        </button>
+
+    </div>
+
+    <!-- ================= FOOTER ================= -->
+    <div class="footer">
+        © {{ current_year | default(2026) }} OKOYA FOOD COMPANY LIMITED | Official Order Management Record
+    </div>
+
 </div>
 
+</section>
+
 <style>
-:root {
-    --primary: #004080;
-    --primary-dark: #003060;
-    --success: #28a745;
-    --danger: #dc3545;
-    --warning: #ffc107;
-    --bg: #eef2f7;
-    --card: #fff;
-    --text: #1e293b;
-    --muted: #64748b;
+
+body{
+    background:#f4f6f9;
+    font-family:Arial,sans-serif;
 }
 
-body {
-    background: linear-gradient(135deg,#eef2f7,#dbe7f5,#c7daf0);
-    font-family: 'Poppins', Arial, sans-serif;
-    margin: 0;
+.register-container{
+    width:210mm;
+    min-height:297mm;
+    margin:20px auto;
+    background:#fff;
+    padding:12mm;
+    box-shadow:0 0 10px rgba(0,0,0,0.08);
+    border-radius:8px;
 }
 
-.letter-page {
-    width: 100%;
-    max-width: 1200px;
-    margin: auto;
-    padding: 25px;
+.official-header{
+    text-align:center;
+    border-bottom:3px solid #111;
+    padding-bottom:10px;
+    margin-bottom:15px;
 }
 
-.letter-header {
-    background: linear-gradient(135deg,#004080,#0056b3,#007bff);
-    color: white;
-    padding: 20px 25px;
-    border-radius: 16px;
+.official-header h1{
+    font-size:26px;
+    margin:0;
+    color:#111;
+    font-weight:bold;
+}
+
+.official-header h3{
+    font-size:13px;
+    margin:4px 0;
+}
+
+.official-header p{
+    font-size:12px;
+    margin:2px 0;
+}
+
+.document-title{
+    margin-top:12px;
+    font-size:22px;
+    font-weight:bold;
+    color:#0056b3;
+    letter-spacing:1px;
+}
+
+.document-meta{
+    margin-top:8px;
+    font-size:12px;
+    color:#444;
+}
+
+.section-card{
+    border:1px solid #dcdcdc;
+    border-radius:8px;
+    padding:15px;
+    margin-bottom:15px;
+    page-break-inside:avoid;
+}
+
+.section-title{
+    font-size:15px;
+    font-weight:bold;
+    color:#0d47a1;
+    margin-bottom:12px;
+    border-left:4px solid #0d47a1;
+    padding-left:10px;
+}
+
+.form-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+}
+
+.field{
+    display:flex;
+    flex-direction:column;
+}
+
+.field.full{
+    grid-column:1 / 3;
+}
+
+label{
+    font-weight:bold;
+    margin-bottom:4px;
+    font-size:13px;
+    color:#333;
+}
+
+input, textarea{
+    width:100%;
+    padding:10px;
+    border:1px solid #bbb;
+    border-radius:6px;
+    background:#fafafa;
+    font-size:13px;
+    box-sizing:border-box;
+}
+
+textarea{
+    resize:none;
+}
+
+.highlight{
+    font-weight:bold;
+    background:#e8f5e9;
+    color:#1b5e20;
+}
+
+.signature-zone{
+    display:flex;
+    justify-content:space-between;
+    margin-top:30px;
+    page-break-inside:avoid;
+}
+
+.sign-box{
+    width:45%;
+    text-align:center;
+    font-size:13px;
+    padding-top:20px;
+}
+
+.action-bar{
+    text-align:center;
+    margin-top:20px;
+}
+
+.print-btn{
+    background:#0d47a1;
+    color:white;
+    border:none;
+    padding:12px 25px;
+    border-radius:6px;
+    cursor:pointer;
+    font-size:14px;
+}
+
+.secondary-btn{
+    background:#666;
+    color:white;
+    padding:12px 20px;
+    text-decoration:none;
+    border-radius:6px;
+    margin-right:10px;
+}
+
+.footer{
+    text-align:center;
+    margin-top:25px;
+    font-size:11px;
+    color:#666;
+    border-top:1px solid #ddd;
+    padding-top:8px;
+}
+
+/* ================= HEADER FLEX ================= */
+
+.official-header-row{
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    flex-wrap: wrap;
-    gap: 15px;
-    margin-bottom: 25px;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-}
-
-.header-left {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-.letter-logo {
-    width: 70px;
-    height: 70px;
-    object-fit: contain;
-    border-radius: 12px;
-    background: white;
-    padding: 5px;
-}
-
-.header-left h1 {
-    margin: 0;
-    font-size: 1.6rem;
-    font-weight: 800;
-}
-
-.header-left p {
-    margin: 5px 0 0;
-    opacity: 0.9;
-}
-
-.header-actions {
-    display: flex;
-    gap: 10px;
-}
-
-.letter-container {
-    background: var(--card);
-    padding: 40px;
-    border-radius: 16px;
-    box-shadow: 0 12px 35px rgba(0,0,0,0.12);
-}
-
-.meta-bar {
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 10px;
-    font-size: 13px;
-    color: var(--muted);
-    background: #f8fafc;
-    padding: 12px 16px;
-    border-radius: 10px;
+    gap: 25px;
+    border-bottom: 3px solid #111;
+    padding-bottom: 15px;
     margin-bottom: 20px;
 }
 
-.company-header {
-    text-align: center;
-    border-bottom: 2px solid var(--primary);
-    padding-bottom: 20px;
-    margin-bottom: 25px;
-}
+/* LOGO BOX FIXED */
+.company-logo-box{
+    width: 140px;
+    height: 140px;
+    flex-shrink: 0;
 
-.company-header img {
-    width: 90px;
-    height: 90px;
-    object-fit: contain;
-}
-
-.company-header h1 {
-    margin: 12px 0 5px;
-    font-size: 22px;
-    color: var(--primary);
-    font-weight: 800;
-}
-
-.company-header p {
-    margin: 0;
-    font-size: 14px;
-    color: var(--muted);
-}
-
-.status-badge {
-    display: inline-block;
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 700;
-    margin-top: 12px;
-    color: white;
-}
-
-.status-warning { background: #f59e0b; }
-.status-danger { background: var(--danger); }
-.status-success { background: var(--success); }
-.status-deactivated { background: var(--danger); }
-.status-reactivated { background: var(--success); }
-.status-active { background: var(--success); }
-.status-inactive { background: var(--muted); }
-
-.letter-title {
-    text-align: center;
-    font-size: 18px;
-    font-weight: 700;
-    margin: 25px 0;
-    color: #111;
-    letter-spacing: 0.5px;
-}
-
-.info-box {
-    background: #f8fafc;
-    padding: 20px;
-    border-left: 4px solid var(--primary);
-    border-radius: 10px;
-    margin-bottom: 25px;
-}
-
-.info-grid {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 20px;
-    flex-wrap: wrap;
-}
-
-.info-box p {
-    margin: 8px 0;
-    font-size: 14px;
-    line-height: 1.8;
-}
-
-.info-box strong {
-    color: var(--primary);
-}
-
-.worker-passport {
-    width: 120px;
-    height: 120px;
-    object-fit: cover;
-    border-radius: 12px;
-    border: 2px solid var(--primary);
-}
-
-.divider {
-    border: none;
-    height: 2px;
-    background: linear-gradient(90deg,transparent,var(--primary),transparent);
-    margin: 25px 0;
-}
-
-.letter-content {
-    background: #f8fafc;
-    border-left: 5px solid var(--primary);
-    padding: 25px;
-    font-size: 14px;
-    line-height: 1.9;
-    white-space: pre-wrap;
-    color: var(--text);
-    border-radius: 10px;
-}
-
-.empty-state {
-    text-align: center;
-    padding: 50px 20px;
-    color: var(--muted);
-}
-
-.empty-state h3 {
-    color: var(--text);
-    margin-bottom: 10px;
-}
-
-.signature {
-    margin-top: 60px;
-    display: flex;
-    justify-content: space-between;
-    gap: 40px;
-    flex-wrap: wrap;
-}
-
-.sig-box {
-    text-align: center;
-    flex: 1;
-    min-width: 200px;
-}
-
-.signature-line {
-    margin-top: 50px;
-    border-top: 1px solid #000;
-    width: 220px;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.sig-box span {
-    display: block;
-    margin-top: 10px;
-    font-weight: 600;
-    color: var(--text);
-}
-
-.btn-area {
-    margin-top: 35px;
-    text-align: center;
     display: flex;
     justify-content: center;
-    gap: 12px;
-    flex-wrap: wrap;
+    align-items: center;
 }
 
-.btn {
-    padding: 12px 20px;
-    border-radius: 10px;
-    border: none;
-    cursor: pointer;
-    font-weight: 700;
-    text-decoration: none;
-    display: inline-block;
-    transition: 0.2s;
+/* LOGO IMAGE */
+.company-logo{
+    width: 120px;
+    height: 120px;
+    object-fit: contain;
+    border-radius: 8px;
 }
 
-.btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+/* HEADER TEXT */
+.official-header{
+    flex: 1;
+    text-align: center;
 }
 
-.print-btn {
-    background: var(--success);
-    color: white;
-}
+/* ================= PRINT MODE ================= */
 
-.email-btn {
-    background: #007bff;
-    color: white;
-}
-
-.back-btn {
-    background: var(--primary);
-    color: white;
-}
-
-/* PRINT CSS */
 @media print {
-    @page {
-        size: A4;
-        margin: 15mm;
+
+    .official-header-row{
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        border-bottom: 3px solid #000;
+        padding-bottom: 10px;
+        margin-bottom: 15px;
     }
 
-    html, body {
-        background: white !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        font-size: 11pt !important;
-        color: black !important;
+    .company-logo-box{
+        width: 180px;
+        height: 180px;
     }
 
-    .no-print {
-        display: none !important;
-    }
-
-    .letter-page {
-        max-width: 100% !important;
-        width: 100% !important;
-        padding: 0 !important;
-        margin: 0 !important;
-        box-shadow: none !important;
-    }
-
-    .letter-container {
-        box-shadow: none !important;
-        border-radius: 0 !important;
-        padding: 0 !important;
-        background: white !important;
-    }
-
-    .letter-header {
-        background: white !important;
-        color: black !important;
-        box-shadow: none !important;
-        border-bottom: 2px solid black !important;
-    }
-
-    .letter-content {
-        background: white !important;
-        color: black !important;
-        border-left: 3px solid black !important;
-        white-space: pre-wrap !important;
-        word-wrap: break-word !important;
-        font-size: 11pt !important;
-        line-height: 1.7 !important;
-        padding: 15px !important;
-        display: block !important;
-        page-break-inside: auto !important;
-        break-inside: auto !important;
-    }
-
-    .company-header h1,
-    .company-header p,
-    .letter-title,
-    .info-box p,
-    .info-box strong,
-    .meta-bar span,
-    .sig-box span,
-    .letter-header h1,
-    .letter-header p {
-        color: black !important;
-    }
-
-    .meta-bar, .info-box {
-        background: white !important;
-        border: 1px solid #999 !important;
-    }
-
-    .company-header img,
-    .worker-passport,
-    .letter-logo {
-        width: 80px !important;
-        height: 80px !important;
-    }
-
-    /* Allow letter content to break across pages */
-    .letter-content, .divider {
-        page-break-inside: auto !important;
-        break-inside: auto !important;
-    }
-
-    /* Keep header and signature together */
-    .info-box, .signature, .company-header {
-        page-break-inside: avoid;
-        break-inside: avoid;
+    .company-logo{
+        width: 160px;
+        height: 160px;
+        object-fit: contain;
     }
 }
+/* ================= PRINT ================= */
+@media print{
+
+    @page{
+        size:A4 portrait;
+        margin:10mm;
+    }
+
+    body{
+        background:white;
+    }
+
+    .no-print{
+        display:none !important;
+    }
+
+    .register-container{
+        width:100%;
+        min-height:auto;
+        margin:0;
+        padding:0;
+        box-shadow:none;
+        border:none;
+    }
+
+    input, textarea{
+        border:none;
+        border-bottom:1px solid #000;
+        background:white;
+        border-radius:0;
+        padding:6px;
+    }
+
+    .section-card{
+        border:1px solid #000;
+    }
+
+    .section-title{
+        color:#000;
+        border-left:4px solid #000;
+    }
+
+    .highlight{
+        background:white;
+        color:black;
+        font-weight:bold;
+    }
+
+    .footer{
+        position:fixed;
+        bottom:0;
+        width:100%;
+    }
+
+    .signature-zone{
+        margin-top:20px;
+    }
+}
+
 </style>
 
 {% endblock %}
