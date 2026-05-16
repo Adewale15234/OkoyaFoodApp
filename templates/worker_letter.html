@@ -6,7 +6,7 @@
 
 <div class="letter-page">
 
-    <!-- HEADER BAR -->
+    <!-- HEADER BAR - HIDDEN ON PRINT -->
     <header class="letter-header no-print">
         <div class="header-left">
             <img src="{{ url_for('static', filename='logo.png') }}" class="letter-logo" alt="Logo">
@@ -23,7 +23,7 @@
     </header>
 
     <!-- LETTER CONTAINER -->
-    <div class="letter-container">
+    <div class="letter-container" id="print-area">
 
         <!-- META INFO BAR -->
         <div class="meta-bar">
@@ -101,10 +101,12 @@
             </div>
         </div>
 
-        <!-- ACTION BUTTONS -->
+        <!-- ACTION BUTTONS - HIDDEN ON PRINT -->
         <div class="btn-area no-print">
             <button class="btn print-btn" onclick="window.print()">🖨 Print Letter</button>
+
             <a href="{{ url_for('workers.workers_name') }}" class="btn back-btn">← Back to Workers</a>
+
             <form action="{{ url_for('workers.send_worker_letter', worker_id=worker.id) }}" method="POST" style="display:inline;">
                 <button type="submit" class="btn email-btn">📧 Send Email</button>
             </form>
@@ -116,6 +118,7 @@
 <style>
 :root {
     --primary: #004080;
+    --primary-dark: #003060;
     --success: #28a745;
     --danger: #dc3545;
     --warning: #ffc107;
@@ -244,6 +247,8 @@ body {
 .status-success { background: var(--success); }
 .status-deactivated { background: var(--danger); }
 .status-reactivated { background: var(--success); }
+.status-active { background: var(--success); }
+.status-inactive { background: var(--muted); }
 
 .letter-title {
     text-align: center;
@@ -312,6 +317,11 @@ body {
     color: var(--muted);
 }
 
+.empty-state h3 {
+    color: var(--text);
+    margin-bottom: 10px;
+}
+
 .signature {
     margin-top: 60px;
     display: flex;
@@ -366,15 +376,26 @@ body {
     box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
 
-.print-btn { background: var(--success); color: white; }
-.email-btn { background: #007bff; color: white; }
-.back-btn { background: var(--primary); color: white; }
+.print-btn {
+    background: var(--success);
+    color: white;
+}
 
-/* PRINT */
+.email-btn {
+    background: #007bff;
+    color: white;
+}
+
+.back-btn {
+    background: var(--primary);
+    color: white;
+}
+
+/* ===================== PRINT CSS ===================== */
 @media print {
     @page {
         size: A4;
-        margin: 15mm 15mm;
+        margin: 15mm;
     }
 
     html, body {
@@ -383,17 +404,33 @@ body {
         padding: 0 !important;
         font-size: 11pt !important;
         color: black !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
     }
 
-    .no-print { display: none !important; }
+    /* Hide everything by default */
+    body * {
+        visibility: hidden;
+    }
 
-    .letter-page, .letter-container {
+    /* Only show the letter container and its children */
+    #print-area, #print-area * {
+        visibility: visible;
+    }
+
+    #print-area {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        background: white !important;
+        box-shadow: none !important;
         padding: 0 !important;
         margin: 0 !important;
-        width: 100% !important;
-        max-width: none !important;
-        box-shadow: none !important;
-        background: white !important;
+    }
+
+    .no-print {
+        display: none !important;
     }
 
     .company-header img {
@@ -406,9 +443,14 @@ body {
         color: black !important;
     }
 
+    .company-header p {
+        color: black !important;
+    }
+
     .letter-title {
         font-size: 13pt !important;
         margin: 15px 0 !important;
+        color: black !important;
     }
 
     .meta-bar, .info-box {
@@ -431,6 +473,11 @@ body {
     .info-box p {
         font-size: 11pt !important;
         margin: 5px 0 !important;
+        color: black !important;
+    }
+
+    .info-box strong {
+        color: black !important;
     }
 
     .worker-passport {
@@ -445,6 +492,15 @@ body {
     .signature-line {
         margin-top: 35px !important;
         width: 180px !important;
+        border-top: 1px solid #000 !important;
+    }
+
+    .sig-box span {
+        color: black !important;
+    }
+
+    .meta-bar span {
+        color: black !important;
     }
 
     .info-box, .letter-content, .signature, .company-header {
@@ -453,7 +509,7 @@ body {
     }
 }
 
-/* RESPONSIVE */
+/* ===================== RESPONSIVE ===================== */
 @media(max-width: 768px) {
     .letter-page { padding: 15px; }
     .letter-header { flex-direction: column; text-align: center; }
