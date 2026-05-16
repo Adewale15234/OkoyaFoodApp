@@ -430,6 +430,9 @@ body {
         font-size: 11pt !important;
         line-height: 1.7 !important;
         padding: 15px !important;
+        display: block !important;
+        page-break-inside: auto !important;
+        break-inside: auto !important;
     }
 
     .company-header h1,
@@ -456,7 +459,14 @@ body {
         height: 80px !important;
     }
 
-    .info-box, .letter-content, .signature, .company-header {
+    /* Allow letter content to break across pages */
+    .letter-content, .divider {
+        page-break-inside: auto !important;
+        break-inside: auto !important;
+    }
+
+    /* Keep header and signature together */
+    .info-box, .signature, .company-header {
         page-break-inside: avoid;
         break-inside: avoid;
     }
