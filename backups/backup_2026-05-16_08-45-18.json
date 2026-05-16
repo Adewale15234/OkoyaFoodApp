@@ -1,0 +1,68 @@
+{
+  "workers": [
+    {
+      "id": 6,
+      "worker_code": "OFCL0001",
+      "name": "Wahab Ismail Adewale",
+      "phone_number": "09158732229",
+      "date_of_birth": "2004-05-02",
+      "gender": "Male",
+      "qualifications": "B.Sc",
+      "position": "Manager",
+      "national_id": "58242652626",
+      "nationality": "Nigeria",
+      "home_address": "Saki, Oyo State, NigeriaIsale adinni area",
+      "ethnic_group": "Yoruba",
+      "place_of_residence": "SAKI OYO STATE",
+      "disability": "",
+      "email": "wismailadewale@gmail.com",
+      "date_of_employment": "2026-05-15",
+      "amount_of_salary": 20000.0,
+      "bank_name": "Zenith Bank",
+      "bank_account": "9114613446",
+      "bank_account_name": "ismail adewale wahab",
+      "guarantor": "Father",
+      "passport": "bb3a2c80091641799d784006686b3479_20240615_194445.jpg",
+      "is_active": false,
+      "status_reason": "he is so rude",
+      "status_date": "2026-05-16 15:38:47.877581",
+      "status_type": "deactivated",
+      "status_letter": "OKOYA FOOD COMPANY LIMITED\nHUMAN RESOURCES DEPARTMENT\nOFFICIAL DISCIPLINARY NOTICE\n\nEmployee Name: Wahab Ismail Adewale\nEmployee Code: OFCL0001\nPosition: Manager\n\nSTATUS: DEACTIVATED\n\nREASON FOR ACTION:\nhe is so rude\n\nHR DECISION\n\nFollowing internal review and company policy guidelines,\nyou have been placed under disciplinary action and\ntemporarily removed from active duty pending further review.\n\nYou are advised to report to the HR department for clarification.\n\nEffective Date: 2026-05-16\n\nNOTE:\nFailure to comply may lead to permanent termination.\n\nOKOYA FOOD HR MANAGEMENT SYSTEM\n",
+      "warning_count": 2,
+      "last_action_by": "admin",
+      "last_action_date": "2026-05-16 15:38:47.877581",
+      "notes": null,
+      "updated_at": "2026-05-16 15:39:39.746643"
+    }
+  ],
+  "email_logs": [],
+  "alembic_version": [
+    {
+      "version_num": "3934e94806a0"
+    }
+  ],
+  "orders": [
+    {
+      "id": 1,
+      "created_at": "2026-05-12 18:47:21.431898",
+      "name": "Wahab Ismail Adewale",
+      "email": "wismailadewale@gmail.com",
+      "items": "Soya Beans",
+      "kilograms": 200,
+      "unit_price": 100.0,
+      "total_amount": 20000.0,
+      "date_needed": "2002-02-05 00:00:00",
+      "driver_name": "ISMAIL",
+      "vehicle_plate_number": "20078",
+      "bank_name": "Opay",
+      "account_number": "9158732229",
+      "account_bank_name": "WAHAB ISMAIL",
+      "description": "good",
+      "phone_number": "09158732229",
+      "status": "Confirmed",
+      "confirmed_at": "2026-05-13 15:00:21.827270"
+    }
+  ],
+  "attendance": [],
+  "salary": []
+}

@@ -4,7 +4,7 @@
 
 {% block content %}
 
-<div class="letter-page">
+<div class="letter-page" id="print-area">
 
     <header class="letter-header no-print">
         <div class="header-left">
@@ -21,7 +21,7 @@
         </div>
     </header>
 
-    <div class="letter-container" id="print-area">
+    <div class="letter-container">
 
         <div class="meta-bar">
             <span><strong>Worker ID:</strong> {{ worker.worker_code }}</span>
@@ -395,25 +395,33 @@ body {
         color: black !important;
     }
 
-    body > *:not(#print-area) {
-        display: none !important;
-    }
-
     .no-print {
         display: none !important;
     }
 
-    #print-area {
-        display: block !important;
+    .letter-page {
+        max-width: 100% !important;
         width: 100% !important;
-        background: white !important;
-        box-shadow: none !important;
         padding: 0 !important;
         margin: 0 !important;
+        box-shadow: none !important;
+    }
+
+    .letter-container {
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        padding: 0 !important;
+        background: white !important;
+    }
+
+    .letter-header {
+        background: white !important;
+        color: black !important;
+        box-shadow: none !important;
+        border-bottom: 2px solid black !important;
     }
 
     .letter-content {
-        display: block !important;
         background: white !important;
         color: black !important;
         border-left: 3px solid black !important;
@@ -430,7 +438,9 @@ body {
     .info-box p,
     .info-box strong,
     .meta-bar span,
-    .sig-box span {
+    .sig-box span,
+    .letter-header h1,
+    .letter-header p {
         color: black !important;
     }
 
@@ -440,9 +450,15 @@ body {
     }
 
     .company-header img,
-    .worker-passport {
+    .worker-passport,
+    .letter-logo {
         width: 80px !important;
         height: 80px !important;
+    }
+
+    .info-box, .letter-content, .signature, .company-header {
+        page-break-inside: avoid;
+        break-inside: avoid;
     }
 }
 </style>
