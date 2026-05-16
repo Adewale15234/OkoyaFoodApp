@@ -6,7 +6,6 @@
 
 <div class="letter-page">
 
-    <!-- HEADER BAR - HIDDEN ON PRINT -->
     <header class="letter-header no-print">
         <div class="header-left">
             <img src="{{ url_for('static', filename='logo.png') }}" class="letter-logo" alt="Logo">
@@ -22,17 +21,14 @@
         </div>
     </header>
 
-    <!-- LETTER CONTAINER -->
     <div class="letter-container" id="print-area">
 
-        <!-- META INFO BAR -->
         <div class="meta-bar">
             <span><strong>Worker ID:</strong> {{ worker.worker_code }}</span>
             <span><strong>Dept:</strong> HR Department - OKOYA FOOD LTD</span>
             <span><strong>Date:</strong> {{ current_date if current_date else now.strftime('%d %B %Y') if now else '' }}</span>
         </div>
 
-        <!-- COMPANY HEADER -->
         <div class="company-header">
             <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo">
             <h1>OKOYA FOOD COMPANY LIMITED</h1>
@@ -45,12 +41,10 @@
             {% endif %}
         </div>
 
-        <!-- TITLE -->
         <div class="letter-title">
             OFFICIAL HR DISCIPLINARY / REINSTATEMENT LETTER
         </div>
 
-        <!-- WORKER INFO -->
         <div class="info-box">
             <div class="info-grid">
                 <div>
@@ -76,7 +70,6 @@
 
         <hr class="divider">
 
-        <!-- LETTER CONTENT -->
         {% if worker.status_letter %}
             <div class="letter-content">
                 {{ worker.status_letter }}
@@ -88,7 +81,6 @@
             </div>
         {% endif %}
 
-        <!-- SIGNATURE -->
         <div class="signature">
             <div class="sig-box">
                 <div class="signature-line"></div>
@@ -101,12 +93,9 @@
             </div>
         </div>
 
-        <!-- ACTION BUTTONS - HIDDEN ON PRINT -->
         <div class="btn-area no-print">
             <button class="btn print-btn" onclick="window.print()">🖨 Print Letter</button>
-
             <a href="{{ url_for('workers.workers_name') }}" class="btn back-btn">← Back to Workers</a>
-
             <form action="{{ url_for('workers.send_worker_letter', worker_id=worker.id) }}" method="POST" style="display:inline;">
                 <button type="submit" class="btn email-btn">📧 Send Email</button>
             </form>
@@ -391,7 +380,7 @@ body {
     color: white;
 }
 
-/* ===================== PRINT CSS ===================== */
+/* PRINT CSS */
 @media print {
     @page {
         size: A4;
@@ -404,62 +393,27 @@ body {
         padding: 0 !important;
         font-size: 11pt !important;
         color: black !important;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
     }
 
-    /* Hide everything by default */
-    body * {
-        visibility: hidden;
-    }
-
-    /* Only show the letter container and its children */
-    #print-area, #print-area * {
-        visibility: visible;
-    }
-
-    #print-area {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-        background: white !important;
-        box-shadow: none !important;
-        padding: 0 !important;
-        margin: 0 !important;
+    body > *:not(#print-area) {
+        display: none !important;
     }
 
     .no-print {
         display: none !important;
     }
 
-    .company-header img {
-        width: 80px !important;
-        height: 80px !important;
-    }
-
-    .company-header h1 {
-        font-size: 16pt !important;
-        color: black !important;
-    }
-
-    .company-header p {
-        color: black !important;
-    }
-
-    .letter-title {
-        font-size: 13pt !important;
-        margin: 15px 0 !important;
-        color: black !important;
-    }
-
-    .meta-bar, .info-box {
+    #print-area {
+        display: block !important;
+        width: 100% !important;
         background: white !important;
-        color: black !important;
-        border: 1px solid #999 !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
     }
 
     .letter-content {
+        display: block !important;
         background: white !important;
         color: black !important;
         border-left: 3px solid black !important;
@@ -470,52 +424,26 @@ body {
         padding: 15px !important;
     }
 
-    .info-box p {
-        font-size: 11pt !important;
-        margin: 5px 0 !important;
-        color: black !important;
-    }
-
-    .info-box strong {
-        color: black !important;
-    }
-
-    .worker-passport {
-        width: 90px !important;
-        height: 90px !important;
-    }
-
-    .signature {
-        margin-top: 40px !important;
-    }
-
-    .signature-line {
-        margin-top: 35px !important;
-        width: 180px !important;
-        border-top: 1px solid #000 !important;
-    }
-
+    .company-header h1,
+    .company-header p,
+    .letter-title,
+    .info-box p,
+    .info-box strong,
+    .meta-bar span,
     .sig-box span {
         color: black !important;
     }
 
-    .meta-bar span {
-        color: black !important;
+    .meta-bar, .info-box {
+        background: white !important;
+        border: 1px solid #999 !important;
     }
 
-    .info-box, .letter-content, .signature, .company-header {
-        page-break-inside: avoid;
-        break-inside: avoid;
+    .company-header img,
+    .worker-passport {
+        width: 80px !important;
+        height: 80px !important;
     }
-}
-
-/* ===================== RESPONSIVE ===================== */
-@media(max-width: 768px) {
-    .letter-page { padding: 15px; }
-    .letter-header { flex-direction: column; text-align: center; }
-    .info-grid { flex-direction: column; align-items: center; }
-    .signature { flex-direction: column; gap: 40px; }
-    .letter-container { padding: 25px 20px; }
 }
 </style>
 
