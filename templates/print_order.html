@@ -108,7 +108,7 @@
 
             <div class="field full">
                 <label>Description</label>
-                <textarea rows="3" readonly>{{ order.description or 'No Description' }}</textarea>
+                <textarea rows="2" readonly>{{ order.description or 'No Description' }}</textarea>
             </div>
 
         </div>
@@ -210,77 +210,78 @@
 body{
     background:#f4f6f9;
     font-family:Arial,sans-serif;
+    font-size: 12px;
 }
 
 .register-container{
     width:210mm;
-    min-height:297mm;
-    margin:20px auto;
+    min-height:auto;
+    margin:15px auto;
     background:#fff;
-    padding:12mm;
+    padding:8mm;
     box-shadow:0 0 10px rgba(0,0,0,0.08);
     border-radius:8px;
 }
 
 .official-header{
     text-align:center;
-    border-bottom:3px solid #111;
-    padding-bottom:10px;
-    margin-bottom:15px;
+    border-bottom:2px solid #111;
+    padding-bottom:8px;
+    margin-bottom:12px;
 }
 
 .official-header h1{
-    font-size:26px;
+    font-size:20px;
     margin:0;
     color:#111;
     font-weight:bold;
 }
 
 .official-header h3{
-    font-size:13px;
-    margin:4px 0;
+    font-size:11px;
+    margin:3px 0;
 }
 
 .official-header p{
-    font-size:12px;
+    font-size:10px;
     margin:2px 0;
 }
 
 .document-title{
-    margin-top:12px;
-    font-size:22px;
+    margin-top:8px;
+    font-size:18px;
     font-weight:bold;
     color:#0056b3;
-    letter-spacing:1px;
+    letter-spacing:0.5px;
 }
 
 .document-meta{
-    margin-top:8px;
-    font-size:12px;
+    margin-top:6px;
+    font-size:10px;
     color:#444;
 }
 
 .section-card{
     border:1px solid #dcdcdc;
-    border-radius:8px;
-    padding:15px;
-    margin-bottom:15px;
-    page-break-inside:avoid;
+    border-radius:6px;
+    padding:10px;
+    margin-bottom:10px;
+    page-break-inside:auto;
 }
 
 .section-title{
-    font-size:15px;
+    font-size:13px;
     font-weight:bold;
     color:#0d47a1;
-    margin-bottom:12px;
-    border-left:4px solid #0d47a1;
-    padding-left:10px;
+    margin-bottom:8px;
+    border-left:3px solid #0d47a1;
+    padding-left:8px;
 }
 
 .form-grid{
     display:grid;
     grid-template-columns:1fr 1fr;
-    gap:12px;
+    gap:8px;
 }
 
 .field{
@@ -294,23 +295,24 @@ body{
 
 label{
     font-weight:bold;
-    margin-bottom:4px;
-    font-size:13px;
+    margin-bottom:3px;
+    font-size:11px;
     color:#333;
 }
 
 input, textarea{
     width:100%;
-    padding:10px;
+    padding:6px;
     border:1px solid #bbb;
-    border-radius:6px;
+    border-radius:4px;
     background:#fafafa;
-    font-size:13px;
+    font-size:11px;
     box-sizing:border-box;
 }
 
 textarea{
     resize:none;
+    height:40px;
 }
 
 .highlight{
@@ -322,48 +324,49 @@ textarea{
 .signature-zone{
     display:flex;
     justify-content:space-between;
-    margin-top:30px;
+    margin-top:25px;
     page-break-inside:avoid;
 }
 
 .sign-box{
     width:45%;
     text-align:center;
-    font-size:13px;
-    padding-top:20px;
+    font-size:11px;
+    padding-top:15px;
 }
 
 .action-bar{
     text-align:center;
-    margin-top:20px;
+    margin-top:15px;
 }
 
 .print-btn{
     background:#0d47a1;
     color:white;
     border:none;
-    padding:12px 25px;
+    padding:10px 20px;
     border-radius:6px;
     cursor:pointer;
-    font-size:14px;
+    font-size:12px;
 }
 
 .secondary-btn{
     background:#666;
     color:white;
-    padding:12px 20px;
+    padding:10px 18px;
     text-decoration:none;
     border-radius:6px;
     margin-right:10px;
+    font-size:12px;
 }
 
 .footer{
     text-align:center;
-    margin-top:25px;
-    font-size:11px;
+    margin-top:20px;
+    font-size:10px;
     color:#666;
     border-top:1px solid #ddd;
-    padding-top:8px;
+    padding-top:6px;
 }
 
 /* ================= HEADER FLEX ================= */
@@ -371,16 +374,16 @@ textarea{
 .official-header-row{
     display: flex;
     align-items: center;
-    gap: 25px;
-    border-bottom: 3px solid #111;
-    padding-bottom: 15px;
-    margin-bottom: 20px;
+    gap: 15px;
+    border-bottom: 2px solid #111;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
 }
 
 /* LOGO BOX FIXED */
 .company-logo-box{
-    width: 140px;
-    height: 140px;
+    width: 90px;
+    height: 90px;
     flex-shrink: 0;
 
     display: flex;
@@ -390,10 +393,10 @@ textarea{
 
 /* LOGO IMAGE */
 .company-logo{
-    width: 120px;
-    height: 120px;
+    width: 80px;
+    height: 80px;
     object-fit: contain;
-    border-radius: 8px;
+    border-radius: 6px;
 }
 
 /* HEADER TEXT */
@@ -409,20 +412,20 @@ textarea{
     .official-header-row{
         display: flex;
         align-items: center;
-        gap: 20px;
-        border-bottom: 3px solid #000;
-        padding-bottom: 10px;
-        margin-bottom: 15px;
+        gap: 15px;
+        border-bottom: 2px solid #000;
+        padding-bottom: 8px;
+        margin-bottom: 12px;
     }
 
     .company-logo-box{
-        width: 180px;
-        height: 180px;
+        width: 100px;
+        height: 100px;
     }
 
     .company-logo{
-        width: 160px;
-        height: 160px;
+        width: 90px;
+        height: 90px;
         object-fit: contain;
     }
 }
@@ -436,6 +439,7 @@ textarea{
 
     body{
         background:white;
+        font-size: 10pt;
     }
 
     .no-print{
@@ -456,16 +460,19 @@ textarea{
         border-bottom:1px solid #000;
         background:white;
         border-radius:0;
-        padding:6px;
+        padding:4px;
+        font-size: 10pt;
     }
 
     .section-card{
         border:1px solid #000;
+        page-break-inside:auto;
     }
 
     .section-title{
         color:#000;
-        border-left:4px solid #000;
+        border-left:3px solid #000;
+        font-size: 12pt;
     }
 
     .highlight{
@@ -475,14 +482,20 @@ textarea{
     }
 
     .footer{
-        position:fixed;
+        position:running(footer);
         bottom:0;
         width:100%;
     }
 
     .signature-zone{
         margin-top:20px;
+        page-break-inside:avoid;
     }
+    
+    h1 { font-size: 16pt !important; }
+    h3 { font-size: 10pt !important; }
+    p, label, input, textarea { font-size: 10pt !important; }
+    .document-title { font-size: 14pt !important; }
 }
 
 </style>
