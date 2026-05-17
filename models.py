@@ -15,9 +15,15 @@ class Worker(db.Model):
     position = db.Column(db.String(100), nullable=False)
     national_id = db.Column(db.String(50), nullable=False)
     nationality = db.Column(db.String(50), nullable=False)
-    home_address = db.Column(db.String(200), nullable=False)
+    
+    # Increased from 200 to 255 to fit longer addresses
+    home_address = db.Column(db.String(255), nullable=False)
+    
     ethnic_group = db.Column(db.String(50), nullable=False)
-    place_of_residence = db.Column(db.String(100), nullable=False)
+    
+    # Increased from 100 to 255 to fit Cloudinary URLs
+    place_of_residence = db.Column(db.String(255), nullable=False)
+    
     disability = db.Column(db.String(100), nullable=True)
     email = db.Column(db.String(100), nullable=False)
     date_of_employment = db.Column(db.Date, nullable=False)
@@ -26,7 +32,9 @@ class Worker(db.Model):
     bank_account = db.Column(db.String(50), nullable=True)
     bank_account_name = db.Column(db.String(100), nullable=False)
     guarantor = db.Column(db.String(100), nullable=False)
-    passport = db.Column(db.String(100), nullable=True)
+    
+    # Increased from 100 to 255 to fit Cloudinary URLs like https://res.cloudinary.com/...
+    passport = db.Column(db.String(255), nullable=True)
 
     updated_at = db.Column(
         db.DateTime,
@@ -34,7 +42,9 @@ class Worker(db.Model):
         onupdate=datetime.utcnow
     )
 
-    # STATUS
+    # =========================
+    # STATUS FIELDS
+    # =========================
     is_active = db.Column(db.Boolean, default=True, nullable=False)
     status_type = db.Column(db.String(30), nullable=True)
     status_reason = db.Column(db.Text, nullable=True)
@@ -45,7 +55,9 @@ class Worker(db.Model):
     last_action_date = db.Column(db.DateTime, nullable=True)
     notes = db.Column(db.Text, nullable=True)
 
+    # =========================
     # RELATIONSHIPS
+    # =========================
     attendance_records = db.relationship(
         'Attendance',
         backref='worker',
@@ -67,6 +79,9 @@ class Worker(db.Model):
         passive_deletes=True
     )
 
+    def __repr__(self):
+        return f'<Worker {self.worker_code} - {self.name}>'
+
 class EmailLog(db.Model):
     __tablename__ = 'email_logs'
 
@@ -79,6 +94,9 @@ class EmailLog(db.Model):
     email = db.Column(db.String(120), nullable=False)
     sent_at = db.Column(db.DateTime, default=datetime.utcnow)
     status = db.Column(db.String(20), default="Sent")
+
+    def __repr__(self):
+        return f'<EmailLog {self.email} - {self.status}>'
 
 class Order(db.Model):
     __tablename__ = 'orders'
@@ -101,6 +119,9 @@ class Order(db.Model):
     phone_number = db.Column(db.String(100))
     status = db.Column(db.String(20), default="Pending")
     confirmed_at = db.Column(db.DateTime, nullable=True)
+
+    def __repr__(self):
+        return f'<Order {self.id} - {self.name}>'
 
 class Attendance(db.Model):
     __tablename__ = 'attendance'
@@ -126,6 +147,9 @@ class Attendance(db.Model):
         onupdate=db.func.now()
     )
 
+    def __repr__(self):
+        return f'<Attendance {self.worker_id} - {self.date} - {self.status}>'
+
 class Salary(db.Model):
     __tablename__ = 'salary'
 
@@ -150,3 +174,6 @@ class Salary(db.Model):
     )
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     updated_at = db.Column(db.DateTime, server_default=db.func.now(), onupdate=db.func.now())
+
+    def __repr__(self):
+        return f'<Salary {self.worker_id} - {self.amount}>'

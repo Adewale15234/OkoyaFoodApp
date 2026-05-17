@@ -160,8 +160,9 @@ def create_app(config_name='default'):
     # =========================
     # AUTO BACKUP LOOP
     # =========================
-    # Runs only on local dev, not on Render
-    if os.environ.get("RENDER") != "true":
+    # Don't start backup during migrations or on Render
+    import sys
+    if os.environ.get("RENDER") != "true" and 'db' not in sys.argv:
         threading.Thread(target=auto_backup_loop, args=(app,), daemon=True).start()
 
     return app
