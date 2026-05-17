@@ -21,7 +21,9 @@
 
         <!-- PHOTO -->
         <div class="photo-box">
-            <img src="{% if worker.passport %}{{ url_for('uploaded_file', filename=worker.passport) }}{% else %}{{ url_for('static', filename='default.png') }}{% endif %}" crossorigin="anonymous">
+            <img src="{% if worker.passport %}{{ worker.passport }}{% else %}{{ url_for('static', filename='default.png') }}{% endif %}" 
+                alt="{{ worker.name }}"
+                crossorigin="anonymous">
         </div>
 
         <!-- DETAILS -->
