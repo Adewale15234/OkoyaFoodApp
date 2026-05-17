@@ -33,7 +33,11 @@
         <div class="passport-section">
 
             <div class="passport-box">
-                <img src="{% if worker.passport %}{{ url_for('uploaded_file', filename=worker.passport) }}{% else %}{{ url_for('static', filename='default.png') }}{% endif %}?v={{ worker.id }}"
+                {% if worker.passport %}
+                    <img src="{{ worker.passport }}" class="worker-passport" alt="{{ worker.name }}">
+                {% else %}
+                    <img src="{{ url_for('static', filename='logo.png') }}" class="worker-passport" alt="Default">
+                {% endif %}
                      id="passportPreview"
                      alt="Passport Photo">
                 <div class="passport-meta">
