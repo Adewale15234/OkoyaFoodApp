@@ -16,7 +16,8 @@
         </div>
 
         <div class="header-actions">
-            <button onclick="window.print()" class="btn print-btn">🖨 Print</button>
+            <button onclick="printSelection()" class="btn print-btn">🖨 Select & Print</button>
+            <button onclick="window.print()" class="btn print-btn">🖨 Print Full Page</button>
             <a href="{{ url_for('workers.workers_name') }}" class="btn back-btn">← Back to Workers</a>
         </div>
     </header>
@@ -36,7 +37,7 @@
 
     <div class="letter-container">
         
-        <!-- PRINT WRAPPER: this will auto-scale on print -->
+        <!-- PRINT WRAPPER -->
         <div class="print-wrapper" id="printWrapper">
 
             <div class="meta-bar">
@@ -87,7 +88,7 @@
             <hr class="divider">
 
             {% if worker.status_letter %}
-                <div class="letter-content">
+                <div class="letter-content" id="letterContent">
                     {{ worker.status_letter }}
                 </div>
             {% else %}
@@ -112,7 +113,8 @@
         </div>
 
         <div class="btn-area no-print">
-            <button class="btn print-btn" onclick="window.print()">🖨 Print Letter</button>
+            <button class="btn print-btn" onclick="printSelection()">🖨 Select & Print Letter Only</button>
+            <button class="btn print-btn" onclick="window.print()">🖨 Print Full Page</button>
             <a href="{{ url_for('workers.workers_name') }}" class="btn back-btn">← Back to Workers</a>
             <form action="{{ url_for('workers.send_worker_letter', worker_id=worker.id) }}" method="POST" style="display:inline;">
                 <button type="submit" class="btn email-btn">📧 Send Email</button>
@@ -128,7 +130,6 @@ document.addEventListener("DOMContentLoaded", function() {
     const scaleValue = document.getElementById('scaleValue');
     const printWrapper = document.getElementById('printWrapper');
     
-    // Load saved scale from localStorage
     const savedScale = localStorage.getItem('letterScale') || 88;
     setScale(savedScale);
     slider.value = savedScale;
@@ -145,6 +146,38 @@ document.addEventListener("DOMContentLoaded", function() {
         scaleValue.textContent = val + '%';
         slider.value = val;
         localStorage.setItem('letterScale', val);
+    }
+
+    // Print only the letter content - this opens print dialog with just the text selected
+    window.printSelection = function() {
+        const content = document.getElementById('letterContent').innerText;
+        
+        const printWindow = window.open('', '', 'height=600,width=800');
+        printWindow.document.write(`
+            <html>
+            <head>
+                <title>Print Letter - {{ worker.name }}</title>
+                <style>
+                    body {
+                        font-family: Arial, sans-serif;
+                        font-size: 12pt;
+                        line-height: 1.6;
+                        color: #000;
+                        padding: 20mm;
+                        white-space: pre-wrap;
+                    }
+                    @page {
+                        size: A4;
+                        margin: 15mm;
+                    }
+                </style>
+            </head>
+            <body onload="window.print(); window.close()">
+                ${content.replace(/</g, '&lt;').replace(/>/g, '&gt;')}
+            </body>
+            </html>
+        `);
+        printWindow.document.close();
     }
 });
 </script>
@@ -175,7 +208,6 @@ body {
     padding: 25px;
 }
 
-/* FIT CONTROLS */
 .fit-controls {
     background: white;
     padding: 15px 20px;
@@ -210,22 +242,11 @@ body {
 
 #scaleSlider::-webkit-slider-thumb {
     -webkit-appearance: none;
-    appearance: none;
     width: 18px;
     height: 18px;
     border-radius: 50%;
     background: var(--primary);
     cursor: pointer;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-}
-
-#scaleSlider::-moz-range-thumb {
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    background: var(--primary);
-    cursor: pointer;
-    border: none;
     box-shadow: 0 2px 6px rgba(0,0,0,0.2);
 }
 
@@ -429,8 +450,11 @@ body {
     font-size: 14px;
     line-height: 1.9;
     white-space: pre-wrap;
+    word-wrap: break-word;
     color: var(--text);
     border-radius: 10px;
+    display: block !important;
+    overflow: visible !important;
 }
 
 .empty-state {
@@ -517,14 +541,14 @@ body {
 @media print {
     @page {
         size: A4;
-        margin: 10mm;
+        margin: 15mm;
     }
 
     html, body {
         background: white !important;
         margin: 0 !important;
         padding: 0 !important;
-        font-size: 10pt !important;
+        font-size: 11pt !important;
         color: black !important;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
@@ -549,18 +573,9 @@ body {
         background: white !important;
     }
 
-    /* Auto-fit everything on one A4 page using CSS variables */
     .print-wrapper {
-        transform-origin: top left;
-        transform: scale(var(--print-scale));
-        width: var(--print-width);
-    }
-
-    .letter-header {
-        background: white !important;
-        color: black !important;
-        box-shadow: none !important;
-        border-bottom: 2px solid black !important;
+        transform: none !important;
+        width: 100% !important;
     }
 
     .letter-content {
@@ -569,12 +584,13 @@ body {
         border-left: 3px solid black !important;
         white-space: pre-wrap !important;
         word-wrap: break-word !important;
-        font-size: 10pt !important;
+        font-size: 11pt !important;
         line-height: 1.6 !important;
-        padding: 12px !important;
+        padding: 15px !important;
         display: block !important;
-        page-break-inside: avoid !important;
-        break-inside: avoid !important;
+        overflow: visible !important;
+        page-break-inside: auto !important;
+        break-inside: auto !important;
     }
 
     .company-header h1,
@@ -583,17 +599,13 @@ body {
     .info-box p,
     .info-box strong,
     .meta-bar span,
-    .sig-box span,
-    .letter-header h1,
-    .letter-header p {
+    .sig-box span {
         color: black !important;
     }
 
     .meta-bar, .info-box {
         background: white !important;
         border: 1px solid #999 !important;
-        page-break-inside: avoid !important;
-        break-inside: avoid !important;
     }
 
     .company-header img,
@@ -605,13 +617,6 @@ body {
 
     .info-box, .signature, .company-header, .letter-title {
         page-break-inside: avoid;
-        break-inside: avoid;
-    }
-
-    .signature {
-        margin-top: 40px;
-        page-break-inside: avoid;
-        break-inside: avoid;
     }
 }
 </style>
