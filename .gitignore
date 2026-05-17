@@ -7,3 +7,5 @@ venv/
 *.db
 uploads/
 *.sqlite3
+backups/
+*.json
