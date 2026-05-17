@@ -99,9 +99,9 @@
                         <td>{{ loop.index }}</td>
                         <td class="worker-name">
                             <div class="worker-info">
-                                <img src="{{ url_for('static', filename='uploads/' ~ worker.passport) if worker.passport else url_for('static', filename='default.png') }}"
-                                     class="worker-avatar" alt="{{ worker.name }}"
-                                     onerror="this.src='{{ url_for('static', filename='default.png') }}'">
+                                <img src="{{ url_for('uploaded_file', filename=worker.passport) if worker.passport else url_for('static', filename='default.png') }}"
+                                    class="worker-avatar" alt="{{ worker.name }}"
+                                    onerror="this.src='{{ url_for('static', filename='default.png') }}'">
                                 <span>{{ worker.name }}</span>
                             </div>
                         </td>

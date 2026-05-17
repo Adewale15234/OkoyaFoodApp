@@ -192,9 +192,9 @@ def register_worker():
 @workers_bp.route('/')
 @login_required()
 def workers_name():
-    if session.get('role') not in ['admin', 'secretary']:
-        flash("Please login first", "warning")
-        return redirect(url_for('auth.login'))
+    if session.get('role') not in ['admin', 'hr', 'manager']:
+        flash("You are not authorized to access this page.", "error")
+        return redirect(url_for('secretary.secretary_dashboard'))
 
     workers = Worker.query.order_by(Worker.id.desc()).all()
     new_worker_id = request.args.get('new_id', type=int)
