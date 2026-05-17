@@ -26,12 +26,11 @@
     <div class="fit-controls no-print">
         <div class="fit-controls-inner">
             <span class="fit-label">📄 Fit to Page</span>
-            <input type="range" id="scaleSlider" min="70" max="100" value="88" step="1">
-            <span id="scaleValue">88%</span>
-            <button type="button" class="btn fit-btn" onclick="setScale(95)">95%</button>
-            <button type="button" class="btn fit-btn" onclick="setScale(88)">88%</button>
-            <button type="button" class="btn fit-btn" onclick="setScale(80)">80%</button>
-            <button type="button" class="btn fit-btn reset-btn" onclick="setScale(100)">Reset</button>
+            <input type="range" id="scaleSlider" min="80" max="120" value="100" step="1">
+            <span id="scaleValue">100%</span>
+            <button type="button" class="btn fit-btn" onclick="setScale(100)">100%</button>
+            <button type="button" class="btn fit-btn" onclick="setScale(110)">110%</button>
+            <button type="button" class="btn fit-btn" onclick="setScale(120)">120%</button>
         </div>
     </div>
 
@@ -74,7 +73,11 @@
 
                     <div class="passport-box">
                         {% if worker.passport %}
-                            <img src="{{ url_for('uploaded_file', filename=worker.passport) }}?v={{ worker.updated_at.timestamp() if worker.updated_at else worker.id }}"
+                            {% if worker.passport %}
+                                <img src="{{ worker.passport }}" class="worker-passport">
+                            {% else %}
+                                <img src="{{ url_for('static', filename='logo.png') }}" class="worker-passport">
+                            {% endif %}
                                 class="worker-passport"
                                 alt="{{ worker.name }}"
                                 onerror="this.src='{{ url_for('static', filename='logo.png') }}'">
@@ -125,60 +128,71 @@
 </div>
 
 <script>
+function setScale(val) {
+    const printWrapper = document.getElementById('printWrapper');
+    const scaleValue = document.getElementById('scaleValue');
+    const slider = document.getElementById('scaleSlider');
+    
+    const scale = val / 100;
+    printWrapper.style.setProperty('--print-scale', scale);
+    scaleValue.textContent = val + '%';
+    slider.value = val;
+    localStorage.setItem('letterScale', val);
+}
+
+function printSelection() {
+    const contentEl = document.getElementById('letterContent');
+    
+    if (!contentEl) {
+        alert('No letter content found to print.');
+        return;
+    }
+    
+    const content = contentEl.innerText;
+    
+    const printWindow = window.open('', '', 'height=800,width=800');
+    if (!printWindow) {
+        alert('Popup blocked. Allow popups for this site.');
+        return;
+    }
+    
+    printWindow.document.write(`
+        <html>
+        <head>
+            <title>Print Letter - {{ worker.name }}</title>
+            <style>
+                body {
+                    font-family: Arial, sans-serif;
+                    font-size: 12pt;
+                    line-height: 1.6;
+                    color: #000;
+                    padding: 15mm;
+                    white-space: pre-wrap;
+                }
+                @page {
+                    size: A4;
+                    margin: 15mm;
+                }
+            </style>
+        </head>
+        <body onload="window.print(); window.close()">
+            ${content.replace(/</g, '&lt;').replace(/>/g, '&gt;')}
+        </body>
+        </html>
+    `);
+    printWindow.document.close();
+}
+
 document.addEventListener("DOMContentLoaded", function() {
     const slider = document.getElementById('scaleSlider');
-    const scaleValue = document.getElementById('scaleValue');
-    const printWrapper = document.getElementById('printWrapper');
+    const savedScale = localStorage.getItem('letterScale') || 100;
     
-    const savedScale = localStorage.getItem('letterScale') || 88;
     setScale(savedScale);
     slider.value = savedScale;
     
     slider.addEventListener('input', function() {
         setScale(this.value);
     });
-    
-    window.setScale = function(val) {
-        const scale = val / 100;
-        const width = 100 / scale * 100;
-        printWrapper.style.setProperty('--print-scale', scale);
-        printWrapper.style.setProperty('--print-width', width + '%');
-        scaleValue.textContent = val + '%';
-        slider.value = val;
-        localStorage.setItem('letterScale', val);
-    }
-
-    // Print only the letter content - this opens print dialog with just the text selected
-    window.printSelection = function() {
-        const content = document.getElementById('letterContent').innerText;
-        
-        const printWindow = window.open('', '', 'height=600,width=800');
-        printWindow.document.write(`
-            <html>
-            <head>
-                <title>Print Letter - {{ worker.name }}</title>
-                <style>
-                    body {
-                        font-family: Arial, sans-serif;
-                        font-size: 12pt;
-                        line-height: 1.6;
-                        color: #000;
-                        padding: 20mm;
-                        white-space: pre-wrap;
-                    }
-                    @page {
-                        size: A4;
-                        margin: 15mm;
-                    }
-                </style>
-            </head>
-            <body onload="window.print(); window.close()">
-                ${content.replace(/</g, '&lt;').replace(/>/g, '&gt;')}
-            </body>
-            </html>
-        `);
-        printWindow.document.close();
-    }
 });
 </script>
 
@@ -238,6 +252,38 @@ body {
     background: #e2e8f0;
     outline: none;
     -webkit-appearance: none;
+    appearance: none;
+    cursor: pointer;
+}
+
+/* Chrome/Safari thumb */
+#scaleSlider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--primary);
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+/* Firefox thumb */
+#scaleSlider::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--primary);
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+/* Firefox track */
+#scaleSlider::-moz-range-track {
+    background: #e2e8f0;
+    height: 6px;
+    border-radius: 5px;
 }
 
 #scaleSlider::-webkit-slider-thumb {
@@ -271,11 +317,6 @@ body {
 .fit-btn:hover {
     background: var(--primary);
     color: white;
-}
-
-.reset-btn {
-    background: var(--warning);
-    color: #000;
 }
 
 .letter-header {
@@ -332,8 +373,9 @@ body {
 
 .print-wrapper {
     width: 100%;
-    --print-scale: 0.88;
-    --print-width: 114%;
+    transform: scale(var(--print-scale));
+    transform-origin: top left;
+    width: calc(100% / var(--print-scale));
 }
 
 .meta-bar {
@@ -537,7 +579,7 @@ body {
     color: white;
 }
 
-/* PRINT CSS */
+/* PRINT CSS - NO SCALING, NO CUTTING */
 @media print {
     @page {
         size: A4;
@@ -573,6 +615,7 @@ body {
         background: white !important;
     }
 
+    /* CRITICAL: Remove scaling in print */
     .print-wrapper {
         transform: none !important;
         width: 100% !important;

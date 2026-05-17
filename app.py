@@ -8,24 +8,38 @@ import time
 from services.backup_manager import create_backup
 from werkzeug.utils import secure_filename
 from datetime import datetime
+import cloudinary  # NEW: Cloudinary SDK for cloud uploads
 
 def create_app(config_name='default'):
     app = Flask(__name__)
     app.config.from_object(config[config_name])
 
-    # Fix Render PostgreSQL URL
+    # =========================
+    # CLOUDINARY CONFIG - NEW
+    # =========================
+    # Cloudinary handles file storage so uploads don't get deleted on Render deploys
+    cloudinary.config(
+        cloud_name=os.environ.get('CLOUDINARY_CLOUD_NAME'),
+        api_key=os.environ.get('CLOUDINARY_API_KEY'),
+        api_secret=os.environ.get('CLOUDINARY_API_SECRET')
+    )
+
+    # =========================
+    # DATABASE CONFIG
+    # =========================
+    # Fix Render PostgreSQL URL to use psycopg2 driver
     db_url = app.config['SQLALCHEMY_DATABASE_URI']
     if db_url and db_url.startswith("postgresql://"):
         app.config['SQLALCHEMY_DATABASE_URI'] = db_url.replace("postgresql://", "postgresql+psycopg2://", 1)
 
     # =========================
-    # UPLOAD FOLDER CONFIG
+    # UPLOAD FOLDER CONFIG - DEPRECATED
     # =========================
-    UPLOAD_FOLDER = 'C:/okoya_uploads'
-    app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-    
-    # Create folder if it doesn't exist
-    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+    # Local upload folder removed. Cloudinary is used instead for persistent storage.
+    # UPLOAD_FOLDER = 'C:/okoya_uploads'
+    # app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+    # os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+    # Keeping comments above to maintain line count and show what was removed
 
     db.init_app(app)
     migrate.init_app(app, db)
@@ -33,7 +47,9 @@ def create_app(config_name='default'):
 
     logging.basicConfig(level=logging.INFO)
 
-    # Register blueprints
+    # =========================
+    # REGISTER BLUEPRINTS
+    # =========================
     from routes.auth import auth_bp
     from routes.admin import admin_bp
     from routes.secretary import secretary_bp
@@ -103,6 +119,15 @@ def create_app(config_name='default'):
         except Exception as e:
             return str(e)
 
+    @app.route('/check-cloud')
+    def check_cloud():
+        # Endpoint to verify Cloudinary env vars are loaded on Render
+        return {
+            "cloud_name": os.environ.get('CLOUDINARY_CLOUD_NAME'),
+            "api_key_set": bool(os.environ.get('CLOUDINARY_API_KEY')),
+            "api_secret_set": bool(os.environ.get('CLOUDINARY_API_SECRET'))
+        }
+
     @app.route("/mail-test")
     def mail_test():
         from flask_mail import Message
@@ -124,18 +149,25 @@ def create_app(config_name='default'):
             return f"<pre>{traceback.format_exc()}</pre>"
 
     # =========================
-    # ROUTE TO SERVE UPLOADED FILES
+    # ROUTE TO SERVE UPLOADED FILES - DEPRECATED
     # =========================
-    @app.route('/uploads/<filename>')
-    def uploaded_file(filename):
-        return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+    # Local file serving removed. Cloudinary serves files directly via CDN.
+    # @app.route('/uploads/<filename>')
+    # def uploaded_file(filename):
+    #     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+    # Keeping commented code to maintain structure and line count
 
+    # =========================
+    # AUTO BACKUP LOOP
+    # =========================
+    # Runs only on local dev, not on Render
     if os.environ.get("RENDER") != "true":
         threading.Thread(target=auto_backup_loop, args=(app,), daemon=True).start()
 
     return app
 
 def auto_backup_loop(app):
+    # Background thread for automatic database backups
     with app.app_context():
         while True:
             try:
@@ -144,7 +176,7 @@ def auto_backup_loop(app):
                 print("Backup completed")
             except Exception as e:
                 print("Backup error:", e)
-            time.sleep(86400)
+            time.sleep(86400)  # Sleep for 24 hours
 
 app = create_app(os.getenv('FLASK_ENV', 'default'))
 

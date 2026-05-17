@@ -110,7 +110,11 @@
 
                         <td class="worker-name">
                             <div class="worker-info">
-                                <img src="{{ url_for('uploaded_file', filename=worker.passport) if worker.passport else url_for('static', filename='default.png') }}" 
+                                {% if worker.passport %}
+                                    <img src="{{ worker.passport }}" class="worker-passport">
+                                {% else %}
+                                    <img src="{{ url_for('static', filename='logo.png') }}" class="worker-passport">
+                                {% endif %} 
                                     class="worker-avatar" alt="{{ worker.name }}">
                                 <span>{{ worker.name }}</span>
                             </div>

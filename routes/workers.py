@@ -109,9 +109,9 @@ def register_worker():
                     return redirect(url_for('workers.register_worker'))
 
             # ===============================
-            # 6. PASSPORT UPLOAD - SAVE TO C:/okoya_uploads
+            # 6. PASSPORT UPLOAD - CLOUDINARY
             # ===============================
-            passport_filename = None
+            passport_url = None
             passport_file = request.files.get('passport')
 
             if passport_file and passport_file.filename.strip():
@@ -119,14 +119,15 @@ def register_worker():
                     flash("Only image files (jpg, jpeg, png, gif, webp) allowed.", "danger")
                     return redirect(url_for('workers.register_worker'))
 
-                upload_folder = current_app.config['UPLOAD_FOLDER']
-                os.makedirs(upload_folder, exist_ok=True)
-                original_name = secure_filename(passport_file.filename)
-                unique_name = f"{uuid.uuid4().hex}_{original_name}"
-                save_path = os.path.join(upload_folder, unique_name)
-                passport_file.save(save_path)
-                passport_filename = unique_name
-                print(f"[PASSPORT SAVED] {save_path}")
+                import cloudinary.uploader
+                result = cloudinary.uploader.upload(
+                    passport_file,
+                    folder="okoya_passports",
+                    transformation=[{"width": 500, "height": 500, "crop": "fill"}],
+                    resource_type="image"
+                )
+                passport_url = result['secure_url']
+                print(f"[PASSPORT UPLOADED] {passport_url}")
 
             # ===============================
             # 7. AUTO WORKER CODE
@@ -167,7 +168,7 @@ def register_worker():
                 bank_account_name=bank_account_name,
                 bank_name=bank_name,
                 bank_account=bank_account,
-                passport=passport_filename,
+                passport=passport_url, # Save Cloudinary URL now
                 is_active=True
             )
 
@@ -335,24 +336,30 @@ def edit_worker(worker_id):
             worker.date_of_birth = safe_date(request.form.get('date_of_birth'))
             worker.date_of_employment = safe_date(request.form.get('date_of_employment'))
 
+            # ===============================
+            # PASSPORT UPLOAD - CLOUDINARY
+            # ===============================
             passport_file = request.files.get('passport')
             if passport_file and passport_file.filename:
                 if allowed_file(passport_file.filename):
-                    upload_folder = current_app.config['UPLOAD_FOLDER']
-                    os.makedirs(upload_folder, exist_ok=True)
+                    import cloudinary.uploader
 
-                    if worker.passport:
-                        old_file = os.path.join(upload_folder, worker.passport)
-                        if os.path.exists(old_file):
-                            try:
-                                os.remove(old_file)
-                            except:
-                                pass
+                    # Delete old image from Cloudinary if exists
+                    if worker.passport and 'cloudinary.com' in worker.passport:
+                        try:
+                            public_id = worker.passport.split('/upload/')[1].rsplit('.', 1)[0]
+                            cloudinary.uploader.destroy(public_id)
+                        except:
+                            pass
 
-                    safe_name = secure_filename(passport_file.filename)
-                    new_filename = f"{uuid.uuid4().hex}_{safe_name}"
-                    passport_file.save(os.path.join(upload_folder, new_filename))
-                    worker.passport = new_filename
+                    # Upload new image
+                    result = cloudinary.uploader.upload(
+                        passport_file,
+                        folder="okoya_passports",
+                        transformation=[{"width": 500, "height": 500, "crop": "fill"}],
+                        resource_type="image"
+                    )
+                    worker.passport = result['secure_url']
                     worker.updated_at = datetime.utcnow()
                 else:
                     flash("Only jpg, jpeg, png, gif, webp files allowed.", "danger")
@@ -416,10 +423,14 @@ def delete_worker(worker_id):
     worker = Worker.query.get_or_404(worker_id)
 
     try:
-        if worker.passport:
-            file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], worker.passport)
-            if os.path.exists(file_path):
-                os.remove(file_path)
+        # Delete passport from Cloudinary if exists
+        if worker.passport and 'cloudinary.com' in worker.passport:
+            import cloudinary.uploader
+            try:
+                public_id = worker.passport.split('/upload/')[1].rsplit('.', 1)[0]
+                cloudinary.uploader.destroy(public_id)
+            except:
+                pass
 
         db.session.query(EmailLog).filter_by(worker_id=worker.id).delete()
         db.session.query(Attendance).filter_by(worker_id=worker.id).delete()
