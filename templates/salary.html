@@ -100,12 +100,15 @@
                         <td class="worker-name">
                             <div class="worker-info">
                                 {% if worker.passport %}
-                                    <img src="{{ worker.passport }}" class="worker-passport">
+                                    <img src="{{ worker.passport }}" 
+                                        class="worker-avatar" 
+                                        alt="{{ worker.name }}"
+                                        onerror="this.src='{{ url_for('static', filename='default.png') }}'">
                                 {% else %}
-                                    <img src="{{ url_for('static', filename='logo.png') }}" class="worker-passport">
+                                    <img src="{{ url_for('static', filename='logo.png') }}" 
+                                        class="worker-avatar" 
+                                        alt="{{ worker.name }}">
                                 {% endif %}
-                                    class="worker-avatar" alt="{{ worker.name }}"
-                                    onerror="this.src='{{ url_for('static', filename='default.png') }}'">
                                 <span>{{ worker.name }}</span>
                             </div>
                         </td>

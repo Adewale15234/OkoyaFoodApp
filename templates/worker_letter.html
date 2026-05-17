@@ -72,18 +72,18 @@
                     </div>
 
                     <div class="passport-box">
-                        {% if worker.passport %}
+                        <div class="passport-box">
                             {% if worker.passport %}
-                                <img src="{{ worker.passport }}" class="worker-passport">
-                            {% else %}
-                                <img src="{{ url_for('static', filename='logo.png') }}" class="worker-passport">
-                            {% endif %}
-                                class="worker-passport"
+                                <img src="{{ worker.passport }}" 
+                                class="worker-passport" 
                                 alt="{{ worker.name }}"
                                 onerror="this.src='{{ url_for('static', filename='logo.png') }}'">
-                        {% else %}
-                            <img src="{{ url_for('static', filename='logo.png') }}" class="worker-passport" alt="Default">
-                        {% endif %}
+                            {% else %}
+                                <img src="{{ url_for('static', filename='logo.png') }}" 
+                                    class="worker-passport" 
+                                    alt="Default">
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
             </div>          
