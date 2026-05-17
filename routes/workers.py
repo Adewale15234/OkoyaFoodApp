@@ -379,7 +379,7 @@ def edit_worker(worker_id):
 @login_required(role='admin')
 def worker_id_card(worker_id):
     worker = Worker.query.get_or_404(worker_id)
-    passport_url = get_passport_url(worker)
+    passport_url = worker.passport or url_for('static', filename='logo.png')
 
     verify_url = url_for('workers.verify_worker', worker_code=worker.worker_code, _external=True)
 

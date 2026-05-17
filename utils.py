@@ -6,6 +6,10 @@ from datetime import datetime
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
 
 def allowed_file(filename):
+    """
+    Check if file extension is allowed.
+    Kept for upload validation, but not needed for Cloudinary URLs.
+    """
     return (
         '.' in filename and
         filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -13,11 +17,13 @@ def allowed_file(filename):
 
 def get_passport_url(worker):
     """
-    Return URL for worker passport from C:/okoya_uploads via uploaded_file route.
+    Return URL for worker passport.
+    Cloudinary stores the full URL in worker.passport, so we just return it.
     Falls back to default.png if no passport.
     """
     if worker.passport:
-        return url_for('uploaded_file', filename=worker.passport) + f"?v={int(time.time())}"
+        # Add cache-buster so browser reloads after update
+        return f"{worker.passport}?v={int(time.time())}"
     return url_for('static', filename='default.png')
 
 def safe_date(value):
