@@ -21,76 +21,94 @@
         </div>
     </header>
 
-    <div class="letter-container">
-
-        <div class="meta-bar">
-            <span><strong>Worker ID:</strong> {{ worker.worker_code }}</span>
-            <span><strong>Dept:</strong> HR Department - OKOYA FOOD LTD</span>
-            <span><strong>Date:</strong> {{ current_date if current_date else now.strftime('%d %B %Y') if now else '' }}</span>
+    <!-- FIT TO PAGE CONTROLS -->
+    <div class="fit-controls no-print">
+        <div class="fit-controls-inner">
+            <span class="fit-label">📄 Fit to Page</span>
+            <input type="range" id="scaleSlider" min="70" max="100" value="88" step="1">
+            <span id="scaleValue">88%</span>
+            <button type="button" class="btn fit-btn" onclick="setScale(95)">95%</button>
+            <button type="button" class="btn fit-btn" onclick="setScale(88)">88%</button>
+            <button type="button" class="btn fit-btn" onclick="setScale(80)">80%</button>
+            <button type="button" class="btn fit-btn reset-btn" onclick="setScale(100)">Reset</button>
         </div>
+    </div>
 
-        <div class="company-header">
-            <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo">
-            <h1>OKOYA FOOD COMPANY LIMITED</h1>
-            <p>Staff Management & HR Department</p>
+    <div class="letter-container">
+        
+        <!-- PRINT WRAPPER: this will auto-scale on print -->
+        <div class="print-wrapper" id="printWrapper">
 
-            {% if worker.status_type %}
-                <div class="status-badge status-{{ worker.status_type|lower }}">
-                    {{ worker.status_type|upper }}
+            <div class="meta-bar">
+                <span><strong>Worker ID:</strong> {{ worker.worker_code }}</span>
+                <span><strong>Dept:</strong> HR Department - OKOYA FOOD LTD</span>
+                <span><strong>Date:</strong> {{ current_date if current_date else now.strftime('%d %B %Y') if now else '' }}</span>
+            </div>
+
+            <div class="company-header">
+                <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo">
+                <h1>OKOYA FOOD COMPANY LIMITED</h1>
+                <p>Staff Management & HR Department</p>
+
+                {% if worker.status_type %}
+                    <div class="status-badge status-{{ worker.status_type|lower }}">
+                        {{ worker.status_type|upper }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="letter-title">
+                OFFICIAL HR DISCIPLINARY / REINSTATEMENT LETTER
+            </div>
+
+            <div class="info-box">
+                <div class="info-grid">
+                    <div>
+                        <p><strong>Name:</strong> {{ worker.name }}</p>
+                        <p><strong>Code:</strong> {{ worker.worker_code }}</p>
+                        <p><strong>Position:</strong> {{ worker.position or '—' }}</p>
+                        <p><strong>Phone:</strong> {{ worker.phone_number or '—' }}</p>
+                        <p><strong>Department:</strong> {{ worker.department or '—' }}</p>
+                    </div>
+
+                    <div class="passport-box">
+                        {% if worker.passport %}
+                            <img src="{{ url_for('uploaded_file', filename=worker.passport) }}?v={{ worker.updated_at.timestamp() if worker.updated_at else worker.id }}"
+                                class="worker-passport"
+                                alt="{{ worker.name }}"
+                                onerror="this.src='{{ url_for('static', filename='logo.png') }}'">
+                        {% else %}
+                            <img src="{{ url_for('static', filename='logo.png') }}" class="worker-passport" alt="Default">
+                        {% endif %}
+                    </div>
+                </div>
+            </div>          
+
+            <hr class="divider">
+
+            {% if worker.status_letter %}
+                <div class="letter-content">
+                    {{ worker.status_letter }}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <h3>No HR letter generated yet</h3>
+                    <p>Generate a letter from the worker profile to view it here.</p>
                 </div>
             {% endif %}
-        </div>
 
-        <div class="letter-title">
-            OFFICIAL HR DISCIPLINARY / REINSTATEMENT LETTER
-        </div>
-
-        <div class="info-box">
-            <div class="info-grid">
-                <div>
-                    <p><strong>Name:</strong> {{ worker.name }}</p>
-                    <p><strong>Code:</strong> {{ worker.worker_code }}</p>
-                    <p><strong>Position:</strong> {{ worker.position or '—' }}</p>
-                    <p><strong>Phone:</strong> {{ worker.phone_number or '—' }}</p>
-                    <p><strong>Department:</strong> {{ worker.department or '—' }}</p>
+            <div class="signature">
+                <div class="sig-box">
+                    <div class="signature-line"></div>
+                    <span>HR Manager</span>
                 </div>
 
-                <div class="passport-box">
-                    {% if worker.passport %}
-                        <img src="{{ url_for('static', filename='uploads/' ~ worker.passport) }}?v={{ worker.updated_at.timestamp() if worker.updated_at else worker.id }}"
-                            class="worker-passport"
-                            alt="{{ worker.name }}"
-                            onerror="this.src='{{ url_for('static', filename='logo.png') }}'">
-                    {% else %}
-                        <img src="{{ url_for('static', filename='logo.png') }}" class="worker-passport" alt="Default">
-                    {% endif %}
+                <div class="sig-box">
+                    <div class="signature-line"></div>
+                    <span>Managing Director</span>
                 </div>
             </div>
-        </div>          
 
-        <hr class="divider">
-
-        {% if worker.status_letter %}
-            <div class="letter-content">
-                {{ worker.status_letter }}
-            </div>
-        {% else %}
-            <div class="empty-state">
-                <h3>No HR letter generated yet</h3>
-                <p>Generate a letter from the worker profile to view it here.</p>
-            </div>
-        {% endif %}
-
-        <div class="signature">
-            <div class="sig-box">
-                <div class="signature-line"></div>
-                <span>HR Manager</span>
-            </div>
-
-            <div class="sig-box">
-                <div class="signature-line"></div>
-                <span>Managing Director</span>
-            </div>
         </div>
 
         <div class="btn-area no-print">
@@ -103,6 +121,33 @@
 
     </div>
 </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const slider = document.getElementById('scaleSlider');
+    const scaleValue = document.getElementById('scaleValue');
+    const printWrapper = document.getElementById('printWrapper');
+    
+    // Load saved scale from localStorage
+    const savedScale = localStorage.getItem('letterScale') || 88;
+    setScale(savedScale);
+    slider.value = savedScale;
+    
+    slider.addEventListener('input', function() {
+        setScale(this.value);
+    });
+    
+    window.setScale = function(val) {
+        const scale = val / 100;
+        const width = 100 / scale * 100;
+        printWrapper.style.setProperty('--print-scale', scale);
+        printWrapper.style.setProperty('--print-width', width + '%');
+        scaleValue.textContent = val + '%';
+        slider.value = val;
+        localStorage.setItem('letterScale', val);
+    }
+});
+</script>
 
 <style>
 :root {
@@ -128,6 +173,88 @@ body {
     max-width: 1200px;
     margin: auto;
     padding: 25px;
+}
+
+/* FIT CONTROLS */
+.fit-controls {
+    background: white;
+    padding: 15px 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    border: 1px solid #e2e8f0;
+}
+
+.fit-controls-inner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.fit-label {
+    font-weight: 700;
+    color: var(--primary);
+    font-size: 14px;
+}
+
+#scaleSlider {
+    flex: 1;
+    max-width: 200px;
+    height: 6px;
+    border-radius: 5px;
+    background: #e2e8f0;
+    outline: none;
+    -webkit-appearance: none;
+}
+
+#scaleSlider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--primary);
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+#scaleSlider::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--primary);
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+#scaleValue {
+    font-weight: 700;
+    color: var(--text);
+    min-width: 45px;
+    text-align: center;
+    background: #f1f5f9;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 13px;
+}
+
+.fit-btn {
+    padding: 6px 12px;
+    font-size: 12px;
+    background: #e2e8f0;
+    color: var(--text);
+}
+
+.fit-btn:hover {
+    background: var(--primary);
+    color: white;
+}
+
+.reset-btn {
+    background: var(--warning);
+    color: #000;
 }
 
 .letter-header {
@@ -180,6 +307,12 @@ body {
     padding: 40px;
     border-radius: 16px;
     box-shadow: 0 12px 35px rgba(0,0,0,0.12);
+}
+
+.print-wrapper {
+    width: 100%;
+    --print-scale: 0.88;
+    --print-width: 114%;
 }
 
 .meta-bar {
@@ -384,15 +517,17 @@ body {
 @media print {
     @page {
         size: A4;
-        margin: 15mm;
+        margin: 10mm;
     }
 
     html, body {
         background: white !important;
         margin: 0 !important;
         padding: 0 !important;
-        font-size: 11pt !important;
+        font-size: 10pt !important;
         color: black !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
     }
 
     .no-print {
@@ -414,6 +549,13 @@ body {
         background: white !important;
     }
 
+    /* Auto-fit everything on one A4 page using CSS variables */
+    .print-wrapper {
+        transform-origin: top left;
+        transform: scale(var(--print-scale));
+        width: var(--print-width);
+    }
+
     .letter-header {
         background: white !important;
         color: black !important;
@@ -427,12 +569,12 @@ body {
         border-left: 3px solid black !important;
         white-space: pre-wrap !important;
         word-wrap: break-word !important;
-        font-size: 11pt !important;
-        line-height: 1.7 !important;
-        padding: 15px !important;
+        font-size: 10pt !important;
+        line-height: 1.6 !important;
+        padding: 12px !important;
         display: block !important;
-        page-break-inside: auto !important;
-        break-inside: auto !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
     }
 
     .company-header h1,
@@ -450,23 +592,24 @@ body {
     .meta-bar, .info-box {
         background: white !important;
         border: 1px solid #999 !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
     }
 
     .company-header img,
     .worker-passport,
     .letter-logo {
-        width: 80px !important;
-        height: 80px !important;
+        width: 70px !important;
+        height: 70px !important;
     }
 
-    /* Allow letter content to break across pages */
-    .letter-content, .divider {
-        page-break-inside: auto !important;
-        break-inside: auto !important;
+    .info-box, .signature, .company-header, .letter-title {
+        page-break-inside: avoid;
+        break-inside: avoid;
     }
 
-    /* Keep header and signature together */
-    .info-box, .signature, .company-header {
+    .signature {
+        margin-top: 40px;
         page-break-inside: avoid;
         break-inside: avoid;
     }

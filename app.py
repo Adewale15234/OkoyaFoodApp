@@ -1,4 +1,4 @@
-from flask import Flask, send_file
+from flask import Flask, send_file, send_from_directory
 from config import config
 from extensions import db, migrate, mail
 import os
@@ -6,6 +6,8 @@ import logging
 import threading
 import time
 from services.backup_manager import create_backup
+from werkzeug.utils import secure_filename
+from datetime import datetime
 
 def create_app(config_name='default'):
     app = Flask(__name__)
@@ -15,6 +17,15 @@ def create_app(config_name='default'):
     db_url = app.config['SQLALCHEMY_DATABASE_URI']
     if db_url and db_url.startswith("postgresql://"):
         app.config['SQLALCHEMY_DATABASE_URI'] = db_url.replace("postgresql://", "postgresql+psycopg2://", 1)
+
+    # =========================
+    # UPLOAD FOLDER CONFIG
+    # =========================
+    UPLOAD_FOLDER = 'C:/okoya_uploads'
+    app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+    
+    # Create folder if it doesn't exist
+    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
     db.init_app(app)
     migrate.init_app(app, db)
@@ -111,6 +122,13 @@ def create_app(config_name='default'):
             import traceback
             traceback.print_exc()
             return f"<pre>{traceback.format_exc()}</pre>"
+
+    # =========================
+    # ROUTE TO SERVE UPLOADED FILES
+    # =========================
+    @app.route('/uploads/<filename>')
+    def uploaded_file(filename):
+        return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
     if os.environ.get("RENDER") != "true":
         threading.Thread(target=auto_backup_loop, args=(app,), daemon=True).start()

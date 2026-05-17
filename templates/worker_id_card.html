@@ -21,7 +21,7 @@
 
         <!-- PHOTO -->
         <div class="photo-box">
-            <img src="{{ passport_url if passport_url else url_for('static', filename='default.png') }}">
+            <img src="{% if worker.passport %}{{ url_for('uploaded_file', filename=worker.passport) }}{% else %}{{ url_for('static', filename='default.png') }}{% endif %}" crossorigin="anonymous">
         </div>
 
         <!-- DETAILS -->
@@ -40,7 +40,7 @@
 
         <!-- QR -->
         <div class="qr-box">
-            <img src="data:image/png;base64,{{ qr_code }}">
+            <img src="data:image/png;base64,{{ qr_code }}" crossorigin="anonymous">
             <small>Scan Verify</small>
         </div>
 

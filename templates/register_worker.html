@@ -448,7 +448,7 @@ h3 {
 
     <div class="passport-preview">
         {% if worker and worker.passport %}
-        <img src="{{ url_for('static', filename='uploads/' ~ worker.passport) }}" alt="Passport">
+        <img src="{{ url_for('uploaded_file', filename=worker.passport) }}" alt="Passport">
         {% else %}
         <img id="passportPreview" alt="Passport Preview">
         {% endif %}

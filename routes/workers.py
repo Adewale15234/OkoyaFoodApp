@@ -14,7 +14,6 @@ from io import BytesIO
 
 workers_bp = Blueprint('workers', __name__, url_prefix='/workers')
 
-
 @workers_bp.route('/register_worker', methods=['GET', 'POST'])
 @login_required(role='admin')
 def register_worker():
@@ -110,7 +109,7 @@ def register_worker():
                     return redirect(url_for('workers.register_worker'))
 
             # ===============================
-            # 6. PASSPORT UPLOAD
+            # 6. PASSPORT UPLOAD - SAVE TO C:/okoya_uploads
             # ===============================
             passport_filename = None
             passport_file = request.files.get('passport')
@@ -120,7 +119,7 @@ def register_worker():
                     flash("Only image files (jpg, jpeg, png, gif, webp) allowed.", "danger")
                     return redirect(url_for('workers.register_worker'))
 
-                upload_folder = os.path.join(current_app.root_path, 'static', 'uploads')
+                upload_folder = current_app.config['UPLOAD_FOLDER']
                 os.makedirs(upload_folder, exist_ok=True)
                 original_name = secure_filename(passport_file.filename)
                 unique_name = f"{uuid.uuid4().hex}_{original_name}"
@@ -339,7 +338,7 @@ def edit_worker(worker_id):
             passport_file = request.files.get('passport')
             if passport_file and passport_file.filename:
                 if allowed_file(passport_file.filename):
-                    upload_folder = current_app.config.get('UPLOAD_FOLDER', 'static/uploads')
+                    upload_folder = current_app.config['UPLOAD_FOLDER']
                     os.makedirs(upload_folder, exist_ok=True)
 
                     if worker.passport:
@@ -356,7 +355,7 @@ def edit_worker(worker_id):
                     worker.passport = new_filename
                     worker.updated_at = datetime.utcnow()
                 else:
-                    flash("Only jpg, jpeg and png files allowed.", "danger")
+                    flash("Only jpg, jpeg, png, gif, webp files allowed.", "danger")
                     return redirect(url_for('workers.edit_worker', worker_id=worker.id))
 
             db.session.commit()

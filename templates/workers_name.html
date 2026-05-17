@@ -145,9 +145,9 @@
                             <div class="detail-card">
                                 <h3>Passport</h3>
                                 {% if worker.passport %}
-                                   <img src="{{ url_for('static', filename='uploads/' ~ worker.passport) }}?v={{ worker.updated_at.timestamp() if worker.updated_at else worker.id }}" class="passport-img">
+                                <img src="{{ url_for('uploaded_file', filename=worker.passport) }}?v={{ worker.updated_at.timestamp() if worker.updated_at else worker.id }}" class="passport-img">
                                 {% else %}
-                                    <p>No passport uploaded</p>
+                                <p>No passport uploaded</p>
                                 {% endif %}
                             </div>
 

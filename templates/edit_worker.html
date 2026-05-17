@@ -33,7 +33,7 @@
         <div class="passport-section">
 
             <div class="passport-box">
-                <img src="{{ url_for('static', filename='uploads/' ~ worker.passport) if worker.passport else url_for('static', filename='default.png') }}?v={{ worker.id }}"
+                <img src="{% if worker.passport %}{{ url_for('uploaded_file', filename=worker.passport) }}{% else %}{{ url_for('static', filename='default.png') }}{% endif %}?v={{ worker.id }}"
                      id="passportPreview"
                      alt="Passport Photo">
                 <div class="passport-meta">
@@ -539,27 +539,27 @@ input:focus, select:focus {
 
 /* MOBILE */
 @media(max-width:768px){
-   .grid {
+  .grid {
         grid-template-columns: 1fr;
     }
 
-   .passport-section {
+  .passport-section {
         flex-direction: column;
         align-items: center;
     }
 
-   .upgrade-header {
+  .upgrade-header {
         flex-direction: column;
         gap: 15px;
         text-align: center;
     }
 
-   .header-actions {
+  .header-actions {
         width: 100%;
         justify-content: center;
     }
 
-   .edit-card {
+  .edit-card {
         padding: 20px;
     }
 }

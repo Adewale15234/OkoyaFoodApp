@@ -12,8 +12,12 @@ def allowed_file(filename):
     )
 
 def get_passport_url(worker):
+    """
+    Return URL for worker passport from C:/okoya_uploads via uploaded_file route.
+    Falls back to default.png if no passport.
+    """
     if worker.passport:
-        return url_for('static', filename=f'uploads/{worker.passport}') + f"?v={int(time.time())}"
+        return url_for('uploaded_file', filename=worker.passport) + f"?v={int(time.time())}"
     return url_for('static', filename='default.png')
 
 def safe_date(value):
