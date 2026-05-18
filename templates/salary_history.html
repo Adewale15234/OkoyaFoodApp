@@ -184,7 +184,10 @@
                             </div>
                         </td>
                         <td>{{ record.worker.department if record.worker else '—' }}</td>
-                        <td>{{ record.total_days_present }}</td>
+                        <td>
+                            {{ record.present_days }} / {{ record.days_in_month }}
+                            <small style="color:#64748b;">({{ "%.1f"|format(record.attendance_percent) }}%)</small>
+                        </td>
                         <td>₦{{ "%.2f"|format(record.daily_rate) }}</td>
                         <td class="amount-cell">₦{{ "%.2f"|format(record.gross_salary) }}</td>
                         <td class="amount-cell red">₦{{ "%.2f"|format(record.deductions) }}</td>

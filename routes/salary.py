@@ -16,15 +16,10 @@ def salary():
     period = request.args.get('period', datetime.now().strftime('%Y-%m'))
     year, month = map(int, period.split('-'))
 
-    today = datetime.today()
-    current_year = year
-    current_month = month
+    days_in_month = monthrange(year, month)[1]
+    if days_in_month < 1:
+        days_in_month = 1
 
-    total_days_in_month = monthrange(current_year, current_month)[1]
-    if total_days_in_month < 1:
-        total_days_in_month = 1
-
-    # Check if period is locked
     is_locked = PayrollLock.query.filter_by(month=period).first()
 
     # Get or auto-create salary records for this period
@@ -34,11 +29,16 @@ def salary():
         workers = Worker.query.filter_by(is_active=True).all()
         for w in workers:
             total_days_present = w.get_month_attendance(period)
+
+            # Calculate daily rate based on registered salary amount / days in month
+            monthly_salary = float(w.amount_of_salary or 0)
+            auto_daily_rate = round(monthly_salary / days_in_month, 2) if days_in_month > 0 else 0
+
             s = Salary(
                 worker_id=w.id,
                 month=period,
                 total_days_present=total_days_present,
-                daily_rate=float(w.daily_rate or w.amount_of_salary or 0),
+                daily_rate=auto_daily_rate,
                 deductions=0
             )
             s.auto_fill_from_worker()
@@ -47,9 +47,11 @@ def salary():
         db.session.commit()
         salary_data = Salary.query.filter_by(month=period).all()
 
-    # Attach extra display values to each salary object for template
+    # Attach extra display values for template
     for s in salary_data:
+        s.days_in_month = days_in_month
         s.present_days = s.total_days_present
+        s.attendance_percent = round((s.total_days_present / days_in_month) * 100, 2) if days_in_month > 0 else 0
         s.daily_rate_display = s.daily_rate
         s.calculated_salary = s.net_salary
         s.worker_name = s.worker.name if s.worker else 'Unknown'
@@ -84,11 +86,13 @@ def salary():
             salary_record = Salary.query.filter_by(worker_id=worker_id, month=period).first()
 
             if not salary_record:
+                monthly_salary = float(worker.amount_of_salary or 0)
+                auto_daily_rate = round(monthly_salary / days_in_month, 2) if days_in_month > 0 else 0
                 salary_record = Salary(
                     worker_id=worker_id,
                     month=period,
                     total_days_present=0,
-                    daily_rate=float(worker.daily_rate or worker.amount_of_salary or 0),
+                    daily_rate=auto_daily_rate,
                     deductions=0
                 )
                 salary_record.auto_fill_from_worker()
@@ -96,8 +100,12 @@ def salary():
             # Recalculate attendance and salary
             total_days_present = worker.get_month_attendance(period)
             salary_record.total_days_present = total_days_present
-            salary_record.calculate()
 
+            # Recalculate daily rate in case month changed
+            monthly_salary = float(worker.amount_of_salary or 0)
+            salary_record.daily_rate = round(monthly_salary / days_in_month, 2) if days_in_month > 0 else 0
+
+            salary_record.calculate()
             db.session.add(salary_record)
 
             # Audit log
@@ -125,8 +133,9 @@ def salary():
         'salary.html',
         salary_data=salary_data,
         total_payroll=round(total_payroll, 2),
-        current_month=current_month,
-        current_year=current_year,
+        current_month=month,
+        current_year=year,
+        days_in_month=days_in_month,
         period=period,
         banks=banks,
         departments=departments,
@@ -290,6 +299,11 @@ def salary_history():
     status_filter = request.args.get('status', 'all')
     department_filter = request.args.get('department', 'all')
 
+    year, month = map(int, period.split('-'))
+    days_in_month = monthrange(year, month)[1]
+    if days_in_month < 1:
+        days_in_month = 1
+
     query = Salary.query.filter_by(month=period)
 
     if status_filter == 'processed':
@@ -301,6 +315,13 @@ def salary_history():
         query = query.join(Worker).filter(Worker.department == department_filter)
 
     salaries = query.order_by(Salary.payment_date.desc()).all()
+
+    # Attach extra display values
+    for s in salaries:
+        s.days_in_month = days_in_month
+        s.present_days = s.total_days_present
+        s.attendance_percent = round((s.total_days_present / days_in_month) * 100, 1) if days_in_month > 0 else 0
+        s.daily_rate_display = s.daily_rate
 
     total_gross = sum(s.gross_salary for s in salaries)
     total_deductions = sum(s.deductions for s in salaries)
