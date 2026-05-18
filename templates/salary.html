@@ -101,11 +101,21 @@
                         <td class="worker-name">
                             <div class="worker-info">
                                 {% set passport_file = worker.passport %}
-                                <img src="{{ passport_file if passport_file else url_for('static', filename='logo.png') }}"
-                                    class="worker-avatar"
-                                    alt="{{ worker.name }}"
-                                    onerror="this.src='{{ url_for('static', filename='logo.png') }}'">
-                                <span>{{ worker.name }}</span>
+                                {% if passport_file %}
+                                    {% if passport_file.startswith('http') %}
+                                        <img src="{{ passport_file }}" class="worker-avatar" alt="{{ worker.name }}" 
+                                            onerror="this.src='{{ url_for('static', filename='default.png') }}'">
+                                    {% else %}
+                                        <img src="{{ url_for('static', filename='uploads/' ~ passport_file) }}" class="worker-avatar" alt="{{ worker.name }}" 
+                                            onerror="this.src='{{ url_for('static', filename='default.png') }}'">
+                                    {% endif %}
+                                {% else %}
+                                    <img src="{{ url_for('static', filename='default.png') }}" class="worker-avatar" alt="{{ worker.name }}">
+                                {% endif %}
+                                <div class="worker-details">
+                                    <span class="worker-name-text">{{ worker.name }}</span>
+                                    <span class="worker-id">ID: {{ worker.worker_code or worker.id }}</span>
+                                </div>
                             </div>
                         </td>
 
@@ -206,29 +216,28 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Handle form submissions via AJAX
     document.querySelectorAll('.salary-form').forEach(function(form) {
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const workerId = this.dataset.workerId;
-            const statusBadge = document.getElementById('status-' + workerId);
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const workerId = this.dataset.workerId;
+        const statusBadge = document.getElementById('status-' + workerId);
 
-            fetch(this.action || window.location.href, {
-                method: 'POST',
-                body: new FormData(this)
-            })
-            .then(function(response) {
-                if (response.ok) {
-                    // Reload the page so we show the real DB state
-                    window.location.reload();
-                } else {
-                    alert('Error saving salary. Try again.');
-                }
-            })
-            .catch(function(err) {
-                console.error(err);
+        fetch("{{ url_for('salary.save_salary') }}", {
+            method: 'POST',
+            body: new FormData(this)
+        })
+        .then(function(response) {
+            if (response.ok) {
+                window.location.reload();
+            } else {
                 alert('Error saving salary. Try again.');
-            });
+            }
+        })
+        .catch(function(err) {
+            console.error(err);
+            alert('Error saving salary. Try again.');
         });
     });
+});
 
     updateProcessedCount();
 });
