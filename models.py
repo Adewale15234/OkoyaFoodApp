@@ -72,9 +72,10 @@ class Worker(db.Model):
         lazy='dynamic'
     )
 
+    # Fixed: use back_populates instead of backref
     salaries = db.relationship(
         'Salary',
-        backref='worker',
+        back_populates='worker',
         cascade="all, delete-orphan",
         passive_deletes=True,
         lazy='dynamic'
@@ -210,8 +211,8 @@ class Salary(db.Model):
         index=True
     )
     
-    # Relationship to Worker so self.worker works
-    worker = db.relationship('Worker', backref=db.backref('salaries', lazy='dynamic', cascade='all, delete-orphan'))
+    # Fixed: use back_populates instead of backref
+    worker = db.relationship('Worker', back_populates='salaries')
     
     # New fields for monthly payroll system
     month = db.Column(db.String(7), nullable=False, index=True)  # Format: "2025-10"
