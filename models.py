@@ -144,19 +144,27 @@ class Attendance(db.Model):
     __tablename__ = 'attendance'
 
     id = db.Column(db.Integer, primary_key=True)
+    
     worker_id = db.Column(
         db.Integer,
         db.ForeignKey('workers.id', ondelete="CASCADE"),
         nullable=False,
         index=True
     )
+    
     date = db.Column(
         db.Date,
         nullable=False,
-        default=db.func.current_date(),
+        default=date.today,
         index=True
     )
-    status = db.Column(db.String(10), nullable=False)
+    
+    status = db.Column(db.String(20), nullable=False)  # Present, Absent, Late, Leave
+    
+    time_in = db.Column(db.Time, nullable=True)
+    time_out = db.Column(db.Time, nullable=True)
+    notes = db.Column(db.String(100), nullable=True)
+    
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     updated_at = db.Column(
         db.DateTime,
@@ -164,8 +172,33 @@ class Attendance(db.Model):
         onupdate=db.func.now()
     )
 
+    # Relationship
+    worker = db.relationship('Worker', backref='attendances', lazy='joined')
+
+    # Prevent duplicate attendance for same worker on same date
+    __table_args__ = (
+        db.UniqueConstraint('worker_id', 'date', name='_worker_date_uc'),
+    )
+
     def __repr__(self):
         return f'<Attendance {self.worker_id} - {self.date} - {self.status}>'
+
+    @property
+    def duration(self):
+        """Calculate duration between time_in and time_out"""
+        if self.time_in and self.time_out:
+            from datetime import datetime, timedelta
+            dt_in = datetime.combine(date.today(), self.time_in)
+            dt_out = datetime.combine(date.today(), self.time_out)
+            
+            # Handle overnight shifts
+            if dt_out < dt_in:
+                dt_out += timedelta(days=1)
+            
+            diff = dt_out - dt_in
+            hours = diff.total_seconds() / 3600
+            return round(hours, 2)
+        return None
 
 class Salary(db.Model):
     __tablename__ = 'salary'
