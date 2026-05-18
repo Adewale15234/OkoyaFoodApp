@@ -122,10 +122,27 @@
                         <td class="worker-cell">
                             <div class="worker-info">
                                 {% set passport_file = record.worker.passport if record.worker else None %}
-                                <img src="{{ url_for('static', filename='uploads/' ~ passport_file) if passport_file else url_for('static', filename='default.png') }}"
-                                     class="worker-avatar"
-                                     alt="{{ record.worker.name if record.worker else 'Unknown' }}"
-                                     onerror="this.src='{{ url_for('static', filename='default.png') }}'">
+                                
+                                {% if passport_file %}
+                                    {% if passport_file.startswith('http') %}
+                                        {# Cloudinary/S3 URL #}
+                                        <img src="{{ passport_file }}" 
+                                            class="worker-avatar"
+                                            alt="{{ record.worker.name if record.worker else 'Unknown' }}"
+                                            onerror="this.src='{{ url_for('static', filename='default.png') }}'">
+                                    {% else %}
+                                        {# Local file in static/uploads #}
+                                        <img src="{{ url_for('static', filename='uploads/' ~ passport_file) }}" 
+                                            class="worker-avatar"
+                                            alt="{{ record.worker.name if record.worker else 'Unknown' }}"
+                                            onerror="this.src='{{ url_for('static', filename='default.png') }}'">
+                                    {% endif %}
+                                {% else %}
+                                    <img src="{{ url_for('static', filename='default.png') }}" 
+                                        class="worker-avatar"
+                                        alt="{{ record.worker.name if record.worker else 'Unknown' }}">
+                                {% endif %}
+                                
                                 <span>{{ record.worker.name if record.worker else 'Unknown Worker' }}</span>
                             </div>
                         </td>
