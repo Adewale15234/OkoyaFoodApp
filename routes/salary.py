@@ -386,8 +386,8 @@ def payslip(worker_id):
     period = request.args.get('period', datetime.now().strftime('%Y-%m'))
 
     salary = Salary.query.filter_by(worker_id=worker_id, month=period)\
-                       .options(db.joinedload(Salary.worker))\
-                       .first()
+                      .options(db.joinedload(Salary.worker))\
+                      .first()
 
     if not salary:
         return "Payslip not found for this period", 404
@@ -404,18 +404,20 @@ def payslip(worker_id):
     salary.attendance_percent = round((salary.present_days / days_in_month) * 100, 1) if days_in_month > 0 else 0
 
     # Fallback to worker fields if salary fields are empty
-if salary.worker:
-    salary.worker_code = salary.worker_code  # FIXED
-    salary.bank_name = salary.bank_name or salary.worker.bank_name
-    salary.bank_account = salary.bank_account or salary.worker.bank_account
-    salary.worker_department = salary.worker.department
-    salary.worker_position = getattr(salary.worker, 'position', None)
-else:
-    salary.worker_code = None
-    salary.bank_name = None
-    salary.bank_account = None
-    salary.worker_department = None
-    salary.worker_position = None
+    if salary.worker:
+        salary.worker_code = salary.worker_code
+        salary.bank_name = salary.bank_name or salary.worker.bank_name
+        salary.bank_account = salary.bank_account or salary.worker.bank_account
+        salary.bank_account_name = salary.bank_account_name or salary.worker.bank_account_name
+        salary.worker_department = salary.worker.department
+        salary.worker_position = getattr(salary.worker, 'position', None)
+    else:
+        salary.worker_code = None
+        salary.bank_name = None
+        salary.bank_account = None
+        salary.bank_account_name = None
+        salary.worker_department = None
+        salary.worker_position = None
 
     # Ensure numbers are not None for template
     salary.daily_rate = salary.daily_rate or 0
