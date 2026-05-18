@@ -357,25 +357,35 @@ def salary_history():
 @salary_bp.route('/payslip/<int:worker_id>')
 @login_required(role='admin')
 def payslip(worker_id):
-    """Generate payslip for a worker for a specific period"""
     period = request.args.get('period', datetime.now().strftime('%Y-%m'))
-    salary = Salary.query.filter_by(worker_id=worker_id, month=period).first()
+    salary = Salary.query.filter_by(worker_id=worker_id, month=period).options(db.joinedload(Salary.worker)).first()
 
     if not salary:
         return "Payslip not found", 404
 
-    return render_template('payslip.html', salary=salary, period=period)
+    # Calculate days in month for display
+    year, month = map(int, period.split('-'))
+    days_in_month = monthrange(year, month)[1]
+    salary.days_in_month = days_in_month
+    salary.present_days = salary.total_days_present
+    salary.attendance_percent = round((salary.total_days_present / days_in_month) * 100, 1) if days_in_month > 0 else 0
+
+    return render_template('payslip.html', salary=salary, period=period, now=datetime.now())
 
 @salary_bp.route('/export-csv')
 @login_required(role='admin')
 def export_csv():
-    """Export salary data to CSV"""
     period = request.args.get('period', datetime.now().strftime('%Y-%m'))
+    year, month = map(int, period.split('-'))
+    days_in_month = monthrange(year, month)[1]
+
     salaries = Salary.query.filter_by(month=period).all()
 
-    csv_data = "Worker Code,Name,Department,Days Present,Daily Rate,Gross,Deductions,Net,Bank,Account No,Status\n"
+    csv_data = "Worker Code,Name,Department,Days Present,Days in Month,Attendance %,Daily Rate,Gross,Deductions,Net,Bank,Account No,Status\n"
     for s in salaries:
-        csv_data += f"{s.worker.worker_code},{s.worker.name},{s.worker.department},{s.total_days_present},"
+        present = s.total_days_present
+        percent = round((present / days_in_month) * 100, 1) if days_in_month > 0 else 0
+        csv_data += f"{s.worker_code},{s.worker.name},{s.worker.department},{present},{days_in_month},{percent},"
         csv_data += f"{s.daily_rate},{s.gross_salary},{s.deductions},{s.net_salary},"
         csv_data += f"{s.bank_name},{s.bank_account},{'Processed' if s.is_processed else 'Pending'}\n"
 
