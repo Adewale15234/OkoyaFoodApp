@@ -30,7 +30,6 @@ def salary():
         for w in workers:
             total_days_present = w.get_month_attendance(period)
 
-            # Calculate daily rate based on registered salary amount / days in month
             monthly_salary = float(w.amount_of_salary or 0)
             auto_daily_rate = round(monthly_salary / days_in_month, 2) if days_in_month > 0 else 0
 
@@ -76,7 +75,7 @@ def salary():
 
             if not worker:
                 flash("Worker not found.", "error")
-                return redirect(url_for('salary.salary'))
+                return redirect(url_for('salary.salary', period=period))
 
             if is_locked:
                 flash("This period is locked. Unlock it first to make changes.", "error")
@@ -97,14 +96,17 @@ def salary():
                 )
                 salary_record.auto_fill_from_worker()
 
-            # Recalculate attendance and salary
-            total_days_present = worker.get_month_attendance(period)
+            # Update fields from form/edit
+            total_days_present = int(request.form.get('total_days_present', worker.get_month_attendance(period)))
+            daily_rate = float(request.form.get('daily_rate', salary_record.daily_rate))
+            deductions = float(request.form.get('deductions', salary_record.deductions))
+
             salary_record.total_days_present = total_days_present
+            salary_record.daily_rate = daily_rate
+            salary_record.deductions = deductions
 
-            # Recalculate daily rate in case month changed
-            monthly_salary = float(worker.amount_of_salary or 0)
-            salary_record.daily_rate = round(monthly_salary / days_in_month, 2) if days_in_month > 0 else 0
-
+            # Mark as processed when saved
+            salary_record.is_processed = True
             salary_record.calculate()
             db.session.add(salary_record)
 
@@ -121,13 +123,14 @@ def salary():
             db.session.add(audit)
             db.session.commit()
 
-            flash(f"Salary recorded successfully for {worker.name}.", "success")
+            flash(f"Salary processed successfully for {worker.name}.", "success")
             return redirect(url_for('salary.salary', period=period))
 
         except Exception as e:
             db.session.rollback()
             logging.error(f"Salary error: {e}")
             flash("Error recording salary. Try again.", "error")
+            return redirect(url_for('salary.salary', period=period))
 
     return render_template(
         'salary.html',
@@ -162,7 +165,6 @@ def save_salary():
 
     salary = Salary.query.filter_by(worker_id=worker_id, month=month).first()
     if not salary:
-        # Create if doesn't exist
         worker = Worker.query.get(worker_id)
         if not worker:
             return jsonify({'error': 'Worker not found'}), 404
@@ -170,7 +172,7 @@ def save_salary():
             worker_id=worker_id,
             month=month,
             total_days_present=0,
-            daily_rate=float(worker.daily_rate or worker.amount_of_salary or 0),
+            daily_rate=float(worker.amount_of_salary or 0) / monthrange(int(month[:4]), int(month[5:7]))[1],
             deductions=0
         )
         salary.auto_fill_from_worker()
@@ -183,18 +185,20 @@ def save_salary():
     if 'deductions' in data:
         salary.deductions = float(data['deductions'])
 
+    # Mark as processed on save
+    salary.is_processed = True
     salary.calculate()
     db.session.add(salary)
 
     # Audit log
     audit = AuditLog(
         user_name=session.get('username', 'Admin'),
-        action='updated',
+        action='processed',
         table_name='salary',
         record_id=salary.id,
         worker_id=salary.worker_id,
         worker_name=salary.worker.name,
-        details=f'Updated salary for {month}: days={salary.total_days_present}, rate={salary.daily_rate}, ded={salary.deductions}'
+        details=f'Processed salary for {month}: days={salary.total_days_present}, rate={salary.daily_rate}, ded={salary.deductions}'
     )
     db.session.add(audit)
     db.session.commit()
@@ -203,7 +207,8 @@ def save_salary():
         'success': True,
         'net_salary': salary.net_salary,
         'gross_salary': salary.gross_salary,
-        'message': 'Salary updated successfully'
+        'is_processed': salary.is_processed,
+        'message': 'Salary processed successfully'
     })
 
 @salary_bp.route('/save-all', methods=['POST'])
@@ -280,7 +285,6 @@ def toggle_lock():
         locked = True
         action = 'locked'
 
-    # Audit log
     audit = AuditLog(
         user_name=session.get('username', 'Admin'),
         action=action,
@@ -329,7 +333,7 @@ def salary_history():
 
     # Build period list
     available_months = []
-    for y in range(datetime.now().year - 2, datetime.now().year + 1):
+    for y in range(datetime.now().year - 2, datetime.now().year + 2):
         for m in range(1, 13):
             available_months.append(f"{y}-{m:02d}")
     available_months.reverse()
@@ -358,19 +362,45 @@ def salary_history():
 @login_required(role='admin')
 def payslip(worker_id):
     period = request.args.get('period', datetime.now().strftime('%Y-%m'))
-    salary = Salary.query.filter_by(worker_id=worker_id, month=period).options(db.joinedload(Salary.worker)).first()
+
+    salary = Salary.query.filter_by(worker_id=worker_id, month=period)\
+                        .options(db.joinedload(Salary.worker))\
+                        .first()
 
     if not salary:
-        return "Payslip not found", 404
+        return "Payslip not found for this period", 404
 
-    # Calculate days in month for display
+    # Calculate month values
     year, month = map(int, period.split('-'))
     days_in_month = monthrange(year, month)[1]
-    salary.days_in_month = days_in_month
-    salary.present_days = salary.total_days_present
-    salary.attendance_percent = round((salary.total_days_present / days_in_month) * 100, 1) if days_in_month > 0 else 0
+    if days_in_month < 1:
+        days_in_month = 1
 
-    return render_template('payslip.html', salary=salary, period=period, now=datetime.now())
+    # Attach display fields
+    salary.days_in_month = days_in_month
+    salary.present_days = salary.total_days_present or 0
+    salary.attendance_percent = round((salary.present_days / days_in_month) * 100, 1) if days_in_month > 0 else 0
+
+    # Fallback to worker fields if salary fields are empty
+    if salary.worker:
+        salary.worker_code = salary.worker_code or salary.worker_code
+        salary.bank_name = salary.bank_name or salary.worker.bank_name
+        salary.bank_account = salary.bank_account or salary.worker.bank_account
+        salary.worker_department = salary.worker.department
+        salary.worker_position = getattr(salary.worker, 'position', None)
+
+    # Ensure numbers are not None for template
+    salary.daily_rate = salary.daily_rate or 0
+    salary.gross_salary = salary.gross_salary or 0
+    salary.deductions = salary.deductions or 0
+    salary.net_salary = salary.net_salary or 0
+
+    return render_template(
+        'payslip.html',
+        salary=salary,
+        period=period,
+        now=datetime.now()
+    )
 
 @salary_bp.route('/export-csv')
 @login_required(role='admin')
