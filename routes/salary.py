@@ -1,9 +1,11 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, current_app, jsonify
 from extensions import db
 from models import Worker, Attendance, Salary, PayrollLock, AuditLog
+from models import Salary, Worker, PayrollLock, AuditLog
 from utils import login_required
 from datetime import datetime
 from calendar import monthrange
+from flask import jsonify, request, session
 from sqlalchemy import extract, func
 import logging
 
@@ -151,65 +153,85 @@ def salary():
 @login_required(role='admin')
 def save_salary():
     """AJAX endpoint to save individual salary row"""
-    if request.is_json:
-        data = request.get_json()
-    else:
-        data = request.form
+    try:
+        if request.is_json:
+            data = request.get_json()
+        else:
+            data = request.form
 
-    worker_id = data.get('worker_id')
-    month = data.get('month') or request.args.get('period', datetime.now().strftime('%Y-%m'))
+        worker_id = int(data.get('worker_id'))
+        month = data.get('month') or request.args.get('period', datetime.now().strftime('%Y-%m'))
 
-    # Check if period is locked
-    if PayrollLock.query.filter_by(month=month).first():
-        return jsonify({'error': 'Period is locked'}), 403
+        # Validate month format
+        try:
+            year, mon = map(int, month.split('-'))
+        except ValueError:
+            return jsonify({'error': 'Invalid month format. Use YYYY-MM'}), 400
 
-    salary = Salary.query.filter_by(worker_id=worker_id, month=month).first()
-    if not salary:
+        # Check if period is locked
+        if PayrollLock.query.filter_by(month=month).first():
+            return jsonify({'error': 'Period is locked'}), 403
+
         worker = Worker.query.get(worker_id)
         if not worker:
             return jsonify({'error': 'Worker not found'}), 404
-        salary = Salary(
-            worker_id=worker_id,
-            month=month,
-            total_days_present=0,
-            daily_rate=float(worker.amount_of_salary or 0) / monthrange(int(month[:4]), int(month[5:7]))[1],
-            deductions=0
+
+        # Get existing salary or create new one
+        salary = Salary.query.filter_by(worker_id=worker_id, month=month).first()
+        if not salary:
+            days_in_month = monthrange(year, mon)[1]
+            default_daily_rate = float(worker.daily_rate or 0)
+            if default_daily_rate == 0 and worker.amount_of_salary:
+                default_daily_rate = float(worker.amount_of_salary) / 30.0
+
+            salary = Salary(
+                worker_id=worker_id,
+                month=month,
+                total_days_present=worker.get_month_attendance(month),
+                daily_rate=default_daily_rate,
+                deductions=0
+            )
+            salary.auto_fill_from_worker()
+            db.session.add(salary)
+            db.session.flush() # Get salary.id without committing yet
+
+        # Update fields if present in POST
+        if 'total_days_present' in data and data['total_days_present']!= '':
+            salary.total_days_present = int(data['total_days_present'])
+        if 'daily_rate' in data and data['daily_rate']!= '':
+            salary.daily_rate = float(data['daily_rate'])
+        if 'deductions' in data and data['deductions']!= '':
+            salary.deductions = float(data['deductions'])
+
+        # Mark as processed and calculate
+        salary.is_processed = True
+        salary.calculate()
+
+        # Create audit log after flush so salary.id exists
+        audit = AuditLog(
+            user_name=session.get('username', 'Admin'),
+            action='processed',
+            table_name='salary',
+            record_id=salary.id,
+            worker_id=salary.worker_id,
+            worker_name=worker.name,
+            details=f'Processed salary for {month}: days={salary.total_days_present}, rate={salary.daily_rate}, ded={salary.deductions}, net={salary.net_salary}'
         )
-        salary.auto_fill_from_worker()
+        db.session.add(audit)
 
-    # Update fields if present
-    if 'total_days_present' in data:
-        salary.total_days_present = int(data['total_days_present'])
-    if 'daily_rate' in data:
-        salary.daily_rate = float(data['daily_rate'])
-    if 'deductions' in data:
-        salary.deductions = float(data['deductions'])
+        db.session.commit()
 
-    # Mark as processed on save
-    salary.is_processed = True
-    salary.calculate()
-    db.session.add(salary)
+        return jsonify({
+            'success': True,
+            'net_salary': round(salary.net_salary, 2),
+            'gross_salary': round(salary.gross_salary, 2),
+            'is_processed': salary.is_processed,
+            'message': 'Salary processed successfully'
+        })
 
-    # Audit log
-    audit = AuditLog(
-        user_name=session.get('username', 'Admin'),
-        action='processed',
-        table_name='salary',
-        record_id=salary.id,
-        worker_id=salary.worker_id,
-        worker_name=salary.worker.name,
-        details=f'Processed salary for {month}: days={salary.total_days_present}, rate={salary.daily_rate}, ded={salary.deductions}'
-    )
-    db.session.add(audit)
-    db.session.commit()
-
-    return jsonify({
-        'success': True,
-        'net_salary': salary.net_salary,
-        'gross_salary': salary.gross_salary,
-        'is_processed': salary.is_processed,
-        'message': 'Salary processed successfully'
-    })
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
 
 @salary_bp.route('/save-all', methods=['POST'])
 @login_required(role='admin')
@@ -382,18 +404,18 @@ def payslip(worker_id):
     salary.attendance_percent = round((salary.present_days / days_in_month) * 100, 1) if days_in_month > 0 else 0
 
     # Fallback to worker fields if salary fields are empty
-    if salary.worker:
-        salary.worker_code = salary.worker_code
-        salary.bank_name = salary.bank_name or salary.worker.bank_name
-        salary.bank_account = salary.bank_account or salary.worker.bank_account
-        salary.worker_department = salary.worker.department
-        salary.worker_position = getattr(salary.worker, 'position', None)
-    else:
-        salary.worker_code = None
-        salary.bank_name = None
-        salary.bank_account = None
-        salary.worker_department = None
-        salary.worker_position = None
+if salary.worker:
+    salary.worker_code = salary.worker_code  # FIXED
+    salary.bank_name = salary.bank_name or salary.worker.bank_name
+    salary.bank_account = salary.bank_account or salary.worker.bank_account
+    salary.worker_department = salary.worker.department
+    salary.worker_position = getattr(salary.worker, 'position', None)
+else:
+    salary.worker_code = None
+    salary.bank_name = None
+    salary.bank_account = None
+    salary.worker_department = None
+    salary.worker_position = None
 
     # Ensure numbers are not None for template
     salary.daily_rate = salary.daily_rate or 0

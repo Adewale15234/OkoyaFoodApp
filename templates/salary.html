@@ -226,16 +226,19 @@ document.addEventListener('DOMContentLoaded', function() {
             method: 'POST',
             body: new FormData(this)
         })
-        .then(function(response) {
-            if (response.ok) {
-                window.location.reload();
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                statusBadge.className = 'status-badge processed';
+                statusBadge.textContent = 'Processed';
+                updateProcessedCount();
             } else {
-                alert('Error saving salary. Try again.');
+                alert('Error: ' + (data.error || 'Unknown error'));
             }
         })
-        .catch(function(err) {
+        .catch(err => {
             console.error(err);
-            alert('Error saving salary. Try again.');
+            alert('Error saving salary: ' + err);
         });
     });
 });
