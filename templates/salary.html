@@ -97,17 +97,20 @@
                     {% for worker in salary_data %}
                     <tr data-worker-id="{{ worker.id }}">
                         <td>{{ loop.index }}</td>
+                        
                         <td class="worker-name">
                             <div class="worker-info">
-                                {% if worker.passport %}
-                                    <img src="{{ worker.passport }}" 
-                                        class="worker-avatar" 
-                                        alt="{{ worker.name }}"
-                                        onerror="this.src='{{ url_for('static', filename='default.png') }}'">
+                                {% set passport_file = worker.passport %}
+                                {% if passport_file %}
+                                    {% if passport_file.startswith('http') %}
+                                        <img src="{{ passport_file }}" class="worker-avatar" alt="{{ worker.name }}" 
+                                            onerror="this.src='{{ url_for('static', filename='default.png') }}'">
+                                    {% else %}
+                                        <img src="{{ url_for('static', filename='uploads/' ~ passport_file) }}" class="worker-avatar" alt="{{ worker.name }}" 
+                                            onerror="this.src='{{ url_for('static', filename='default.png') }}'">
+                                    {% endif %}
                                 {% else %}
-                                    <img src="{{ url_for('static', filename='logo.png') }}" 
-                                        class="worker-avatar" 
-                                        alt="{{ worker.name }}">
+                                    <img src="{{ url_for('static', filename='default.png') }}" class="worker-avatar" alt="{{ worker.name }}">
                                 {% endif %}
                                 <span>{{ worker.name }}</span>
                             </div>
@@ -115,15 +118,24 @@
 
                         <td>
                             {{ worker.present_days }} / {{ worker.days_in_month }}
-                            <small style="color:#64748b;">({{ worker.attendance_percent }}%)</small>
+                            <small style="color:#64748b;">({{ "%.1f"|format(worker.attendance_percent) }}%)</small>
                         </td>
+                        
                         <td class="daily-rate">₦{{ "{:,.2f}".format(worker.daily_rate_display or 0) }}</td>
+                        
                         <td class="salary-amount">₦{{ "{:,.2f}".format(worker.calculated_salary or 0) }}</td>
 
                         <td>{{ worker.bank_account_name or '—' }}</td>
                         <td>{{ worker.bank_name or '—' }}</td>
                         <td>{{ worker.bank_account or '—' }}</td>
-                        <td><span class="status-badge pending" id="status-{{ worker.id }}">Pending</span></td>
+                        
+                        <td>
+                            {% if worker.is_processed %}
+                                <span class="status-badge processed" id="status-{{ worker.id }}">Processed</span>
+                            {% else %}
+                                <span class="status-badge pending" id="status-{{ worker.id }}">Pending</span>
+                            {% endif %}
+                        </td>
 
                         <td>
                             <form method="post" class="salary-form" data-worker-id="{{ worker.id }}">
@@ -210,14 +222,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 method: 'POST',
                 body: new FormData(this)
             })
-           .then(function(response) {
+            .then(function(response) {
                 if (response.ok) {
-                    statusBadge.className = 'status-badge processed';
-                    statusBadge.textContent = 'Processed';
-                    updateProcessedCount();
+                    // Reload the page so we show the real DB state
+                    window.location.reload();
+                } else {
+                    alert('Error saving salary. Try again.');
                 }
             })
-           .catch(function(err) {
+            .catch(function(err) {
                 console.error(err);
                 alert('Error saving salary. Try again.');
             });
