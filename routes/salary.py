@@ -1,11 +1,9 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, current_app, jsonify
 from extensions import db
 from models import Worker, Attendance, Salary, PayrollLock, AuditLog
-from models import Salary, Worker, PayrollLock, AuditLog
 from utils import login_required
 from datetime import datetime
 from calendar import monthrange
-from flask import jsonify, request, session
 from sqlalchemy import extract, func
 import logging
 
@@ -386,11 +384,16 @@ def payslip(worker_id):
     period = request.args.get('period', datetime.now().strftime('%Y-%m'))
 
     salary = Salary.query.filter_by(worker_id=worker_id, month=period)\
-                      .options(db.joinedload(Salary.worker))\
-                      .first()
+                    .options(db.joinedload(Salary.worker))\
+                    .first()
 
     if not salary:
-        return "Payslip not found for this period", 404
+        flash("Payslip not found for this period", "warning")
+        return redirect(url_for('salary.salary', period=period))
+
+    if not salary.worker:
+        flash("Worker not found for this salary record", "error")
+        return redirect(url_for('salary.salary', period=period))
 
     # Calculate month values
     year, month = map(int, period.split('-'))
@@ -398,26 +401,10 @@ def payslip(worker_id):
     if days_in_month < 1:
         days_in_month = 1
 
-    # Attach display fields
+    # Add display fields to salary object - these are NOT saved to DB
     salary.days_in_month = days_in_month
     salary.present_days = salary.total_days_present or 0
     salary.attendance_percent = round((salary.present_days / days_in_month) * 100, 1) if days_in_month > 0 else 0
-
-    # Fallback to worker fields if salary fields are empty
-    if salary.worker:
-        salary.worker_code = salary.worker_code
-        salary.bank_name = salary.bank_name or salary.worker.bank_name
-        salary.bank_account = salary.bank_account or salary.worker.bank_account
-        salary.bank_account_name = salary.bank_account_name or salary.worker.bank_account_name
-        salary.worker_department = salary.worker.department
-        salary.worker_position = getattr(salary.worker, 'position', None)
-    else:
-        salary.worker_code = None
-        salary.bank_name = None
-        salary.bank_account = None
-        salary.bank_account_name = None
-        salary.worker_department = None
-        salary.worker_position = None
 
     # Ensure numbers are not None for template
     salary.daily_rate = salary.daily_rate or 0
@@ -428,6 +415,7 @@ def payslip(worker_id):
     return render_template(
         'payslip.html',
         salary=salary,
+        worker=salary.worker, # Pass the whole worker object
         period=period,
         now=datetime.now()
     )
@@ -439,15 +427,22 @@ def export_csv():
     year, month = map(int, period.split('-'))
     days_in_month = monthrange(year, month)[1]
 
-    salaries = Salary.query.filter_by(month=period).all()
+    salaries = Salary.query.filter_by(month=period).options(db.joinedload(Salary.worker)).all()
 
     csv_data = "Worker Code,Name,Department,Days Present,Days in Month,Attendance %,Daily Rate,Gross,Deductions,Net,Bank,Account No,Status\n"
     for s in salaries:
         present = s.total_days_present
         percent = round((present / days_in_month) * 100, 1) if days_in_month > 0 else 0
-        csv_data += f"{s.worker_code},{s.worker.name},{s.worker.department},{present},{days_in_month},{percent},"
+        worker = s.worker
+        worker_code = worker.worker_code if worker else ''
+        worker_name = worker.name if worker else 'Unknown'
+        worker_dept = worker.department if worker else ''
+        bank_name = s.bank_name or (worker.bank_name if worker else '')
+        bank_account = s.bank_account or (worker.bank_account if worker else '')
+
+        csv_data += f"{worker_code},{worker_name},{worker_dept},{present},{days_in_month},{percent},"
         csv_data += f"{s.daily_rate},{s.gross_salary},{s.deductions},{s.net_salary},"
-        csv_data += f"{s.bank_name},{s.bank_account},{'Processed' if s.is_processed else 'Pending'}\n"
+        csv_data += f"{bank_name},{bank_account},{'Processed' if s.is_processed else 'Pending'}\n"
 
     return current_app.response_class(
         csv_data,

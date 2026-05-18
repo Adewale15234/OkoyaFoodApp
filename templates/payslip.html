@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Payslip - {{ salary.worker.name }} - {{ period }}</title>
+<title>Payslip - {{ worker.name }} - {{ period }}</title>
 
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
@@ -36,7 +36,7 @@
     }
 
     /* Modal Overlay */
-    .modal-overlay {
+   .modal-overlay {
         position: fixed;
         top: 0;
         left: 0;
@@ -50,7 +50,7 @@
         z-index: 1000;
     }
 
-    .modal-content {
+   .modal-content {
         background: white;
         border-radius: 20px;
         max-width: 900px;
@@ -73,7 +73,7 @@
     }
 
     /* Action Bar */
-    .action-bar {
+   .action-bar {
         position: sticky;
         top: 0;
         background: white;
@@ -87,7 +87,7 @@
         border-radius: 20px 20px 0 0;
     }
 
-    .action-btn {
+   .action-btn {
         background: var(--primary);
         color: white;
         padding: 12px 24px;
@@ -102,31 +102,31 @@
         gap: 8px;
     }
 
-    .action-btn:hover {
+   .action-btn:hover {
         background: var(--primary-dark);
         transform: translateY(-2px);
         box-shadow: 0 6px 15px rgba(3, 73, 44, 0.3);
     }
 
-    .action-btn.secondary {
+   .action-btn.secondary {
         background: var(--text-muted);
     }
 
-    .action-btn.secondary:hover {
+   .action-btn.secondary:hover {
         background: #475569;
     }
 
-    .action-btn.danger {
+   .action-btn.danger {
         background: var(--danger);
     }
 
     /* Payslip Container */
-    .payslip {
+   .payslip {
         padding: 0;
     }
 
     /* Header */
-    .payslip-header {
+   .payslip-header {
         background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
         color: white;
         padding: 40px 30px;
@@ -134,7 +134,7 @@
         overflow: hidden;
     }
 
-    .payslip-header::before {
+   .payslip-header::before {
         content: '';
         position: absolute;
         top: -50%;
@@ -145,7 +145,7 @@
         border-radius: 50%;
     }
 
-    .header-content {
+   .header-content {
         position: relative;
         z-index: 1;
         display: flex;
@@ -154,40 +154,40 @@
         flex-wrap: wrap;
     }
 
-    .company-logo {
+   .company-logo {
         width: 90px;
         height: 90px;
         border-radius: 50%;
-        border: 4px solid rgba(255, 255, 255, 0.3);
+        border: 4px solid rgba(255, 255, 0.3);
         object-fit: cover;
         background: white;
     }
 
-    .header-text {
+   .header-text {
         flex: 1;
     }
 
-    .header-text h1 {
+   .header-text h1 {
         font-size: 1.9rem;
         font-weight: 800;
         margin-bottom: 5px;
         letter-spacing: -0.5px;
     }
 
-    .header-text h2 {
+   .header-text h2 {
         font-size: 1.1rem;
         font-weight: 400;
         opacity: 0.9;
     }
 
-    .header-meta {
+   .header-meta {
         display: flex;
         gap: 15px;
         margin-top: 15px;
         flex-wrap: wrap;
     }
 
-    .meta-badge {
+   .meta-badge {
         background: rgba(255, 255, 255, 0.2);
         padding: 6px 14px;
         border-radius: 20px;
@@ -196,12 +196,12 @@
     }
 
     /* Body */
-    .payslip-body {
+   .payslip-body {
         padding: 35px 30px;
     }
 
     /* Employee Profile Section */
-    .employee-profile {
+   .employee-profile {
         display: grid;
         grid-template-columns: 180px 1fr;
         gap: 30px;
@@ -210,11 +210,11 @@
         border-bottom: 2px dashed var(--border);
     }
 
-    .profile-photo {
+   .profile-photo {
         text-align: center;
     }
 
-    .profile-photo img {
+   .profile-photo img {
         width: 160px;
         height: 160px;
         border-radius: 20px;
@@ -223,20 +223,20 @@
         box-shadow: 0 8px 20px rgba(3, 73, 44, 0.2);
     }
 
-    .profile-photo .emp-code {
+   .profile-photo.emp-code {
         margin-top: 12px;
         font-size: 0.85rem;
         color: var(--text-muted);
         font-weight: 600;
     }
 
-    .profile-details {
+   .profile-details {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
         gap: 18px;
     }
 
-    .detail-box {
+   .detail-box {
         background: var(--bg-light);
         padding: 15px 18px;
         border-radius: 12px;
@@ -244,12 +244,12 @@
         transition: all 0.2s;
     }
 
-    .detail-box:hover {
+   .detail-box:hover {
         transform: translateX(5px);
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     }
 
-    .detail-box label {
+   .detail-box label {
         display: block;
         font-size: 0.75rem;
         color: var(--text-muted);
@@ -259,14 +259,14 @@
         letter-spacing: 0.5px;
     }
 
-    .detail-box .value {
+   .detail-box.value {
         font-size: 1rem;
         font-weight: 700;
         color: var(--text-dark);
     }
 
     /* Status Badge */
-    .status-badge {
+   .status-badge {
         display: inline-flex;
         align-items: center;
         gap: 6px;
@@ -276,17 +276,17 @@
         font-weight: 700;
     }
 
-    .status-badge.processed {
+   .status-badge.processed {
         background: #dcfce7;
         color: #166534;
     }
 
-    .status-badge.pending {
+   .status-badge.pending {
         background: #fef3c7;
         color: #92400e;
     }
 
-    .status-dot {
+   .status-dot {
         width: 8px;
         height: 8px;
         border-radius: 50%;
@@ -294,26 +294,26 @@
     }
 
     /* Salary Breakdown */
-    .breakdown-grid {
+   .breakdown-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 25px;
         margin-bottom: 30px;
     }
 
-    .breakdown-card {
+   .breakdown-card {
         border: 2px solid var(--border);
         border-radius: 16px;
         overflow: hidden;
         transition: all 0.3s;
     }
 
-    .breakdown-card:hover {
+   .breakdown-card:hover {
         border-color: var(--primary);
         box-shadow: 0 8px 20px rgba(3, 73, 44, 0.15);
     }
 
-    .breakdown-header {
+   .breakdown-header {
         background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
         color: white;
         padding: 15px 20px;
@@ -324,51 +324,51 @@
         gap: 10px;
     }
 
-    .breakdown-body {
+   .breakdown-body {
         padding: 0;
     }
 
-    .breakdown-table {
+   .breakdown-table {
         width: 100%;
         border-collapse: collapse;
     }
 
-    .breakdown-table tr {
+   .breakdown-table tr {
         border-bottom: 1px solid var(--border);
     }
 
-    .breakdown-table tr:last-child {
+   .breakdown-table tr:last-child {
         border-bottom: none;
     }
 
-    .breakdown-table td {
+   .breakdown-table td {
         padding: 14px 20px;
         font-size: 0.95rem;
     }
 
-    .breakdown-table .label {
+   .breakdown-table.label {
         color: var(--text-muted);
         font-weight: 500;
     }
 
-    .breakdown-table .amount {
+   .breakdown-table.amount {
         text-align: right;
         font-weight: 700;
         color: var(--text-dark);
     }
 
-    .breakdown-table .total-row {
+   .breakdown-table.total-row {
         background: var(--bg-light);
     }
 
-    .breakdown-table .total-row td {
+   .breakdown-table.total-row td {
         font-size: 1.05rem;
         font-weight: 800;
         color: var(--primary);
     }
 
     /* Net Pay Card */
-    .net-pay-card {
+   .net-pay-card {
         background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
         color: white;
         padding: 35px;
@@ -379,7 +379,7 @@
         overflow: hidden;
     }
 
-    .net-pay-card::before {
+   .net-pay-card::before {
         content: '';
         position: absolute;
         top: -100px;
@@ -390,7 +390,7 @@
         border-radius: 50%;
     }
 
-    .net-pay-card label {
+   .net-pay-card label {
         display: block;
         font-size: 0.9rem;
         opacity: 0.9;
@@ -400,20 +400,20 @@
         font-weight: 600;
     }
 
-    .net-pay-amount {
+   .net-pay-amount {
         font-size: 3rem;
         font-weight: 800;
         margin-bottom: 5px;
     }
 
-    .net-pay-text {
+   .net-pay-text {
         font-size: 1.1rem;
         opacity: 0.95;
         font-weight: 500;
     }
 
     /* Signature Section */
-    .signature-section {
+   .signature-section {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
         gap: 40px;
@@ -422,30 +422,30 @@
         border-top: 2px dashed var(--border);
     }
 
-    .sig-box {
+   .sig-box {
         text-align: center;
     }
 
-    .sig-line {
+   .sig-line {
         height: 60px;
         border-bottom: 2px solid var(--text-dark);
         margin-bottom: 12px;
     }
 
-    .sig-label {
+   .sig-label {
         font-weight: 600;
         color: var(--text-dark);
         font-size: 0.95rem;
     }
 
-    .sig-role {
+   .sig-role {
         font-size: 0.85rem;
         color: var(--text-muted);
         margin-top: 4px;
     }
 
     /* Footer */
-    .payslip-footer {
+   .payslip-footer {
         margin-top: 40px;
         padding-top: 25px;
         border-top: 1px solid var(--border);
@@ -454,7 +454,7 @@
         font-size: 0.85rem;
     }
 
-    .footer-grid {
+   .footer-grid {
         display: flex;
         justify-content: center;
         gap: 30px;
@@ -462,7 +462,7 @@
         margin-bottom: 15px;
     }
 
-    .footer-item {
+   .footer-item {
         display: flex;
         align-items: center;
         gap: 6px;
@@ -474,34 +474,34 @@
             padding: 10px;
         }
 
-        .modal-overlay {
+       .modal-overlay {
             padding: 10px;
         }
 
-        .header-content {
+       .header-content {
             flex-direction: column;
             text-align: center;
         }
 
-        .employee-profile {
+       .employee-profile {
             grid-template-columns: 1fr;
             text-align: center;
         }
 
-        .profile-photo {
+       .profile-photo {
             margin: 0 auto;
         }
 
-        .breakdown-grid {
+       .breakdown-grid {
             grid-template-columns: 1fr;
         }
 
-        .signature-section {
+       .signature-section {
             grid-template-columns: 1fr;
             gap: 30px;
         }
 
-        .net-pay-amount {
+       .net-pay-amount {
             font-size: 2.2rem;
         }
     }
@@ -513,28 +513,28 @@
             padding: 0;
         }
 
-        .modal-overlay {
+       .modal-overlay {
             position: static;
             background: white;
             padding: 0;
         }
 
-        .modal-content {
+       .modal-content {
             box-shadow: none;
             max-height: none;
             border-radius: 0;
         }
 
-        .no-print {
-            display: none !important;
+       .no-print {
+            display: none!important;
         }
 
-        .action-bar {
+       .action-bar {
             display: none;
         }
 
-        .payslip-header::before,
-        .net-pay-card::before {
+       .payslip-header::before,
+       .net-pay-card::before {
             display: none;
         }
 
@@ -549,7 +549,7 @@
 
 <div class="modal-overlay">
     <div class="modal-content">
-        
+
         <!-- Action Bar -->
         <div class="action-bar no-print">
             <button onclick="downloadPDF()" class="action-btn">
@@ -564,7 +564,7 @@
         </div>
 
         <div class="payslip" id="payslipContent">
-            
+
             <!-- Header -->
             <div class="payslip-header">
                 <div class="header-content">
@@ -586,57 +586,57 @@
                 <!-- Employee Profile -->
                 <div class="employee-profile">
                     <div class="profile-photo">
-                        {% set passport_file = salary.worker.passport if salary.worker else None %}
+                        {% set passport_file = worker.passport if worker else None %}
                         {% if passport_file %}
                             {% if passport_file.startswith('http') %}
-                                <img src="{{ passport_file }}" alt="{{ salary.worker.name }}" 
+                                <img src="{{ passport_file }}" alt="{{ worker.name }}"
                                     onerror="this.src='{{ url_for('static', filename='default.png') }}'">
                             {% else %}
-                                <img src="{{ url_for('static', filename='uploads/' ~ passport_file) }}" alt="{{ salary.worker.name }}" 
+                                <img src="{{ url_for('static', filename='uploads/' ~ passport_file) }}" alt="{{ worker.name }}"
                                     onerror="this.src='{{ url_for('static', filename='default.png') }}'">
                             {% endif %}
                         {% else %}
                             <img src="{{ url_for('static', filename='default.png') }}" alt="Default">
                         {% endif %}
-                        <div class="emp-code">ID: {{ salary.worker_code or salary.worker_code if salary.worker else 'N/A' }}</div>
+                        <div class="emp-code">ID: {{ worker.worker_code if worker else 'N/A' }}</div>
                     </div>
 
                     <div class="profile-details">
                         <div class="detail-box">
                             <label>Employee Name</label>
-                            <div class="value">{{ salary.worker.name if salary.worker else 'N/A' }}</div>
+                            <div class="value">{{ worker.name if worker else 'N/A' }}</div>
                         </div>
-                        
+
                         <div class="detail-box">
                             <label>Department</label>
-                            <div class="value">{{ salary.worker_department or salary.worker.department if salary.worker else 'N/A' }}</div>
+                            <div class="value">{{ worker.department if worker else 'N/A' }}</div>
                         </div>
-                        
+
                         <div class="detail-box">
                             <label>Position</label>
-                            <div class="value">{{ salary.worker_position or 'N/A' }}</div>
+                            <div class="value">{{ worker.position or 'N/A' }}</div>
                         </div>
-                        
+
                         <div class="detail-box">
                             <label>Bank Name</label>
-                            <div class="value">{{ salary.bank_name or 'N/A' }}</div>
+                            <div class="value">{{ worker.bank_name or 'N/A' }}</div>
                         </div>
-                        
+
                         <div class="detail-box">
                             <label>Account Number</label>
-                            <div class="value">{{ salary.bank_account or 'N/A' }}</div>
+                            <div class="value">{{ worker.bank_account or 'N/A' }}</div>
                         </div>
-                        
+
                         <div class="detail-box">
                             <label>Days Present</label>
                             <div class="value">{{ salary.present_days }} / {{ salary.days_in_month }} days</div>
                         </div>
-                        
+
                         <div class="detail-box">
                             <label>Attendance Rate</label>
                             <div class="value">{{ "%.1f"|format(salary.attendance_percent) }}%</div>
                         </div>
-                        
+
                         <div class="detail-box">
                             <label>Payment Status</label>
                             <div class="value">
@@ -653,7 +653,7 @@
                                 {% endif %}
                             </div>
                         </div>
-                        
+
                         <div class="detail-box">
                             <label>Payment Date</label>
                             <div class="value">{{ salary.payment_date.strftime('%d %b %Y') if salary.payment_date else 'Not Paid' }}</div>
@@ -663,7 +663,7 @@
 
                 <!-- Salary Breakdown -->
                 <div class="breakdown-grid">
-                    
+
                     <!-- Earnings -->
                     <div class="breakdown-card">
                         <div class="breakdown-header">
@@ -723,15 +723,15 @@
                     <div class="sig-box">
                         <div class="sig-line"></div>
                         <div class="sig-label">Employee Signature</div>
-                        <div class="sig-role">{{ salary.worker.name if salary.worker else '' }}</div>
+                        <div class="sig-role">{{ worker.name if worker else '' }}</div>
                     </div>
-                    
+
                     <div class="sig-box">
                         <div class="sig-line"></div>
                         <div class="sig-label">HR Officer</div>
                         <div class="sig-role">Human Resources</div>
                     </div>
-                    
+
                     <div class="sig-box">
                         <div class="sig-line"></div>
                         <div class="sig-label">Accountant</div>
@@ -766,7 +766,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Auto-print if ?print=1 in URL
+    // Auto-print if?print=1 in URL
     if (window.location.search.includes('print=1')) {
         setTimeout(() => window.print(), 800);
     }
@@ -774,7 +774,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function downloadPDF() {
     const element = document.getElementById('payslipContent');
-    const filename = 'Payslip_{{ (salary.worker.name or "Employee")|replace(" ", "_") }}_{{ period }}.pdf';
+    const filename = 'Payslip_{{ (worker.name or "Employee")|replace(" ", "_") }}_{{ period }}.pdf';
 
     const opt = {
         margin: [0.5, 0.5, 0.5, 0.5],
@@ -799,11 +799,11 @@ function downloadPDF() {
     btn.disabled = true;
 
     html2pdf().set(opt).from(element).save()
-    .then(() => {
+   .then(() => {
         btn.innerHTML = originalHTML;
         btn.disabled = false;
     })
-    .catch(err => {
+   .catch(err => {
         console.error('PDF generation failed:', err);
         alert('Failed to generate PDF. Please try again.');
         btn.innerHTML = originalHTML;

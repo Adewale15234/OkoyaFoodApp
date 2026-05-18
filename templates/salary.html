@@ -100,21 +100,21 @@
                         
                         <td class="worker-name">
                             <div class="worker-info">
-                                {% set passport_file = worker.passport %}
+                                {% set passport_file = worker.worker.passport %}
                                 {% if passport_file %}
                                     {% if passport_file.startswith('http') %}
-                                        <img src="{{ passport_file }}" class="worker-avatar" alt="{{ worker.name }}" 
+                                        <img src="{{ passport_file }}" class="worker-avatar" alt="{{ worker.worker.name }}" 
                                             onerror="this.src='{{ url_for('static', filename='default.png') }}'">
                                     {% else %}
-                                        <img src="{{ url_for('static', filename='uploads/' ~ passport_file) }}" class="worker-avatar" alt="{{ worker.name }}" 
+                                        <img src="{{ url_for('static', filename='uploads/' ~ passport_file) }}" class="worker-avatar" alt="{{ worker.worker.name }}" 
                                             onerror="this.src='{{ url_for('static', filename='default.png') }}'">
                                     {% endif %}
                                 {% else %}
-                                    <img src="{{ url_for('static', filename='default.png') }}" class="worker-avatar" alt="{{ worker.name }}">
+                                    <img src="{{ url_for('static', filename='default.png') }}" class="worker-avatar" alt="{{ worker.worker.name }}">
                                 {% endif %}
                                 <div class="worker-details">
-                                    <span class="worker-name-text">{{ worker.name }}</span>
-                                    <span class="worker-id">ID: {{ worker.worker_code or worker.id }}</span>
+                                    <span class="worker-name-text">{{ worker.worker.name }}</span>
+                                    <span class="worker-id">ID: {{ worker.worker_code or worker.worker.id }}</span>
                                 </div>
                             </div>
                         </td>
@@ -238,7 +238,7 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .catch(err => {
             console.error(err);
-            alert('Error saving salary: ' + err);
+            alert('Error saving salary: ' + err.message);
         });
     });
 });
