@@ -590,13 +590,13 @@
                         {% if passport_file %}
                             {% if passport_file.startswith('http') %}
                                 <img src="{{ passport_file }}" alt="{{ salary.worker.name }}" 
-                                     onerror="this.src='{{ url_for('static', filename='logo.png') }}'">
+                                    onerror="this.src='{{ url_for('static', filename='default.png') }}'">
                             {% else %}
                                 <img src="{{ url_for('static', filename='uploads/' ~ passport_file) }}" alt="{{ salary.worker.name }}" 
-                                     onerror="this.src='{{ url_for('static', filename='logo.png') }}'">
+                                    onerror="this.src='{{ url_for('static', filename='default.png') }}'">
                             {% endif %}
                         {% else %}
-                            <img src="{{ url_for('static', filename='logo.png') }}" alt="Default">
+                            <img src="{{ url_for('static', filename='default.png') }}" alt="Default">
                         {% endif %}
                         <div class="emp-code">ID: {{ salary.worker_code or salary.worker_code if salary.worker else 'N/A' }}</div>
                     </div>

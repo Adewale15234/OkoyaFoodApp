@@ -210,6 +210,9 @@ class Salary(db.Model):
         index=True
     )
     
+    # Relationship to Worker so self.worker works
+    worker = db.relationship('Worker', backref=db.backref('salaries', lazy='dynamic', cascade='all, delete-orphan'))
+    
     # New fields for monthly payroll system
     month = db.Column(db.String(7), nullable=False, index=True)  # Format: "2025-10"
     
@@ -242,14 +245,29 @@ class Salary(db.Model):
 
     def calculate(self):
         """Recalculate gross and net salary"""
-        self.gross_salary = float(self.total_days_present) * float(self.daily_rate)
-        self.net_salary = float(self.gross_salary) - float(self.deductions)
+        days = float(self.total_days_present or 0)
+        rate = float(self.daily_rate or 0)
+        ded = float(self.deductions or 0)
+        
+        self.gross_salary = days * rate
+        self.net_salary = self.gross_salary - ded
         self.amount = self.net_salary  # Keep backward compatibility
         return self
 
     def auto_fill_from_worker(self):
         """Fill salary record with worker's current data"""
-        self.daily_rate = float(self.worker.daily_rate or self.worker.amount_of_salary or 0)
+        if not self.worker:
+            return self
+            
+        # Use daily_rate if set, otherwise calculate from monthly salary
+        if self.worker.daily_rate and float(self.worker.daily_rate) > 0:
+            self.daily_rate = float(self.worker.daily_rate)
+        elif self.worker.amount_of_salary and float(self.worker.amount_of_salary) > 0:
+            # If only monthly salary exists, daily rate = monthly / 30
+            self.daily_rate = float(self.worker.amount_of_salary) / 30.0
+        else:
+            self.daily_rate = 0.0
+            
         self.bank_name = self.worker.bank_name
         self.bank_account = self.worker.bank_account
         self.bank_account_name = self.worker.bank_account_name

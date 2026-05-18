@@ -203,7 +203,11 @@
                         </td>
                         <td>{{ record.payment_date.strftime('%d %b %Y') }}</td>
                         <td class="no-print">
-                            <button class="action-btn" onclick="viewPayslip({{ record.worker_id }})">View</button>
+                            <a href="{{ url_for('salary.payslip', worker_id=record.worker_id, period=period) }}" 
+                            target="_blank" 
+                            class="action-btn">
+                                View
+                            </a>
                         </td>
                     </tr>
                     {% endfor %}
