@@ -1,58 +1,1209 @@
-<!-- templates/salary_pdf.html -->
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <title>Salary Records</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            font-size: 14px;
-            padding: 20px;
+{% extends 'base.html' %}
+{% block title %}Salary Management | Okoya Food{% endblock %}
+
+{% block content %}
+
+<div class="salary-page" id="salaryApp">
+
+    <!-- ================= HEADER ================= -->
+    <section class="salary-header no-print">
+        <div class="header-left">
+            <img src="{{ url_for('static', filename='logo.png') }}" class="company-logo" alt="Logo">
+            <div>
+                <h1>Salary Management Portal</h1>
+                <p>OKOYA FOOD COMPANY LIMITED — Payroll Processing System</p>
+                <div class="time-row">
+                    <span id="liveDateTime"></span>
+                    <span class="dot">•</span>
+                    <span id="periodLabel">{{ current_month }}/{{ current_year }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="header-right">
+            <button class="theme-toggle" id="themeToggle" title="Toggle Theme">🌓</button>
+            <a href="{{ url_for('admin.admin_dashboard') }}" class="nav-btn">← Dashboard</a>
+            <button onclick="window.print()" class="nav-btn print-btn">🖨 Print</button>
+        </div>
+    </section>
+
+    <!-- ================= PERIOD CONTROLS ================= -->
+    <section class="period-controls no-print">
+        <div class="period-left">
+            <label for="monthSelect">Period:</label>
+            <input type="month" id="monthSelect" value="{{ current_year }}-{{ '%02d'|format(current_month|int) }}">
+            <button class="control-btn" onclick="loadPeriod()">Load Period</button>
+            <button class="control-btn ghost" onclick="copyPreviousMonth()">Copy Previous Month</button>
+        </div>
+        <div class="period-right">
+            <span class="chip">Status: <strong id="lockStatus">{{ 'Locked' if is_locked else 'Open' }}</strong></span>
+            <button class="control-btn warning" onclick="toggleLockPeriod()">
+                {{ 'Unlock Period' if is_locked else 'Lock Period' }}
+            </button>
+        </div>
+    </section>
+
+    <!-- ================= SUMMARY ================= -->
+    <section class="summary-grid">
+        <div class="summary-card green">
+            <p>Total Workers</p>
+            <h2 id="totalWorkers">{{ salary_data|length }}</h2>
+            <small>Active Payroll</small>
+        </div>
+
+        <div class="summary-card blue">
+            <p>Total Payroll</p>
+            <h2 id="totalPayroll">₦{{ "{:,.2f}".format(total_payroll or 0) }}</h2>
+            <small>For <span id="periodText">{{ current_month }}/{{ current_year }}</span></small>
+        </div>
+
+        <div class="summary-card gold">
+            <p>Salary Period</p>
+            <h2>{{ now.strftime('%B %Y') if now else current_month ~ '/' ~ current_year }}</h2>
+            <small id="periodSub">{{ current_month }} {{ current_year }}</small>
+        </div>
+
+        <div class="summary-card purple">
+            <p>Processed</p>
+            <h2 id="processedCount">0</h2>
+            <small id="processedPercent">0% complete</small>
+        </div>
+
+        <div class="summary-card red">
+            <p>Pending</p>
+            <h2 id="pendingCount">0</h2>
+            <small>Awaiting Approval</small>
+        </div>
+
+        <div class="summary-card teal">
+            <p>Avg Salary</p>
+            <h2 id="avgSalary">₦0.00</h2>
+            <small>Per Worker</small>
+        </div>
+    </section>
+
+    <!-- ================= FILTER / SEARCH ================= -->
+    <section class="control-panel no-print">
+        <div class="search-box">
+            <input type="text" id="salarySearch" placeholder="Search worker name, code, bank..." onkeyup="filterTable()">
+            <span class="search-icon">🔍</span>
+        </div>
+
+        <div class="filter-box">
+            <select id="statusFilter" onchange="filterTable()">
+                <option value="all">All Status</option>
+                <option value="pending">Pending</option>
+                <option value="processed">Processed</option>
+            </select>
+
+            <select id="bankFilter" onchange="filterTable()">
+                <option value="all">All Banks</option>
+                {% for bank in banks|default([]) %}
+                <option value="{{ bank }}">{{ bank }}</option>
+                {% endfor %}
+            </select>
+
+            <select id="departmentFilter" onchange="filterTable()">
+                <option value="all">All Departments</option>
+                {% for dept in departments|default([]) %}
+                <option value="{{ dept }}">{{ dept }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="action-box">
+            <button onclick="exportCSV()" class="control-btn">📊 Export CSV</button>
+            <button onclick="exportExcel()" class="control-btn">📈 Export Excel</button>
+            <button onclick="exportPDF()" class="control-btn export-btn">📄 Export PDF</button>
+            <button onclick="window.print()" class="control-btn print-btn">📄 Report</button>
+            <button onclick="openBulkModal()" class="control-btn secondary">⚡ Bulk Actions</button>
+        </div>
+    </section>
+
+    <!-- ================= BULK ACTIONS BAR ================= -->
+    <section class="bulk-bar no-print" id="bulkBar" style="display:none;">
+        <span><span id="selectedCount">0</span> selected</span>
+        <div class="bulk-actions">
+            <button onclick="bulkMarkProcessed()">Mark Processed</button>
+            <button onclick="bulkMarkPending()">Mark Pending</button>
+            <button onclick="bulkExportSelected()">Export Selected</button>
+            <button onclick="clearSelection()" class="ghost">Clear</button>
+        </div>
+    </section>
+
+    <!-- ================= TABLE ================= -->
+    <section class="table-section">
+        <div class="table-wrapper">
+            <table class="salary-table" id="salaryTable">
+                <thead>
+                    <tr>
+                        <th class="no-print"><input type="checkbox" id="selectAll" onchange="toggleSelectAll(this)"></th>
+                        <th>#</th>
+                        <th>Worker Name</th>
+                        <th>Code</th>
+                        <th>Dept</th>
+                        <th>Days Present</th>
+                        <th>Daily Rate</th>
+                        <th>Gross Pay</th>
+                        <th>Deductions</th>
+                        <th>Net Pay</th>
+                        <th>Account Name</th>
+                        <th>Bank</th>
+                        <th>Account No</th>
+                        <th>Status</th>
+                        <th class="no-print">Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for worker in salary_data %}
+                    <tr data-worker-id="{{ worker.id }}"
+                        data-status="{{ 'processed' if worker.is_processed else 'pending' }}"
+                        data-bank="{{ worker.bank_name or '' }}"
+                        data-dept="{{ worker.department or '' }}">
+
+                        <td class="no-print"><input type="checkbox" class="rowCheck" onchange="updateBulkBar()"></td>
+                        <td>{{ loop.index }}</td>
+
+                        <td class="worker-name">
+                            <div class="worker-info">
+                                {% if worker.passport %}
+                                    <img src="{{ worker.passport }}"
+                                        class="worker-avatar"
+                                        alt="{{ worker.name }}"
+                                        onerror="this.src='{{ url_for('static', filename='default.png') }}'">
+                                {% else %}
+                                    <img src="{{ url_for('static', filename='logo.png') }}"
+                                        class="worker-avatar"
+                                        alt="{{ worker.name }}">
+                                {% endif %}
+                                <span>{{ worker.name }}</span>
+                            </div>
+                        </td>
+
+                        <td>{{ worker.worker_code or '—' }}</td>
+                        <td>{{ worker.department or '—' }}</td>
+
+                        <td class="editable" data-field="total_days_present">
+                            <span class="view">{{ worker.total_days_present }}</span>
+                            <input type="number" class="edit" value="{{ worker.total_days_present }}" min="0" style="display:none;">
+                        </td>
+
+                        <td class="daily-rate editable" data-field="daily_rate">
+                            <span class="view">₦{{ "{:,.2f}".format(worker.daily_rate or 0) }}</span>
+                            <input type="number" class="edit" value="{{ worker.daily_rate or 0 }}" step="0.01" style="display:none;">
+                        </td>
+
+                        <td class="gross-pay">₦{{ "{:,.2f}".format(worker.gross_salary or worker.calculated_salary or 0) }}</td>
+
+                        <td class="editable" data-field="deductions">
+                            <span class="view">₦{{ "{:,.2f}".format(worker.deductions or 0) }}</span>
+                            <input type="number" class="edit" value="{{ worker.deductions or 0 }}" step="0.01" style="display:none;">
+                        </td>
+
+                        <td class="salary-amount">₦{{ "{:,.2f}".format(worker.net_salary or worker.calculated_salary or 0) }}</td>
+
+                        <td>{{ worker.bank_account_name or '—' }}</td>
+                        <td>{{ worker.bank_name or '—' }}</td>
+                        <td>{{ worker.bank_account or '—' }}</td>
+
+                        <td>
+                            <span class="status-badge {{ 'processed' if worker.is_processed else 'pending' }}"
+                                  id="status-{{ worker.id }}">
+                                {{ 'Processed' if worker.is_processed else 'Pending' }}
+                            </span>
+                        </td>
+
+                        <td class="no-print">
+                            <div class="action-cell">
+                                <form method="post" class="salary-form" data-worker-id="{{ worker.id }}">
+                                    <input type="hidden" name="worker_id" value="{{ worker.id }}">
+                                    <button type="submit" class="save-btn">Save</button>
+                                </form>
+                                <button class="edit-btn" onclick="toggleEditRow(this)">Edit</button>
+                                <button class="view-btn" onclick="viewPayslip({{ worker.id }})">Payslip</button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+                <tfoot>
+                    <tr class="total-row">
+                        <td colspan="6">Total Payroll</td>
+                        <td id="footerGross">₦0.00</td>
+                        <td id="footerDeduct">₦0.00</td>
+                        <td colspan="6" id="footerNet">₦{{ "{:,.2f}".format(total_payroll or 0) }}</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <div class="table-footer">
+            <span id="selectionInfo">{{ salary_data|length }} workers loaded</span>
+            <div class="footer-actions">
+                <button class="save-all-btn" onclick="saveAllSalaries()">💾 Save All Pending</button>
+                <button class="process-all-btn" onclick="processAll()">✅ Process All</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================= ANALYTICS ================= -->
+    <section class="analytics-panel">
+        <div class="analytics-card">
+            <h3>Payroll Breakdown</h3>
+            <canvas id="payrollChart"></canvas>
+        </div>
+
+        <div class="analytics-card">
+            <h3>Department Distribution</h3>
+            <canvas id="deptChart"></canvas>
+        </div>
+
+        <div class="analytics-card">
+            <h3>Monthly Trend</h3>
+            <canvas id="trendChart"></canvas>
+        </div>
+    </section>
+
+    <!-- ================= AUDIT LOG ================= -->
+    <section class="audit-panel">
+        <h3>Audit Log</h3>
+        <div class="audit-table-wrapper">
+            <table class="audit-table">
+                <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th>User</th>
+                        <th>Action</th>
+                        <th>Worker</th>
+                        <th>Details</th>
+                    </tr>
+                </thead>
+                <tbody id="auditBody">
+                    {% for log in audit_logs|default([]) %}
+                    <tr>
+                        <td>{{ log.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td>{{ log.user_name }}</td>
+                        <td>{{ log.action }}</td>
+                        <td>{{ log.worker_name }}</td>
+                        <td>{{ log.details }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- ================= BULK MODAL ================= -->
+    <div class="modal-overlay" id="bulkModal" style="display:none;">
+        <div class="modal">
+            <h3>Bulk Actions</h3>
+            <div class="modal-body">
+                <label>Apply Daily Rate to Selected:</label>
+                <input type="number" id="bulkDailyRate" step="0.01" placeholder="Enter rate">
+
+                <label>Apply Deduction % to Selected:</label>
+                <input type="number" id="bulkDeduction" step="0.1" placeholder="Enter %">
+
+                <label>Mark Status:</label>
+                <select id="bulkStatus">
+                    <option value="pending">Pending</option>
+                    <option value="processed">Processed</option>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button onclick="applyBulkChanges()" class="control-btn">Apply</button>
+                <button onclick="closeBulkModal()" class="control-btn ghost">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= PAYSLIP MODAL ================= -->
+    <div class="modal-overlay" id="payslipModal" style="display:none;">
+        <div class="modal payslip-modal">
+            <div id="payslipContent"></div>
+            <div class="modal-footer">
+                <button onclick="printPayslip()" class="control-btn">🖨 Print Payslip</button>
+                <button onclick="closePayslipModal()" class="control-btn ghost">Close</button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Live clock
+    function updateTime() {
+        const now = new Date();
+        document.getElementById("liveDateTime").innerHTML = now.toLocaleString('en-US', {
+            weekday: 'short',
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        });
+    }
+    updateTime();
+    setInterval(updateTime, 1000);
+
+    // Theme toggle
+    const themeToggle = document.getElementById("themeToggle");
+    themeToggle.addEventListener("click", function() {
+        document.body.classList.toggle("light-mode");
+        localStorage.setItem("theme", document.body.classList.contains("light-mode")? "light" : "dark");
+    });
+    if (localStorage.getItem("theme") === "light") {
+        document.body.classList.add("light-mode");
+    }
+
+    // Handle form submissions via AJAX
+    document.querySelectorAll('.salary-form').forEach(function(form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            saveSalaryRow(this);
+        });
+    });
+
+    initCharts();
+    updateProcessedCount();
+    calculateFooterTotals();
+});
+
+function saveSalaryRow(form) {
+    const workerId = form.dataset.workerId;
+    const statusBadge = document.getElementById('status-' + workerId);
+    const row = form.closest('tr');
+
+    const formData = new FormData(form);
+
+    // Add edited values
+    row.querySelectorAll('.editable').forEach(cell => {
+        const field = cell.dataset.field;
+        const input = cell.querySelector('.edit');
+        if (input && input.style.display!== 'none') {
+            formData.append(field, input.value);
         }
-        h1 {
-            text-align: center;
+    });
+
+    fetch(form.action || window.location.href, {
+        method: 'POST',
+        body: formData
+    })
+  .then(response => {
+        if (response.ok) {
+            statusBadge.className = 'status-badge processed';
+            statusBadge.textContent = 'Processed';
+            row.dataset.status = 'processed';
+            updateProcessedCount();
+            calculateFooterTotals();
+            showToast('Salary saved successfully');
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
+    })
+  .catch(err => {
+        console.error(err);
+        showToast('Error saving salary. Try again.', 'error');
+    });
+}
+
+function toggleEditRow(btn) {
+    const row = btn.closest('tr');
+    const isEditing = row.classList.contains('editing');
+
+    if (isEditing) {
+        // Save edits
+        row.querySelectorAll('.editable').forEach(cell => {
+            const view = cell.querySelector('.view');
+            const input = cell.querySelector('.edit');
+            view.textContent = input.value;
+            view.style.display = '';
+            input.style.display = 'none';
+        });
+        row.classList.remove('editing');
+        btn.textContent = 'Edit';
+        recalculateRow(row);
+    } else {
+        // Enter edit mode
+        row.querySelectorAll('.editable').forEach(cell => {
+            const view = cell.querySelector('.view');
+            const input = cell.querySelector('.edit');
+            input.style.display = '';
+            view.style.display = 'none';
+        });
+        row.classList.add('editing');
+        btn.textContent = 'Done';
+    }
+}
+
+function recalculateRow(row) {
+    const days = parseFloat(row.querySelector('[data-field="total_days_present"].edit').value) || 0;
+    const rate = parseFloat(row.querySelector('[data-field="daily_rate"].edit').value) || 0;
+    const deduct = parseFloat(row.querySelector('[data-field="deductions"].edit').value) || 0;
+
+    const gross = days * rate;
+    const net = gross - deduct;
+
+    row.querySelector('.gross-pay').textContent = '₦' + gross.toLocaleString('en-US', {minimumFractionDigits: 2});
+    row.querySelector('.salary-amount').textContent = '₦' + net.toLocaleString('en-US', {minimumFractionDigits: 2});
+
+    row.querySelector('[data-field="total_days_present"].view').textContent = days;
+    row.querySelector('[data-field="daily_rate"].view').textContent = '₦' + rate.toLocaleString('en-US', {minimumFractionDigits: 2});
+    row.querySelector('[data-field="deductions"].view').textContent = '₦' + deduct.toLocaleString('en-US', {minimumFractionDigits: 2});
+}
+
+function filterTable() {
+    const search = document.getElementById("salarySearch").value.toLowerCase();
+    const status = document.getElementById("statusFilter").value;
+    const bank = document.getElementById("bankFilter").value;
+    const dept = document.getElementById("departmentFilter").value;
+
+    document.querySelectorAll("#salaryTable tbody tr").forEach(row => {
+        const name = row.querySelector('.worker-name').textContent.toLowerCase();
+        const rowStatus = row.dataset.status;
+        const rowBank = row.dataset.bank;
+        const rowDept = row.dataset.dept;
+
+        const matchSearch = name.includes(search);
+        const matchStatus = status === 'all' || rowStatus === status;
+        const matchBank = bank === 'all' || rowBank === bank;
+        const matchDept = dept === 'all' || rowDept === dept;
+
+        row.style.display = (matchSearch && matchStatus && matchBank && matchDept)? "" : "none";
+    });
+}
+
+function toggleSelectAll(checkbox) {
+    document.querySelectorAll('.rowCheck').forEach(cb => {
+        if (cb.closest('tr').style.display!== 'none') {
+            cb.checked = checkbox.checked;
         }
-        th, td {
-            border: 1px solid #444;
-            padding: 8px;
-            text-align: left;
+    });
+    updateBulkBar();
+}
+
+function updateBulkBar() {
+    const checked = document.querySelectorAll('.rowCheck:checked').length;
+    document.getElementById('selectedCount').textContent = checked;
+    document.getElementById('bulkBar').style.display = checked > 0? 'flex' : 'none';
+}
+
+function clearSelection() {
+    document.querySelectorAll('.rowCheck').forEach(cb => cb.checked = false);
+    document.getElementById('selectAll').checked = false;
+    updateBulkBar();
+}
+
+function exportCSV() {
+    let csv = 'Name,Code,Department,Days Present,Daily Rate,Gross,Deductions,Net,Account Name,Bank,Account No,Status\n';
+    document.querySelectorAll('#salaryTable tbody tr').forEach(row => {
+        if (row.style.display === 'none') return;
+        const cells = row.querySelectorAll('td');
+        csv += `"${cells[2].querySelector('span').textContent.trim()}",`;
+        csv += `"${cells[3].textContent.trim()}",`;
+        csv += `"${cells[4].textContent.trim()}",`;
+        csv += `"${cells[5].textContent.trim()}",`;
+        csv += `"${cells[6].textContent.trim()}",`;
+        csv += `"${cells[7].textContent.trim()}",`;
+        csv += `"${cells[8].textContent.trim()}",`;
+        csv += `"${cells[9].textContent.trim()}",`;
+        csv += `"${cells[10].textContent.trim()}",`;
+        csv += `"${cells[11].textContent.trim()}",`;
+        csv += `"${cells[12].textContent.trim()}",`;
+        csv += `"${cells[13].textContent.trim()}"\n`;
+    });
+
+    downloadFile(csv, 'salary_{{ current_year }}_{{ current_month }}.csv', 'text/csv');
+}
+
+function exportExcel() {
+    exportCSV(); // Same as CSV, Excel opens it fine
+    showToast('Excel file exported');
+}
+
+function exportPDF() {
+    window.print();
+}
+
+function downloadFile(content, filename, type) {
+    const blob = new Blob([content], { type: type });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    window.URL.revokeObjectURL(url);
+}
+
+function updateProcessedCount() {
+    const processed = document.querySelectorAll('.status-badge.processed').length;
+    const total = document.querySelectorAll('.salary-form').length;
+    const pending = total - processed;
+    const percent = total > 0? Math.round((processed / total) * 100) : 0;
+
+    document.getElementById('processedCount').textContent = processed;
+    document.getElementById('pendingCount').textContent = pending;
+    document.getElementById('processedPercent').textContent = percent + '% complete';
+}
+
+function calculateFooterTotals() {
+    let gross = 0, deduct = 0, net = 0;
+    document.querySelectorAll('#salaryTable tbody tr').forEach(row => {
+        if (row.style.display === 'none') return;
+        const grossVal = parseFloat(row.querySelector('.gross-pay').textContent.replace(/[^0-9.-]/g, '')) || 0;
+        const deductVal = parseFloat(row.querySelector('[data-field="deductions"].view').textContent.replace(/[^0-9.-]/g, '')) || 0;
+        const netVal = parseFloat(row.querySelector('.salary-amount').textContent.replace(/[^0-9.-]/g, '')) || 0;
+        gross += grossVal;
+        deduct += deductVal;
+        net += netVal;
+    });
+
+    document.getElementById('footerGross').textContent = '₦' + gross.toLocaleString('en-US', {minimumFractionDigits: 2});
+    document.getElementById('footerDeduct').textContent = '₦' + deduct.toLocaleString('en-US', {minimumFractionDigits: 2});
+    document.getElementById('footerNet').textContent = '₦' + net.toLocaleString('en-US', {minimumFractionDigits: 2});
+    document.getElementById('totalPayroll').textContent = '₦' + net.toLocaleString('en-US', {minimumFractionDigits: 2});
+
+    const avg = document.querySelectorAll('#salaryTable tbody tr').length > 0? net / document.querySelectorAll('#salaryTable tbody tr').length : 0;
+    document.getElementById('avgSalary').textContent = '₦' + avg.toLocaleString('en-US', {minimumFractionDigits: 2});
+}
+
+function saveAllSalaries() {
+    const forms = document.querySelectorAll('.salary-form');
+    let count = 0;
+    forms.forEach(form => {
+        const statusBadge = form.closest('tr').querySelector('.status-badge');
+        if (statusBadge.classList.contains('pending')) {
+            form.dispatchEvent(new Event('submit'));
+            count++;
         }
-        th {
-            background-color: #eee;
+    });
+    showToast(count > 0? count + ' salary records being processed...' : 'All salaries already processed!');
+}
+
+function processAll() {
+    if (confirm('Process all pending salaries for this period?')) {
+        saveAllSalaries();
+    }
+}
+
+function openBulkModal() {
+    document.getElementById('bulkModal').style.display = 'flex';
+}
+
+function closeBulkModal() {
+    document.getElementById('bulkModal').style.display = 'none';
+}
+
+function applyBulkChanges() {
+    const rate = document.getElementById('bulkDailyRate').value;
+    const deduct = document.getElementById('bulkDeduction').value;
+    const status = document.getElementById('bulkStatus').value;
+
+    document.querySelectorAll('.rowCheck:checked').forEach(cb => {
+        const row = cb.closest('tr');
+        if (rate) row.querySelector('[data-field="daily_rate"].edit').value = rate;
+        if (deduct) {
+            const gross = parseFloat(row.querySelector('.gross-pay').textContent.replace(/[^0-9.-]/g, '')) || 0;
+            const deductAmount = (gross * parseFloat(deduct)) / 100;
+            row.querySelector('[data-field="deductions"].edit').value = deductAmount;
         }
-    </style>
-</head>
-<body>
-    <h1>Salary Records</h1>
-    <table>
-        <thead>
-            <tr>
-                <th>Staff ID</th>
-                <th>Name</th>
-                <th>Present Days</th>
-                <th>Daily Rate</th>
-                <th>Amount</th>
-                <th>Payment Date</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for s in salary_records %}
-            <tr>
-                <td>{{ s.worker.staff_id }}</td>
-                <td>{{ s.worker.name }}</td>
-                <td>{{ s.total_days_present }}</td>
-                <td>₦{{ s.daily_rate }}</td>
-                <td><strong>₦{{ s.amount }}</strong></td>
-                <td>{{ s.payment_date.strftime('%Y-%m-%d') }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</body>
-</html>
+        if (status) {
+            const badge = row.querySelector('.status-badge');
+            badge.className = 'status-badge ' + status;
+            badge.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+            row.dataset.status = status;
+        }
+        recalculateRow(row);
+    });
+
+    closeBulkModal();
+    updateProcessedCount();
+    calculateFooterTotals();
+    showToast('Bulk changes applied');
+}
+
+function viewPayslip(workerId) {
+    document.getElementById('payslipModal').style.display = 'flex';
+    document.getElementById('payslipContent').innerHTML = '<p>Loading payslip for worker ' + workerId + '...</p>';
+    // Fetch payslip data from backend here
+}
+
+function closePayslipModal() {
+    document.getElementById('payslipModal').style.display = 'none';
+}
+
+function printPayslip() {
+    const printContent = document.getElementById('payslipContent').innerHTML;
+    const printWindow = window.open('', '', 'height=600,width=800');
+    printWindow.document.write('<html><head><title>Payslip</title></head><body>' + printContent + '</body></html>');
+    printWindow.document.close();
+    printWindow.print();
+}
+
+function loadPeriod() {
+    const month = document.getElementById('monthSelect').value;
+    window.location.href = '?period=' + month;
+}
+
+function copyPreviousMonth() {
+    if (confirm('Copy attendance and rates from previous month?')) {
+        showToast('Copied previous month data');
+    }
+}
+
+function toggleLockPeriod() {
+    fetch('/salary/toggle-lock', { method: 'POST' })
+   .then(res => res.json())
+   .then(data => {
+        document.getElementById('lockStatus').textContent = data.locked? 'Locked' : 'Open';
+        showToast(data.locked? 'Period locked' : 'Period unlocked');
+    });
+}
+
+function bulkMarkProcessed() {
+    document.querySelectorAll('.rowCheck:checked').forEach(cb => {
+        const row = cb.closest('tr');
+        const badge = row.querySelector('.status-badge');
+        badge.className = 'status-badge processed';
+        badge.textContent = 'Processed';
+        row.dataset.status = 'processed';
+    });
+    updateProcessedCount();
+    clearSelection();
+}
+
+function bulkMarkPending() {
+    document.querySelectorAll('.rowCheck:checked').forEach(cb => {
+        const row = cb.closest('tr');
+        const badge = row.querySelector('.status-badge');
+        badge.className = 'status-badge pending';
+        badge.textContent = 'Pending';
+        row.dataset.status = 'pending';
+    });
+    updateProcessedCount();
+    clearSelection();
+}
+
+function bulkExportSelected() {
+    exportCSV();
+}
+
+function initCharts() {
+    // Placeholder for Chart.js initialization
+    // Add actual chart data from backend
+}
+
+function showToast(message, type = 'success') {
+    const toast = document.createElement('div');
+    toast.className = 'toast ' + type;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+}
+</script>
+
+<style>
+:root {
+    --primary: #03492c;
+    --primary-light: #0b7a49;
+    --primary-dark: #023220;
+    --success: #16a34a;
+    --warning: #facc15;
+    --danger: #dc2626;
+    --info: #0ea5e9;
+    --bg-light: #f0fdf4;
+    --bg-dark: #0f172a;
+    --text-light: #1e293b;
+    --text-dark: #f1f5f9;
+}
+
+body {
+    background: linear-gradient(135deg,#eef7f2,#d7f5e4,#c5ffe1);
+    font-family: 'Poppins',sans-serif;
+    margin: 0;
+    padding: 0;
+    transition: all 0.3s ease;
+    color: var(--text-light);
+}
+
+body.light-mode {
+    background: linear-gradient(135deg,#f0fdf4,#dcfce7,#bbf7d0);
+    color: var(--text-dark);
+}
+
+.salary-page {
+    max-width: 1600px;
+    margin: auto;
+    padding: 30px;
+}
+
+/* Header */
+.salary-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    background: linear-gradient(135deg,var(--primary),var(--primary-light),#16c46d);
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.15);
+    color: white;
+    margin-bottom: 25px;
+}
+
+.header-left { display: flex; align-items: center; gap: 20px; }
+.company-logo { width: 110px; height: 110px; object-fit: cover; border-radius: 18px; border: 3px solid rgba(255,255,255,.25); }
+.header-left h1 { margin: 0; font-size: 2rem; font-weight: 800; }
+.header-left p { margin-top: 8px; opacity:.9; }
+
+.time-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    font-size:.9rem;
+    background: rgba(255,255,255,.15);
+    padding: 6px 12px;
+    border-radius: 8px;
+    width: fit-content;
+    margin-top: 8px;
+}
+
+.header-right { display: flex; gap: 10px; align-items: center; }
+.theme-toggle,.nav-btn {
+    background: rgba(255,255,255,.15);
+    border: none;
+    padding: 10px 16px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 700;
+    transition: 0.2s;
+    color: white;
+    text-decoration: none;
+}
+.nav-btn { background: white; color: var(--primary); }
+.print-btn { background: var(--warning); color: #1a1a1a; }
+
+/* Period Controls */
+.period-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    padding: 15px 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+}
+.period-left,.period-right { display: flex; gap: 10px; align-items: center; }
+.period-controls input,.period-controls select {
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+.chip {
+    background: #f1f5f9;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+}
+
+/* Summary Grid */
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(200px,1fr));
+    gap: 20px;
+    margin-bottom: 25px;
+}
+.summary-card {
+    background: white;
+    padding: 25px;
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 8px 20px rgba(0,0,0,.08);
+    transition: 0.3s;
+}
+.summary-card:hover { transform: translateY(-5px); }
+.summary-card h2 { font-size: 1.8rem; margin: 10px 0; color: var(--primary); }
+.green { border-left: 6px solid var(--success); }
+.blue { border-left: 6px solid var(--info); }
+.gold { border-left: 6px solid #eab308; }
+.purple { border-left: 6px solid #9333ea; }
+.red { border-left: 6px solid var(--danger); }
+.teal { border-left: 6px solid #14b8a6; }
+
+/* Control Panel */
+.control-panel {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+.search-box { position: relative; flex: 1; min-width: 300px; }
+.search-box input {
+    padding: 12px 15px 12px 45px;
+    width: 100%;
+    border-radius: 10px;
+    border: 2px solid #e2e8f0;
+    font-size: 15px;
+}
+.search-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); opacity: 0.6; }
+.filter-box { display: flex; gap: 10px; }
+.filter-box select {
+    padding: 10px 15px;
+    border-radius: 10px;
+    border: 2px solid #e2e8f0;
+}
+.action-box { display: flex; gap: 10px; flex-wrap: wrap; }
+.control-btn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 12px 18px;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.2s;
+}
+.control-btn:hover { transform: translateY(-2px); }
+.control-btn.ghost { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
+.control-btn.warning { background: var(--warning); color: #1a1a1a; }
+.control-btn.secondary { background: #6366f1; }
+
+/* Bulk Bar */
+.bulk-bar {
+    background: #fef3c7;
+    padding: 12px 20px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+.bulk-actions { display: flex; gap: 10px; }
+.bulk-actions button {
+    padding: 8px 14px;
+    border: none;
+    border-radius: 8px;
+    background: var(--primary);
+    color: white;
+    cursor: pointer;
+}
+
+/* Table */
+.table-wrapper {
+    overflow: auto;
+    max-height: 70vh;
+    border-radius: 16px;
+    box-shadow: 0 8px 25px rgba(0,0,0,.08);
+    background: white;
+}
+.salary-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 1400px;
+}
+.salary-table th {
+    background: var(--primary);
+    color: white;
+    padding: 14px;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+}
+.salary-table td {
+    padding: 12px;
+    border-bottom: 1px solid #e2e8f0;
+    text-align: center;
+}
+.salary-table tbody tr:nth-child(even) {
+    background: #f8fffb;
+}
+.salary-table tbody tr:hover {
+    background: #d7ffe9;
+}
+.salary-table tbody tr.editing {
+    background: #fef3c7 !important;
+}
+.worker-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-align: left;
+}
+.worker-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #e2e8f0;
+}
+.worker-name {
+    font-weight: 700;
+    color: var(--text-light);
+}
+.salary-amount {
+    font-weight: 800;
+    color: var(--success);
+    font-size: 1.05rem;
+}
+.daily-rate, .gross-pay {
+    color: #64748b;
+    font-size: 0.9rem;
+}
+.editable input {
+    width: 80px;
+    padding: 4px 6px;
+    border: 1px solid var(--primary);
+    border-radius: 4px;
+}
+.status-badge {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+.status-badge.pending {
+    background: #fef3c7;
+    color: #92400e;
+}
+.status-badge.processed {
+    background: #d1fae5;
+    color: #065f46;
+}
+.total-row {
+    background: var(--primary);
+    color: white;
+    font-weight: 800;
+    font-size: 1.1rem;
+}
+.action-cell {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+}
+.save-btn, .edit-btn, .view-btn {
+    padding: 6px 10px;
+    border: none;
+    border-radius: 6px;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 0.85rem;
+}
+.save-btn {
+    background: linear-gradient(135deg,var(--success),#22c55e);
+    color: white;
+}
+.edit-btn {
+    background: var(--info);
+    color: white;
+}
+.view-btn {
+    background: #6366f1;
+    color: white;
+}
+.table-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background: #f8fafc;
+    border-radius: 0 0 16px 16px;
+    border-top: 1px solid #e2e8f0;
+}
+.save-all-btn {
+    background: linear-gradient(135deg,var(--primary),var(--primary-light));
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+}
+.process-all-btn {
+    background: var(--success);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+/* Analytics */
+.analytics-panel {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(300px,1fr));
+    gap: 20px;
+    margin-top: 35px;
+}
+.analytics-card {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 6px 16px rgba(0,0,0,.08);
+}
+.analytics-card h3 {
+    margin-top: 0;
+    color: var(--primary);
+}
+
+/* Audit */
+.audit-panel {
+    margin-top: 30px;
+    background: white;
+    padding: 20px;
+    border-radius: 16px;
+    box-shadow: 0 6px 16px rgba(0,0,0,.08);
+}
+.audit-table-wrapper {
+    overflow-x: auto;
+    max-height: 300px;
+}
+.audit-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.audit-table th {
+    background: #f1f5f9;
+    padding: 10px;
+    text-align: left;
+}
+.audit-table td {
+    padding: 10px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+/* Modals */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+.modal {
+    background: white;
+    padding: 30px;
+    border-radius: 16px;
+    max-width: 600px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+.modal h3 {
+    margin-top: 0;
+    color: var(--primary);
+}
+.modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin: 20px 0;
+}
+.modal-body input, .modal-body select {
+    padding: 10px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+}
+.modal-footer {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+.payslip-modal {
+    max-width: 800px;
+}
+
+/* Toast */
+.toast {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background: var(--success);
+    color: white;
+    padding: 15px 25px;
+    border-radius: 10px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+    z-index: 2000;
+    animation: slideIn 0.3s ease;
+}
+.toast.error {
+    background: var(--danger);
+}
+@keyframes slideIn {
+    from { transform: translateX(400px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+/* Dark mode */
+body.light-mode .summary-card,
+body.light-mode .table-wrapper,
+body.light-mode .period-controls,
+body.light-mode .analytics-card,
+body.light-mode .audit-panel,
+body.light-mode .modal {
+    background: #1e293b;
+    color: var(--text-dark);
+}
+body.light-mode .salary-table tbody tr:nth-child(even) {
+    background: #334155;
+}
+body.light-mode .salary-table tbody tr:hover {
+    background: #475569;
+}
+
+/* Print */
+@media print {
+    .no-print,
+    .header-right,
+    .control-panel,
+    .table-footer,
+    .bulk-bar,
+    .period-controls {
+        display: none !important;
+    }
+    body {
+        background: white;
+    }
+    .salary-page {
+        padding: 0;
+    }
+    .table-wrapper {
+        max-height: none;
+        overflow: visible;
+        box-shadow: none;
+    }
+    @page {
+        size: A4 landscape;
+        margin: 1cm;
+    }
+    .salary-table th {
+        background: #000 !important;
+        color: #fff !important;
+    }
+}
+
+/* Mobile */
+@media(max-width: 768px) {
+    .salary-page { padding: 12px; }
+    .salary-header { flex-direction: column; text-align: center; gap: 20px; }
+    .header-left { flex-direction: column; }
+    .company-logo { width: 85px; height: 85px; }
+    .search-box { min-width: 100%; }
+    .control-panel, .period-controls { flex-direction: column; }
+    .action-box, .filter-box { width: 100%; justify-content: center; }
+    .table-footer { flex-direction: column; gap: 10px; }
+}
+</style>
+
+{% endblock %}

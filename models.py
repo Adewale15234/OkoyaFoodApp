@@ -6,7 +6,7 @@ class Worker(db.Model):
     __tablename__ = 'workers'
 
     id = db.Column(db.Integer, primary_key=True)
-    worker_code = db.Column(db.String(10), unique=True, nullable=True)
+    worker_code = db.Column(db.String(20), unique=True, nullable=True)
     name = db.Column(db.String(100), nullable=False)
     phone_number = db.Column(db.String(20), nullable=False)
     date_of_birth = db.Column(db.Date, nullable=False)
@@ -27,7 +27,11 @@ class Worker(db.Model):
     disability = db.Column(db.String(100), nullable=True)
     email = db.Column(db.String(100), nullable=False)
     date_of_employment = db.Column(db.Date, nullable=False)
+    
+    # Keep for legacy, but we’ll use daily_rate for salary calc
     amount_of_salary = db.Column(db.Float, nullable=False)
+    daily_rate = db.Column(db.Float, nullable=False, default=0.0)
+    
     bank_name = db.Column(db.String(100), nullable=True)
     bank_account = db.Column(db.String(50), nullable=True)
     bank_account_name = db.Column(db.String(100), nullable=False)
@@ -35,6 +39,8 @@ class Worker(db.Model):
     
     # Increased from 100 to 255 to fit Cloudinary URLs like https://res.cloudinary.com/...
     passport = db.Column(db.String(255), nullable=True)
+
+    department = db.Column(db.String(50), nullable=True)
 
     updated_at = db.Column(
         db.DateTime,
@@ -62,14 +68,16 @@ class Worker(db.Model):
         'Attendance',
         backref='worker',
         cascade="all, delete-orphan",
-        passive_deletes=True
+        passive_deletes=True,
+        lazy='dynamic'
     )
 
     salaries = db.relationship(
         'Salary',
         backref='worker',
         cascade="all, delete-orphan",
-        passive_deletes=True
+        passive_deletes=True,
+        lazy='dynamic'
     )
 
     email_logs = db.relationship(
@@ -81,6 +89,15 @@ class Worker(db.Model):
 
     def __repr__(self):
         return f'<Worker {self.worker_code} - {self.name}>'
+
+    def get_month_attendance(self, month_str):
+        """Get attendance count for a specific month. month_str = '2025-10'"""
+        year, month = map(int, month_str.split('-'))
+        return self.attendance_records.filter(
+            func.extract('year', Attendance.date) == year,
+            func.extract('month', Attendance.date) == month,
+            Attendance.status.in_(['present', 'Present', 'P'])
+        ).count()
 
 class EmailLog(db.Model):
     __tablename__ = 'email_logs'
@@ -160,20 +177,83 @@ class Salary(db.Model):
         nullable=False,
         index=True
     )
-    total_days_present = db.Column(db.Integer, nullable=False)
+    
+    # New fields for monthly payroll system
+    month = db.Column(db.String(7), nullable=False, index=True)  # Format: "2025-10"
+    
+    total_days_present = db.Column(db.Integer, nullable=False, default=0)
     daily_rate = db.Column(db.Float, nullable=False, default=0.0)
-    amount = db.Column(db.Float, nullable=False)
+    deductions = db.Column(db.Float, nullable=False, default=0.0)
+    gross_salary = db.Column(db.Float, nullable=False, default=0.0)
+    net_salary = db.Column(db.Float, nullable=False, default=0.0)
+    amount = db.Column(db.Float, nullable=False, default=0.0)  # Keep for backward compatibility
+    is_processed = db.Column(db.Boolean, nullable=False, default=False)
+    
+    # Bank details cached at time of payroll
     bank_name = db.Column(db.String(100), nullable=True)
     bank_account = db.Column(db.String(50), nullable=True)
     bank_account_name = db.Column(db.String(100), nullable=True)
+    
     payment_date = db.Column(
         db.DateTime,
         nullable=False,
-        default=db.func.current_timestamp(),
+        default=datetime.utcnow,
         index=True
     )
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     updated_at = db.Column(db.DateTime, server_default=db.func.now(), onupdate=db.func.now())
 
+    # Unique constraint: one salary record per worker per month
+    __table_args__ = (
+        db.UniqueConstraint('worker_id', 'month', name='uq_worker_month_salary'),
+    )
+
+    def calculate(self):
+        """Recalculate gross and net salary"""
+        self.gross_salary = float(self.total_days_present) * float(self.daily_rate)
+        self.net_salary = float(self.gross_salary) - float(self.deductions)
+        self.amount = self.net_salary  # Keep backward compatibility
+        return self
+
+    def auto_fill_from_worker(self):
+        """Fill salary record with worker's current data"""
+        self.daily_rate = float(self.worker.daily_rate or self.worker.amount_of_salary or 0)
+        self.bank_name = self.worker.bank_name
+        self.bank_account = self.worker.bank_account
+        self.bank_account_name = self.worker.bank_account_name
+        return self
+
     def __repr__(self):
-        return f'<Salary {self.worker_id} - {self.amount}>'
+        return f'<Salary {self.worker_id} - {self.month} - ₦{self.net_salary}>'
+
+class PayrollLock(db.Model):
+    __tablename__ = 'payroll_lock'
+
+    id = db.Column(db.Integer, primary_key=True)
+    month = db.Column(db.String(7), unique=True, nullable=False)  # "2025-10"
+    locked_by = db.Column(db.String(100), nullable=True)
+    locked_at = db.Column(db.DateTime, default=datetime.utcnow)
+    note = db.Column(db.Text, nullable=True)
+
+    def __repr__(self):
+        return f'<PayrollLock {self.month}>'
+
+class AuditLog(db.Model):
+    __tablename__ = 'audit_log'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, nullable=True)
+    user_name = db.Column(db.String(100), nullable=True)
+    action = db.Column(db.String(50), nullable=False)  # created, updated, processed, deleted
+    table_name = db.Column(db.String(50), nullable=False)
+    record_id = db.Column(db.Integer, nullable=True)
+    worker_id = db.Column(db.Integer, db.ForeignKey('workers.id'), nullable=True)
+    worker_name = db.Column(db.String(100), nullable=True)
+    details = db.Column(db.Text, nullable=True)
+    ip_address = db.Column(db.String(50), nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+
+    worker = db.relationship('Worker', backref='audit_logs')
+
+    def __repr__(self):
+        return f'<AuditLog {self.action} - {self.table_name} - {self.record_id}>'

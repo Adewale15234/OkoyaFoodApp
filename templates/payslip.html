@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Payslip - {{ salary.worker.name }} - {{ period }}</title>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Poppins', Arial, sans-serif;
+        background: white;
+        color: #1e293b;
+        padding: 20px;
+    }
+
+    .payslip {
+        max-width: 800px;
+        margin: 0 auto;
+        border: 2px solid #065f46;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .payslip-header {
+        background: linear-gradient(135deg, #03492c, #0b7a49);
+        color: white;
+        padding: 30px;
+        text-align: center;
+    }
+
+    .payslip-header img {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        border: 3px solid white;
+        margin-bottom: 15px;
+    }
+
+    .payslip-header h1 {
+        font-size: 1.8rem;
+        margin-bottom: 5px;
+    }
+
+    .payslip-header h2 {
+        font-size: 1.2rem;
+        font-weight: 400;
+        opacity: 0.9;
+    }
+
+    .payslip-body {
+        padding: 30px;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .info-box {
+        background: #f8fafc;
+        padding: 15px;
+        border-radius: 8px;
+        border-left: 4px solid #065f46;
+    }
+
+    .info-box label {
+        display: block;
+        font-size: 0.85rem;
+        color: #64748b;
+        margin-bottom: 5px;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .info-box value {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #1e293b;
+    }
+
+    .earnings-deductions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .section {
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .section-header {
+        background: #065f46;
+        color: white;
+        padding: 12px 15px;
+        font-weight: 700;
+        font-size: 1rem;
+    }
+
+    .section table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .section td {
+        padding: 12px 15px;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .section tr:last-child td {
+        border-bottom: none;
+    }
+
+    .section tr.total td {
+        background: #f1f5f9;
+        font-weight: 800;
+        font-size: 1.1rem;
+    }
+
+    .amount {
+        text-align: right;
+        font-weight: 700;
+    }
+
+    .net-pay {
+        background: #065f46;
+        color: white;
+        padding: 25px;
+        text-align: center;
+        border-radius: 8px;
+        margin-bottom: 30px;
+    }
+
+    .net-pay label {
+        display: block;
+        font-size: 0.9rem;
+        opacity: 0.9;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+    }
+
+    .net-pay .amount {
+        font-size: 2.5rem;
+        font-weight: 800;
+    }
+
+    .signature-section {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 60px;
+        padding-top: 20px;
+        border-top: 2px dashed #e2e8f0;
+    }
+
+    .sig-box {
+        text-align: center;
+        width: 200px;
+    }
+
+    .sig-line {
+        border-top: 2px solid #1e293b;
+        margin-bottom: 8px;
+        padding-top: 8px;
+    }
+
+    .footer-note {
+        text-align: center;
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 1px solid #e2e8f0;
+        color: #64748b;
+        font-size: 0.85rem;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 700;
+    }
+
+    .status-badge.processed {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .status-badge.pending {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    @media print {
+        body {
+            padding: 0;
+        }
+        .payslip {
+            border: none;
+            box-shadow: none;
+        }
+        @page {
+            size: A4;
+            margin: 1cm;
+        }
+    }
+
+    @media(max-width: 768px) {
+        .info-grid,
+        .earnings-deductions {
+            grid-template-columns: 1fr;
+        }
+        .signature-section {
+            flex-direction: column;
+            gap: 40px;
+            align-items: center;
+        }
+    }
+</style>
+</head>
+<body>
+
+<div class="payslip">
+    <!-- Header -->
+    <div class="payslip-header">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo">
+        <h1>OKOYA FOOD COMPANY LIMITED</h1>
+        <h2>Payslip for {{ period }}</h2>
+    </div>
+
+    <!-- Body -->
+    <div class="payslip-body">
+        
+        <!-- Employee Info -->
+        <div class="info-grid">
+            <div class="info-box">
+                <label>Employee Name</label>
+                <value>{{ salary.worker.name }}</value>
+            </div>
+            <div class="info-box">
+                <label>Employee Code</label>
+                <value>{{ salary.worker_code or 'N/A' }}</value>
+            </div>
+            <div class="info-box">
+                <label>Department</label>
+                <value>{{ salary.worker.department or 'N/A' }}</value>
+            </div>
+            <div class="info-box">
+                <label>Position</label>
+                <value>{{ salary.worker.position or 'N/A' }}</value>
+            </div>
+            <div class="info-box">
+                <label>Bank Name</label>
+                <value>{{ salary.bank_name or 'N/A' }}</value>
+            </div>
+            <div class="info-box">
+                <label>Account Number</label>
+                <value>{{ salary.bank_account or 'N/A' }}</value>
+            </div>
+            <div class="info-box">
+                <label>Days Present</label>
+                <value>{{ salary.total_days_present }} days</value>
+            </div>
+            <div class="info-box">
+                <label>Payment Status</label>
+                <value>
+                    {% if salary.is_processed %}
+                        <span class="status-badge processed">Processed</span>
+                    {% else %}
+                        <span class="status-badge pending">Pending</span>
+                    {% endif %}
+                </value>
+            </div>
+        </div>
+
+        <!-- Earnings & Deductions -->
+        <div class="earnings-deductions">
+            <div class="section">
+                <div class="section-header">Earnings</div>
+                <table>
+                    <tr>
+                        <td>Daily Rate</td>
+                        <td class="amount">₦{{ "%.2f"|format(salary.daily_rate) }}</td>
+                    </tr>
+                    <tr>
+                        <td>Days Worked</td>
+                        <td class="amount">{{ salary.total_days_present }}</td>
+                    </tr>
+                    <tr class="total">
+                        <td>Gross Salary</td>
+                        <td class="amount">₦{{ "%.2f"|format(salary.gross_salary) }}</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="section">
+                <div class="section-header">Deductions</div>
+                <table>
+                    <tr>
+                        <td>Total Deductions</td>
+                        <td class="amount">₦{{ "%.2f"|format(salary.deductions) }}</td>
+                    </tr>
+                    <tr class="total">
+                        <td>Net Deductions</td>
+                        <td class="amount">₦{{ "%.2f"|format(salary.deductions) }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- Net Pay -->
+        <div class="net-pay">
+            <label>Net Pay</label>
+            <div class="amount">₦{{ "%.2f"|format(salary.net_salary) }}</div>
+        </div>
+
+        <!-- Signature -->
+        <div class="signature-section">
+            <div class="sig-box">
+                <div class="sig-line"></div>
+                Employee Signature
+            </div>
+            <div class="sig-box">
+                <div class="sig-line"></div>
+                HR Officer
+            </div>
+            <div class="sig-box">
+                <div class="sig-line"></div>
+                Accountant
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer-note">
+            Generated on {{ now.strftime('%d %B %Y, %I:%M %p') }} | 
+            Period: {{ period }} | 
+            Payslip ID: {{ salary.id }}
+        </div>
+    </div>
+</div>
+
+<!-- Add this button above the signature section -->
+<div class="no-print" style="text-align:center; margin-bottom:20px;">
+    <button onclick="downloadPDF()" style="background:#065f46; color:white; padding:12px 24px; border:none; border-radius:8px; font-weight:700; cursor:pointer; font-size:1rem;">
+        📥 Download PDF
+    </button>
+</div>
+
+<!-- Add this before closing </body> -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script>
+function downloadPDF() {
+    const element = document.querySelector('.payslip');
+    const opt = {
+        margin: 0.5,
+        filename: 'Payslip_{{ salary.worker.name }}_{{ period }}.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+    };
+    
+    html2pdf().set(opt).from(element).save();
+}
+</script>
+
+<style>
+@media print {
+    .no-print { 
+        display: none !important; 
+    }
+
+    html, body {
+        width: 210mm;
+        height: 297mm;
+        margin: 0;
+        padding: 0;
+        background: white !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .salary-page, .payslip {
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
+        padding: 10mm;
+        box-shadow: none;
+        border: none;
+    }
+
+    .salary-report, .salary-table-wrap {
+        overflow: visible;
+        box-shadow: none;
+    }
+
+    .salary-table {
+        width: 100%;
+        min-width: auto;
+        font-size: 10pt;
+        page-break-inside: auto;
+    }
+
+    tr {
+        page-break-inside: avoid;
+        page-break-after: auto;
+    }
+
+    @page {
+        size: A4 portrait;
+        margin: 15mm;
+    }
+}
+
+/* For landscape payslip history */
+@media print and (orientation: landscape) {
+    @page {
+        size: A4 landscape;
+        margin: 10mm;
+    }
+    
+    .salary-table {
+        font-size: 9pt;
+    }
+}
+</style>
+
+<script>
+    // Auto-print when opened directly
+    if (window.location.pathname.includes('/payslip/') && window.location.search.includes('print=1')) {
+        window.onload = function() {
+            window.print();
+        }
+    }
+</script>
+
+</body>
+</html>
