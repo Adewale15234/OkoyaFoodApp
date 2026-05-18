@@ -94,56 +94,59 @@
                 </thead>
 
                 <tbody>
-                    {% for worker in salary_data %}
-                    <tr data-worker-id="{{ worker.id }}">
+                    {% for salary in salary_data %}
+                    <tr data-worker-id="{{ salary.worker_obj.id }}" data-salary-id="{{ salary.id }}">
                         <td>{{ loop.index }}</td>
-                        
+
                         <td class="worker-name">
                             <div class="worker-info">
-                                {% set passport_file = worker.worker.passport %}
+                                {% set passport_file = salary.worker_obj.passport %}
                                 {% if passport_file %}
                                     {% if passport_file.startswith('http') %}
-                                        <img src="{{ passport_file }}" class="worker-avatar" alt="{{ worker.worker.name }}" 
+                                        <img src="{{ passport_file }}" class="worker-avatar" alt="{{ salary.worker_obj.name }}"
                                             onerror="this.src='{{ url_for('static', filename='default.png') }}'">
                                     {% else %}
-                                        <img src="{{ url_for('static', filename='uploads/' ~ passport_file) }}" class="worker-avatar" alt="{{ worker.worker.name }}" 
+                                        <img src="{{ url_for('static', filename='uploads/' ~ passport_file) }}" class="worker-avatar" alt="{{ salary.worker_obj.name }}"
                                             onerror="this.src='{{ url_for('static', filename='default.png') }}'">
                                     {% endif %}
                                 {% else %}
-                                    <img src="{{ url_for('static', filename='default.png') }}" class="worker-avatar" alt="{{ worker.worker.name }}">
+                                    <img src="{{ url_for('static', filename='default.png') }}" class="worker-avatar" alt="{{ salary.worker_obj.name }}">
                                 {% endif %}
                                 <div class="worker-details">
-                                    <span class="worker-name-text">{{ worker.worker.name }}</span>
-                                    <span class="worker-id">ID: {{ worker.worker_code or worker.worker.id }}</span>
+                                    <span class="worker-name-text">{{ salary.worker_obj.name }}</span>
+                                    <span class="worker-id">ID: {{ salary.worker_obj.worker_code or salary.worker_obj.id }}</span>
                                 </div>
                             </div>
                         </td>
 
                         <td>
-                            {{ worker.present_days }} / {{ worker.days_in_month }}
-                            <small style="color:#64748b;">({{ "%.1f"|format(worker.attendance_percent) }}%)</small>
+                            {{ salary.present_days }} / {{ salary.days_in_month }}
+                            <small style="color:#64748b;">({{ "%.1f"|format(salary.attendance_percent) }}%)</small>
                         </td>
-                        
-                        <td class="daily-rate">₦{{ "{:,.2f}".format(worker.daily_rate_display or 0) }}</td>
-                        
-                        <td class="salary-amount">₦{{ "{:,.2f}".format(worker.calculated_salary or 0) }}</td>
 
-                        <td>{{ worker.bank_account_name or '—' }}</td>
-                        <td>{{ worker.bank_name or '—' }}</td>
-                        <td>{{ worker.bank_account or '—' }}</td>
-                        
+                        <td class="daily-rate">₦{{ "{:,.2f}".format(salary.daily_rate_display or 0) }}</td>
+
+                        <td class="salary-amount">₦{{ "{:,.2f}".format(salary.gross_from_attendance or 0) }}</td>
+
+                        <td>{{ salary.bank_account_name or salary.worker_obj.bank_account_name or '—' }}</td>
+                        <td>{{ salary.bank_name or salary.worker_obj.bank_name or '—' }}</td>
+                        <td>{{ salary.bank_account or salary.worker_obj.bank_account or '—' }}</td>
+
                         <td>
-                            {% if worker.is_processed %}
-                                <span class="status-badge processed" id="status-{{ worker.id }}">Processed</span>
+                            {% if salary.is_processed %}
+                                <span class="status-badge processed" id="status-{{ salary.worker_obj.id }}">Processed</span>
                             {% else %}
-                                <span class="status-badge pending" id="status-{{ worker.id }}">Pending</span>
+                                <span class="status-badge pending" id="status-{{ salary.worker_obj.id }}">Pending</span>
                             {% endif %}
                         </td>
 
                         <td>
-                            <form method="post" class="salary-form" data-worker-id="{{ worker.id }}">
-                                <input type="hidden" name="worker_id" value="{{ worker.id }}">
+                            <form method="post" class="salary-form" data-worker-id="{{ salary.worker_obj.id }}">
+                                <input type="hidden" name="worker_id" value="{{ salary.worker_obj.id }}">
                                 <input type="hidden" name="month" value="{{ period }}">
+                                <input type="hidden" name="total_days_present" value="{{ salary.present_days }}">
+                                <input type="hidden" name="daily_rate" value="{{ salary.daily_rate_display }}">
+                                <input type="hidden" name="deductions" value="{{ salary.deductions }}">
                                 <button type="submit" class="save-btn">Save Salary</button>
                             </form>
                         </td>

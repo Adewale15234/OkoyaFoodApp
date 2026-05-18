@@ -23,7 +23,7 @@ def salary():
     is_locked = PayrollLock.query.filter_by(month=period).first()
 
     # Get or auto-create salary records for this period
-    salary_data = Salary.query.filter_by(month=period).all()
+    salary_data = Salary.query.filter_by(month=period).options(db.joinedload(Salary.worker)).all()
 
     if not salary_data:
         workers = Worker.query.filter_by(is_active=True).all()
@@ -44,7 +44,7 @@ def salary():
             s.calculate()
             db.session.add(s)
         db.session.commit()
-        salary_data = Salary.query.filter_by(month=period).all()
+        salary_data = Salary.query.filter_by(month=period).options(db.joinedload(Salary.worker)).all()
 
     # Attach extra display values for template
     for s in salary_data:
@@ -52,9 +52,9 @@ def salary():
         s.present_days = s.total_days_present
         s.attendance_percent = round((s.total_days_present / days_in_month) * 100, 2) if days_in_month > 0 else 0
         s.daily_rate_display = s.daily_rate
+        s.gross_from_attendance = round(s.daily_rate * s.total_days_present, 2) # daily_rate * days present
         s.calculated_salary = s.net_salary
-        s.worker_name = s.worker.name if s.worker else 'Unknown'
-        s.worker_department = s.worker.department if s.worker else 'N/A'
+        s.worker_obj = s.worker # Clear name for template
 
     total_payroll = sum(s.net_salary for s in salary_data)
 
