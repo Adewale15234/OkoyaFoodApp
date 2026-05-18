@@ -67,7 +67,6 @@ class Worker(db.Model):
     # =========================
     attendance_records = db.relationship(
         'Attendance',
-        backref='worker',
         cascade="all, delete-orphan",
         passive_deletes=True,
         lazy='dynamic'
