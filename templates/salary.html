@@ -101,17 +101,10 @@
                         <td class="worker-name">
                             <div class="worker-info">
                                 {% set passport_file = worker.passport %}
-                                {% if passport_file %}
-                                    {% if passport_file.startswith('http') %}
-                                        <img src="{{ passport_file }}" class="worker-avatar" alt="{{ worker.name }}" 
-                                            onerror="this.src='{{ url_for('static', filename='default.png') }}'">
-                                    {% else %}
-                                        <img src="{{ url_for('static', filename='uploads/' ~ passport_file) }}" class="worker-avatar" alt="{{ worker.name }}" 
-                                            onerror="this.src='{{ url_for('static', filename='default.png') }}'">
-                                    {% endif %}
-                                {% else %}
-                                    <img src="{{ url_for('static', filename='default.png') }}" class="worker-avatar" alt="{{ worker.name }}">
-                                {% endif %}
+                                <img src="{{ passport_file if passport_file else url_for('static', filename='logo.png') }}"
+                                    class="worker-avatar"
+                                    alt="{{ worker.name }}"
+                                    onerror="this.src='{{ url_for('static', filename='logo.png') }}'">
                                 <span>{{ worker.name }}</span>
                             </div>
                         </td>
