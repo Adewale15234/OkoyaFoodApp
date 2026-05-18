@@ -47,6 +47,14 @@ def salary():
         db.session.commit()
         salary_data = Salary.query.filter_by(month=period).all()
 
+    # Attach extra display values to each salary object for template
+    for s in salary_data:
+        s.present_days = s.total_days_present
+        s.daily_rate_display = s.daily_rate
+        s.calculated_salary = s.net_salary
+        s.worker_name = s.worker.name if s.worker else 'Unknown'
+        s.worker_department = s.worker.department if s.worker else 'N/A'
+
     total_payroll = sum(s.net_salary for s in salary_data)
 
     # Get filter options

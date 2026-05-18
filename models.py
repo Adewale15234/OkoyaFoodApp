@@ -1,5 +1,6 @@
 from extensions import db
-from datetime import datetime
+from datetime import date
+from datetime import datetime, timedelta
 from sqlalchemy import func
 
 class Worker(db.Model):
@@ -187,7 +188,6 @@ class Attendance(db.Model):
     def duration(self):
         """Calculate duration between time_in and time_out"""
         if self.time_in and self.time_out:
-            from datetime import datetime, timedelta
             dt_in = datetime.combine(date.today(), self.time_in)
             dt_out = datetime.combine(date.today(), self.time_out)
             

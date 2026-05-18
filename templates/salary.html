@@ -114,7 +114,7 @@
                         </td>
                         <td>{{ worker.total_days_present }}</td>
                         <td class="daily-rate">₦{{ "{:,.2f}".format(worker.gross_salary / worker.total_days_present if worker.total_days_present > 0 else 0) }}</td>
-                        <td class="salary-amount">₦{{ "{:,.2f}".format(worker.calculated_salary) }}</td>
+                        <td class="salary-amount">₦{{ "{:,.2f}".format(worker.calculated_salary or 0) }}</td>
                         <td>{{ worker.bank_account_name or '—' }}</td>
                         <td>{{ worker.bank_name or '—' }}</td>
                         <td>{{ worker.bank_account or '—' }}</td>
