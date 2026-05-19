@@ -429,77 +429,147 @@ textarea{
         object-fit: contain;
     }
 }
-/* ================= PRINT ================= */
+
+/* ================= PRINT - A4 AUTO FIT ================= */
 @media print{
-
     @page{
-        size:A4 portrait;
-        margin:8mm;
+        size: A4 portrait;
+        margin: 6mm;
     }
 
-    body{
-        background:white;
-        font-size: 9pt;
+    html, body {
+        width: 210mm;
+        height: 297mm;
+        background: white !important;
+        font-size: 8.5pt !important;
+        line-height: 1.2 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
     }
 
-    .no-print{
-        display:none !important;
+    .no-print, .action-bar, .modal-overlay {
+        display: none !important;
     }
 
-    .register-container{
-        width:100%;
-        min-height:auto;
-        margin:0;
-        padding:0;
-        box-shadow:none;
-        border:none;
+    .register-container, .modal-content {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-height: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+        border: none !important;
+        page-break-after: avoid;
+        page-break-before: avoid;
     }
 
-    input, textarea{
-        border:none;
-        border-bottom:1px solid #000;
-        background:white;
-        border-radius:0;
-        padding:2px 4px;
-        font-size: 9pt;
-    }
-
-    .section-card{
-        border:1px solid #000;
-        page-break-inside:avoid;
-        margin-bottom:5px;
-        padding:5px 6px;
-    }
-
-    .section-title{
-        color:#000;
-        border-left:3px solid #000;
-        font-size: 10pt;
-        margin-bottom:4px;
-    }
-
-    .highlight{
-        background:white;
-        color:black;
-        font-weight:bold;
-    }
-
-    .footer{
-        position:absolute;
-        bottom:0;
-        width:100%;
-    }
-
-    .signature-zone{
-        margin-top:12px;
-        page-break-inside:avoid;
+    /* Prevent orphan cuts */
+    * {
+        page-break-inside: avoid;
+        break-inside: avoid;
     }
     
-    h1 { font-size: 14pt !important; }
-    h3 { font-size: 9pt !important; }
-    p, label, input, textarea { font-size: 9pt !important; }
-    .document-title { font-size: 12pt !important; }
-    .document-meta { font-size: 8pt !important; }
+    .section-card, .breakdown-card, .employee-profile, .signature-section {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        margin-bottom: 4mm !important;
+    }
+
+    /* Compact spacing */
+    .section-card {
+        border: 1px solid #000 !important;
+        padding: 3mm 4mm !important;
+        margin-bottom: 3mm !important;
+    }
+
+    .section-title {
+        color: #000 !important;
+        border-left: 2px solid #000 !important;
+        font-size: 9pt !important;
+        margin-bottom: 2mm !important;
+        padding-left: 3mm !important;
+    }
+
+    /* Inputs */
+    input, textarea {
+        border: none !important;
+        border-bottom: 0.5pt solid #000 !important;
+        background: white !important;
+        border-radius: 0 !important;
+        padding: 1mm 2mm !important;
+        font-size: 8.5pt !important;
+        height: auto !important;
+    }
+
+    /* Typography scale down */
+    h1 { font-size: 13pt !important; margin: 0 0 2mm 0 !important; }
+    h2 { font-size: 11pt !important; margin: 0 0 2mm 0 !important; }
+    h3 { font-size: 9pt !important; margin: 0 0 1mm 0 !important; }
+    p, label, span, td, th, div { 
+        font-size: 8.5pt !important; 
+        line-height: 1.2 !important;
+    }
+    
+    .document-title { font-size: 11pt !important; }
+    .document-meta { font-size: 7.5pt !important; }
+
+    /* Tables */
+    table {
+        width: 100% !important;
+        font-size: 8pt !important;
+    }
+    
+    th, td {
+        padding: 1.5mm 2mm !important;
+    }
+
+    /* Grid adjustments */
+    .breakdown-grid, .employee-profile {
+        gap: 3mm !important;
+    }
+
+    /* Signature zone - keep together */
+    .signature-section {
+        margin-top: 5mm !important;
+        padding-top: 3mm !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+    }
+
+    .sig-line {
+        height: 12mm !important;
+        margin-bottom: 2mm !important;
+    }
+
+    /* Footer - absolute bottom */
+    .footer, .payslip-footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        font-size: 7pt !important;
+        padding-top: 2mm !important;
+        border-top: 0.5pt solid #000 !important;
+    }
+
+    /* Force highlight to B&W */
+    .highlight {
+        background: white !important;
+        color: black !important;
+        font-weight: 700 !important;
+    }
+
+    /* Images scale */
+    img {
+        max-width: 100% !important;
+        height: auto !important;
+    }
+
+    .company-logo, .profile-photo img {
+        max-width: 25mm !important;
+        max-height: 25mm !important;
+    }
 }
 
 </style>
