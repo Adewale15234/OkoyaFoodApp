@@ -1,0 +1,518 @@
+{% extends 'base.html' %}
+{% block title %}Client Order Form | Okoya Food{% endblock %}
+
+{% block content %}
+
+<section class="client-hero">
+
+<!-- BACK NAV -->
+<div class="back-dashboard no-print">
+  {% if session.get('role') == 'admin' %}
+    <a href="{{ url_for('admin.admin_dashboard') }}">← Back to Dashboard</a>
+  {% else %}
+    <a href="{{ url_for('secretary.secretary_dashboard') }}">← Back to Dashboard</a>
+  {% endif %}
+</div>
+
+<!-- MAIN WRAPPER -->
+<div class="client-container print-area">
+
+<!-- HEADER -->
+<div class="client-header sticky-header">
+
+    <div class="logo-box">
+        <img src="{{ url_for('static', filename='android-chrome-512x512.png') }}" alt="Logo">
+    </div>
+
+    <div class="company-center">
+        <h1>OKOYA FOOD COMPANY LIMITED</h1>
+        <p class="motto">POVERTY ERADICATION • REDUCE INEQUALITY • LEAVE NO ONE BEHIND</p>
+        <p class="address">KM 7 Idi APA Community, Shaki, Oyo State, Nigeria</p>
+
+        <h2 class="form-title">CLIENT ORDER MANAGEMENT SYSTEM</h2>
+        <p class="form-subtitle">Professional Order Registration Portal</p>
+    </div>
+
+    <div class="system-status">
+        <span class="badge green">ONLINE</span>
+        <span class="badge blue">SECURE</span>
+        <button class="theme-toggle no-print" id="themeToggle">🌓</button>
+    </div>
+
+</div>
+
+<!-- ANALYTICS PANEL (UI FUTURE READY) -->
+<div class="analytics-panel no-print">
+    <div class="card">
+        <h3>📊 Today Orders</h3>
+        <p id="todayOrders">0</p>
+    </div>
+
+    <div class="card">
+        <h3>💰 Revenue</h3>
+        <p>₦<span id="revenue">0</span></p>
+    </div>
+
+    <div class="card">
+        <h3>🚚 Pending</h3>
+        <p id="pending">0</p>
+    </div>
+
+    <div class="card">
+        <h3>✅ Delivered</h3>
+        <p id="delivered">0</p>
+    </div>
+</div>
+
+<!-- LIVE ORDER PREVIEW -->
+<div class="order-summary no-print">
+    <h3>📦 Live Order Preview</h3>
+    <div class="preview-grid">
+        <p>Kg: <span id="previewKg">0</span></p>
+        <p>Price: ₦<span id="previewPrice">0</span></p>
+        <p class="highlight">Total: ₦<span id="previewTotal">0</span></p>
+    </div>
+</div>
+
+<!-- FORM -->
+<form method="post" class="client-form">
+
+<div class="grid-form">
+
+<div><label>Client Name *</label><input name="name" required></div>
+<div><label>Email</label><input name="email" type="email"></div>
+
+<div><label>Date</label><input name="date" type="date" value="{{ now.strftime('%Y-%m-%d') if now else '' }}"></div>
+
+<div>
+<label>Product *</label>
+<select name="items" required>
+<option value="">Select Product</option>
+{% for p in products %}
+<option value="{{ p }}">{{ p }}</option>
+{% endfor %}
+</select>
+</div>
+
+<div><label>Phone</label><input name="phone_number" type="tel"></div>
+<div><label>Description</label><textarea name="description" rows="2"></textarea></div>
+
+<div><label>Kilograms *</label><input id="kg" name="kilograms" type="number" step="0.01" min="0" oninput="calc()"></div>
+<div><label>Unit Price *</label><input id="price" name="unit_price" type="number" step="0.01" min="0" oninput="calc()"></div>
+
+<div><label>Total</label><input id="total" name="total_amount" readonly></div>
+
+<div><label>Driver</label><input name="driver_name"></div>
+<div><label>Vehicle</label><input name="vehicle_plate_number"></div>
+
+<div><label>Bank</label><input name="bank_name"></div>
+<div><label>Account No</label><input name="account_number"></div>
+
+<div><label>Account Name</label><input name="account_bank_name"></div>
+
+</div>
+
+<!-- ORDER STATUS (FUTURE FEATURE UI) -->
+<div class="status-bar no-print">
+    <span class="status pending">Pending</span>
+    <span class="status approved">Approved</span>
+    <span class="status delivered">Delivered</span>
+    <span class="status paid">Paid</span>
+</div>
+
+<!-- SIGNATURE SECTION -->
+<div class="signature-section">
+    <div>
+        _______________________<br>
+        Client Signature
+    </div>
+
+    <div>
+        _______________________<br>
+        Admin Approval
+    </div>
+
+    <div>
+        _______________________<br>
+        Company Seal
+    </div>
+</div>
+
+<!-- BUTTONS -->
+<div class="actions no-print">
+    <button type="button" onclick="window.print()">🖨 Print</button>
+    <button type="submit">📩 Submit Order</button>
+    <button type="button" onclick="resetForm()">♻ Reset</button>
+</div>
+
+</form>
+
+<!-- FOOTER -->
+<div class="footer">
+© {{ current_year|default(now.year) if now else 2026 }} OKOYA FOOD COMPANY LIMITED
+</div>
+
+</div>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Theme toggle
+    const themeToggle = document.getElementById("themeToggle");
+    themeToggle?.addEventListener("click", function() {
+        document.body.classList.toggle("light-mode");
+        localStorage.setItem("theme", document.body.classList.contains("light-mode")? "light" : "dark");
+    });
+    if (localStorage.getItem("theme") === "light") {
+        document.body.classList.add("light-mode");
+    }
+});
+
+function calc(){
+    let kg = parseFloat(document.getElementById("kg").value) || 0;
+    let price = parseFloat(document.getElementById("price").value) || 0;
+    let total = kg * price;
+
+    document.getElementById("total").value = total.toFixed(2);
+    document.getElementById("previewKg").innerText = kg;
+    document.getElementById("previewPrice").innerText = price.toFixed(2);
+    document.getElementById("previewTotal").innerText = total.toFixed(2);
+}
+
+function resetForm(){
+    document.querySelector("form").reset();
+    calc();
+}
+</script>
+
+<style>
+/* GLOBAL */
+:root {
+    --primary: #03492c;
+    --primary-dark: #022a1a;
+    --accent: #16c46d;
+    --bg: #f4f6fa;
+    --card-bg: #fff;
+    --text: #1e293b;
+    --muted: #64748b;
+}
+
+body {
+    font-family: 'Poppins', Arial, sans-serif;
+    background: linear-gradient(135deg,#edfdf5,#d4f8e8,#bdf6d6);
+    margin: 0;
+    padding: 0;
+    color: var(--text);
+    transition: background 0.3s ease;
+}
+
+body.light-mode {
+    background: linear-gradient(135deg,#f0fdf4,#dcfce7,#bbf7d0);
+}
+
+/* CONTAINER */
+.client-container {
+    max-width: 1200px;
+    margin: 20px auto;
+    background: var(--card-bg);
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+/* BACK NAV */
+.back-dashboard {
+    margin-bottom: 15px;
+}
+
+.back-dashboard a {
+    display: inline-block;
+    background: var(--primary);
+    color: white;
+    padding: 10px 18px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 700;
+    transition: 0.2s;
+}
+
+.back-dashboard a:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+}
+
+/* HEADER */
+.client-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+    border-bottom: 3px solid var(--primary);
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+
+.logo-box img {
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
+}
+
+.company-center {
+    flex: 1;
+    text-align: center;
+}
+
+.company-center h1 {
+    margin: 0;
+    color: var(--primary);
+    font-size: 1.8rem;
+    font-weight: 800;
+}
+
+.motto {
+    color: var(--accent);
+    font-weight: 600;
+    margin: 5px 0;
+}
+
+.address {
+    color: var(--muted);
+    font-size: 0.9rem;
+}
+
+.form-title {
+    margin: 10px 0 5px;
+    color: var(--text);
+}
+
+.form-subtitle {
+    margin: 0;
+    color: var(--muted);
+}
+
+.system-status {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-end;
+}
+
+.theme-toggle {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+/* ANALYTICS */
+.analytics-panel {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.analytics-panel.card {
+    background: #e9f7ff;
+    padding: 15px;
+    border-radius: 12px;
+    text-align: center;
+    border-left: 4px solid var(--primary);
+}
+
+.analytics-panel h3 {
+    margin: 0 0 8px;
+    font-size: 0.95rem;
+    color: var(--muted);
+}
+
+.analytics-panel p {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+/* ORDER SUMMARY */
+.order-summary {
+    background: #fff3cd;
+    padding: 15px;
+    border-left: 5px solid orange;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.preview-grid {
+    display: flex;
+    gap: 30px;
+    flex-wrap: wrap;
+}
+
+.preview-grid.highlight {
+    font-weight: 700;
+    color: var(--primary);
+    font-size: 1.2rem;
+}
+
+/* GRID */
+.grid-form {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+}
+
+.grid-form label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: var(--text);
+}
+
+.grid-form input,
+.grid-form select,
+.grid-form textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+    transition: 0.2s;
+}
+
+.grid-form input:focus,
+.grid-form select:focus,
+.grid-form textarea:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(3,73,44,0.1);
+}
+
+.grid-form input[readonly] {
+    background: #f8fafc;
+    color: var(--primary);
+    font-weight: 700;
+}
+
+/* STATUS */
+.status-bar {
+    display: flex;
+    gap: 10px;
+    margin: 20px 0;
+    flex-wrap: wrap;
+}
+
+.status {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    color: #fff;
+    font-weight: 600;
+}
+
+.pending { background: orange; }
+.approved { background: #2563eb; }
+.delivered { background: #16a34a; }
+.paid { background: #9333ea; }
+
+/* SIGNATURE */
+.signature-section {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 40px;
+    gap: 20px;
+    flex-wrap: wrap;
+    text-align: center;
+    font-weight: 700;
+}
+
+/* BUTTONS */
+.actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 25px;
+    flex-wrap: wrap;
+}
+
+.actions button {
+    padding: 12px 20px;
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.actions button:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+}
+
+.actions button[type="submit"] {
+    background: var(--accent);
+    color: #fff;
+}
+
+/* BADGES */
+.badge {
+    padding: 6px 12px;
+    border-radius: 6px;
+    color: #fff;
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+.green { background: #16a34a; }
+.blue { background: #2563eb; }
+
+/* FOOTER */
+.footer {
+    text-align: center;
+    margin-top: 30px;
+    color: var(--muted);
+    font-size: 0.9rem;
+}
+
+/* RESPONSIVE */
+@media(max-width: 768px) {
+   .grid-form {
+        grid-template-columns: 1fr;
+    }
+   .analytics-panel {
+        grid-template-columns: 1fr 1fr;
+    }
+   .client-header {
+        flex-direction: column;
+        text-align: center;
+    }
+   .system-status {
+        align-items: center;
+    }
+}
+
+/* PRINT */
+@media print {
+   .no-print {
+        display: none!important;
+    }
+    body {
+        background: white;
+    }
+   .client-container {
+        box-shadow: none;
+        padding: 0;
+    }
+    @page {
+        size: A4;
+        margin: 1.5cm;
+    }
+}
+</style>
+
+{% endblock %}

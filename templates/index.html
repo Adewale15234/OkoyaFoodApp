@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="dashboard-container">
+    <!-- Logo and Greeting -->
+    <div class="dashboard-header">
+        <img src="{{ url_for('static', filename='log.png') }}" alt="Logo" class="dashboard-logo">
+
+        <div class="dashboard-greeting">
+            <h2 class="greeting">👋 Hello, Admin! Welcome back.</h2>
+            <p class="today-date">📅 Today: <span id="todayDate"></span></p>
+        </div>
+    </div>
+
+    <!-- Theme Switchers -->
+    <div class="theme-controls sticky-top">
+        <button onclick="setTheme('light')">☀️ Light</button>
+        <button onclick="setTheme('dark')">🌙 Dark</button>
+        <button onclick="setTheme('blue')">🔵 Blue</button>
+        <button onclick="setTheme('red')">🔴 Red</button>
+    </div>
+
+    <h1 class="dashboard-welcome">Welcome to Okoya Food Staff Manager</h1>
+
+    <!-- Dashboard Navigation -->
+    <nav class="dashboard-nav sticky-top">
+        <a href="{{ url_for('register_worker') }}">📋 Register Worker</a>
+        <a href="{{ url_for('attendance') }}">🕒 Mark Attendance</a>
+        <a href="{{ url_for('salary') }}">💰 Record Salary</a>
+        <a href="{{ url_for('attendance_history') }}">📅 Attendance History</a>
+        <a href="{{ url_for('salary_history') }}">🧾 Salary History</a>
+        <a href="{{ url_for('logout') }}" class="logout-btn">🚪 Logout</a>
+    </nav>
+</div>
+
+<script>
+    // Format and display today's date
+    document.addEventListener('DOMContentLoaded', function () {
+        const today = new Date();
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById('todayDate').textContent = today.toLocaleDateString('en-US', options);
+
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+            document.body.className = 'theme-' + savedTheme;
+        }
+    });
+
+    // Theme switcher
+    function setTheme(theme) {
+        document.body.className = 'theme-' + theme;
+        localStorage.setItem('theme', theme);
+    }
+</script>
+
+<style>
+/* =========================
+   Dashboard Styling
+   ========================= */
+
+.dashboard-container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Header */
+.dashboard-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    position: sticky;
+    top: 0;
+    background: #f7fff7;
+    padding: 10px 20px;
+    z-index: 100;
+    border-bottom: 2px solid #09a74f;
+}
+
+/* Greeting */
+.dashboard-greeting h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: #03492c;
+}
+.dashboard-greeting p {
+    margin: 3px 0 0;
+    font-size: 1rem;
+    color: #555;
+}
+
+/* Theme controls sticky */
+.theme-controls {
+    margin: 15px 0;
+    display: flex;
+    gap: 10px;
+    position: sticky;
+    top: 70px; /* Height of dashboard-header */
+    background: #fff;
+    padding: 10px 0;
+    z-index: 90;
+}
+
+/* Buttons */
+.theme-controls button {
+    padding: 8px 14px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: transform 0.2s;
+}
+.theme-controls button:hover {
+    transform: scale(1.05);
+}
+
+/* Dashboard Welcome */
+.dashboard-welcome {
+    text-align: center;
+    margin: 20px 0;
+    font-size: 2rem;
+    color: #03492c;
+}
+
+/* Dashboard Navigation sticky */
+.dashboard-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 20px;
+    position: sticky;
+    top: 130px; /* header + theme-controls height */
+    background: #f7fff7;
+    padding: 10px 0;
+    z-index: 80;
+    border-top: 2px solid #09a74f;
+    border-bottom: 2px solid #09a74f;
+}
+
+.dashboard-nav a {
+    text-decoration: none;
+    background: #09a74f;
+    color: #fff;
+    padding: 10px 16px;
+    border-radius: 6px;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+.dashboard-nav a:hover {
+    background: #0dc95d;
+    transform: scale(1.05);
+}
+
+/* Logout Button Special Color */
+.logout-btn {
+    background: #dc3545 !important;
+}
+.logout-btn:hover {
+    background: #c82333 !important;
+}
+</style>
+{% endblock %}

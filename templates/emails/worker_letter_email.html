@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Official HR Letter</title>
+</head>
+<body style="margin:0; padding:0; background-color:#f4f7fb; font-family:Arial, Helvetica, sans-serif;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color:#f4f7fb;">
+        <tr>
+            <td align="center" style="padding:30px 10px;">
+                <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" style="background:#ffffff; border-radius:8px; overflow:hidden;">
+                    
+                    <!-- Header with Logo -->
+                    <tr>
+                        <td style="background:#004080; padding:30px 20px; text-align:center;">
+                            <img src="{{ company_logo }}" width="90" height="90" alt="Okoya Food Logo" style="display:block; margin:0 auto 15px; background:#ffffff; padding:10px; border-radius:12px;">
+                            <h1 style="margin:0; color:#ffffff; font-size:22px; font-weight:700; letter-spacing:0.5px;">OKOYA FOOD COMPANY LIMITED</h1>
+                            <p style="margin:8px 0 0; color:#e0ecff; font-size:13px;">Staff Management & HR Department</p>
+                        </td>
+                    </tr>
+
+                    <!-- Status Badge -->
+                    {% if worker.status_type %}
+                    <tr>
+                        <td style="padding:25px 30px 0; text-align:center;">
+                            <span style="display:inline-block; padding:8px 20px; border-radius:20px; font-size:12px; font-weight:700; color:#ffffff; background:{% if worker.status_type|lower == 'deactivated' %}#dc3545{% elif worker.status_type|lower == 'reactivated' %}#28a745{% else %}#ffc107{% endif %};">
+                                {{ worker.status_type|upper }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endif %}
+
+                    <!-- Title -->
+                    <tr>
+                        <td style="padding:25px 30px 15px;">
+                            <h2 style="margin:0; text-align:center; font-size:18px; color:#1e293b; font-weight:700;">
+                                OFFICIAL HR DISCIPLINARY / REINSTATEMENT LETTER
+                            </h2>
+                        </td>
+                    </tr>
+
+                    <!-- Worker Info Box -->
+                    <tr>
+                        <td style="padding:0 30px 20px;">
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#f8fafc; border-left:4px solid #004080; border-radius:6px;">
+                                <tr>
+                                    <td style="padding:20px;">
+                                        <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+                                            <tr>
+                                                <td style="padding:5px 0; font-size:14px; color:#1e293b;">
+                                                    <strong style="color:#004080;">Name:</strong> {{ worker.name }}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding:5px 0; font-size:14px; color:#1e293b;">
+                                                    <strong style="color:#004080;">Code:</strong> {{ worker.worker_code }}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding:5px 0; font-size:14px; color:#1e293b;">
+                                                    <strong style="color:#004080;">Position:</strong> {{ worker.position or '—' }}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding:5px 0; font-size:14px; color:#1e293b;">
+                                                    <strong style="color:#004080;">Phone:</strong> {{ worker.phone_number or '—' }}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding:5px 0; font-size:14px; color:#1e293b;">
+                                                    <strong style="color:#004080;">Date:</strong> {{ worker.status_date.strftime('%d %B %Y') if worker.status_date else '' }}
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                    {% if worker.passport %}
+                                    <td width="110" style="padding:20px 20px 20px 0; vertical-align:top; text-align:right;">
+                                        <img src="{{ worker.passport }}" alt="{{ worker.name }}" width="100" height="100" style="border-radius:8px; border:2px solid #004080; object-fit:cover;">
+                                    </td>
+                                    {% endif %}
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Divider -->
+                    <tr>
+                        <td style="padding:0 30px;">
+                            <hr style="border:none; border-top:2px solid #e2e8f0; margin:0;">
+                        </td>
+                    </tr>
+
+                    <!-- Letter Content -->
+                    <tr>
+                        <td style="padding:25px 30px;">
+                            <div style="background:#f8fafc; border-left:4px solid #004080; padding:22px; border-radius:6px; font-size:14px; line-height:1.9; color:#1e293b; white-space:pre-wrap; word-wrap:break-word;">
+{{ worker.status_letter|safe }}
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Signatures -->
+                    <tr>
+                        <td style="padding:40px 30px 30px;">
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+                                <tr>
+                                    <td width="50%" style="text-align:center; padding:0 10px;">
+                                        <div style="border-top:1px solid #000000; width:180px; margin:50px auto 8px;"></div>
+                                        <span style="font-size:13px; font-weight:600; color:#1e293b;">HR Manager</span>
+                                    </td>
+                                    <td width="50%" style="text-align:center; padding:0 10px;">
+                                        <div style="border-top:1px solid #000000; width:180px; margin:50px auto 8px;"></div>
+                                        <span style="font-size:13px; font-weight:600; color:#1e293b;">Managing Director</span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Footer -->
+                    <tr>
+                        <td style="background:#f8fafc; padding:25px 30px; text-align:center; border-top:1px solid #e2e8f0;">
+                            <p style="margin:0 0 8px; font-size:12px; color:#64748b; line-height:1.6;">
+                                This is an official communication from Okoya Food Company Limited.
+                            </p>
+                            <p style="margin:0; font-size:12px; color:#64748b;">
+                                For inquiries: <a href="mailto:hr@okoyafood.com" style="color:#004080; text-decoration:none;">hr@okoyafood.com</a>
+                            </p>
+                            <p style="margin:15px 0 0; font-size:11px; color:#94a3b8;">
+                                © 2026 Okoya Food Ltd — Enterprise HR & Operations System
+                            </p>
+                        </td>
+                    </tr>
+
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

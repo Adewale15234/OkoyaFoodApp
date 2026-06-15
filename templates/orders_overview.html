@@ -1,0 +1,591 @@
+{% extends 'base.html' %}
+{% block title %}Orders Overview | Okoya Food{% endblock %}
+
+{% block content %}
+
+<div class="orders-dashboard">
+
+<header class="dash-header">
+    <div class="header-left">
+        <h1>📦 Orders Control Center</h1>
+        <p>Manage, analyze and control all client orders</p>
+        <div class="meta">
+            <span id="liveTime"></span>
+            <span class="dot">•</span>
+            <span>Total: {{ total_orders }} orders</span>
+        </div>
+    </div>
+    
+    <div class="dash-actions">
+        <input type="text" id="searchInput" placeholder="Search client, product, phone...">
+        <a href="{{ url_for('orders.export_all_orders') }}" class="btn primary">⬇ Export</a>
+        <button onclick="window.print()" class="btn dark">🖨 Print</button>
+        <a href="{{ url_for('admin.admin_dashboard') }}" class="btn secondary">← Dashboard</a>
+        <button id="themeToggle" class="btn theme">🌓</button>
+    </div>
+</header>
+
+<section class="analytics-grid">
+    <div class="card blue">
+        <h3>Total Orders</h3>
+        <p>{{ total_orders }}</p>
+        <small>All time</small>
+    </div>
+    <div class="card green">
+        <h3>Total Revenue</h3>
+        <p>₦{{ "%.2f"|format(total_revenue or 0) }}</p>
+        <small>Net</small>
+    </div>
+    <div class="card gold">
+        <h3>Today Sales</h3>
+        <p>₦{{ "%.2f"|format(today_sales or 0) }}</p>
+        <small>{{ now.strftime('%d %b') if now else '' }}</small>
+    </div>
+    <div class="card orange pending">
+        <h3>Pending</h3>
+        <p>{{ pending_orders }}</p>
+        <small>Awaiting action</small>
+    </div>
+    <div class="card purple confirmed">
+        <h3>Confirmed</h3>
+        <p>{{ confirmed_orders }}</p>
+        <small>Processed</small>
+    </div>
+</section>
+
+<section class="filter-bar no-print">
+    <button class="filter active" data-filter="all">All</button>
+    <button class="filter" data-filter="soya">Soya</button>
+    <button class="filter" data-filter="cashew">Cashew</button>
+    <button class="filter" data-filter="maize">Maize</button>
+    <button class="filter" data-filter="rice">Rice</button>
+</section>
+
+<div class="bulk-bar no-print">
+    <span id="selectedCount">0 selected</span>
+    <button onclick="bulkConfirm()" class="success">✔ Confirm Selected</button>
+    <button onclick="bulkDelete()" class="danger">🗑 Delete Selected</button>
+</div>
+
+<section class="orders-table">
+<div class="table-wrap">
+<table>
+    <thead>
+        <tr>
+            <th><input type="checkbox" id="selectAll"></th>
+            <th>S/N</th>
+            <th>Client</th>
+            <th>Product</th>
+            <th>Kg</th>
+            <th>Total</th>
+            <th>Status</th>
+            <th>Date</th>
+            <th class="no-print">Actions</th>
+        </tr>
+    </thead>
+
+    <tbody id="ordersBody">
+
+    {% for order in all_orders %}
+        <tr class="order-row"
+            data-product="{{ order.items|lower }}"
+            data-client="{{ order.name|lower }}"
+            data-phone="{{ order.phone_number or '' }}">
+
+            <td>
+                <input type="checkbox" class="rowCheck" value="{{ order.id }}">
+            </td>
+
+            <td>{{ loop.index }}</td>
+            <td>
+                <strong>{{ order.name }}</strong><br>
+                <small>{{ order.phone_number or '—' }}</small>
+            </td>
+            <td><span class="product-tag">{{ order.items }}</span></td>
+            <td>{{ order.kilograms or '—' }}</td>
+            <td><strong>₦{{ "%.2f"|format(order.total_amount or 0) }}</strong></td>
+
+            <td>
+                {% if order.status == 'Confirmed' %}
+                    <span class="badge confirmed">Confirmed</span>
+                {% else %}
+                    <span class="badge pending">Pending</span>
+                {% endif %}
+            </td>
+
+            <td>
+                {{ order.created_at.strftime('%d-%m-%Y') if order.created_at else '—' }}
+            </td>
+
+            <td class="no-print">
+                <div class="action-group">
+                    <a href="{{ url_for('orders.print_order', order_id=order.id) }}" class="mini-btn blue" title="Print">🖨</a>
+                    <a href="{{ url_for('orders.export_order', order_id=order.id) }}" class="mini-btn orange" title="Export">⬇</a>
+
+                    {% if order.status != 'Confirmed' %}
+                    <form action="{{ url_for('orders.confirm_order', order_id=order.id) }}" method="POST" style="display:inline;">
+                        <button type="submit" class="mini-btn green" title="Confirm">✔</button>
+                    </form>
+                    {% endif %}
+
+                    <form action="{{ url_for('orders.delete_order', order_id=order.id) }}" method="POST" style="display:inline;">
+                        <button type="submit" class="mini-btn red" onclick="return confirm('Delete this order?')" title="Delete">🗑</button>
+                    </form>
+                </div>
+            </td>
+        </tr>
+    {% else %}
+        <tr>
+            <td colspan="9" class="empty-state">
+                <h3>No orders found</h3>
+                <p>Create an order to see it here</p>
+            </td>
+        </tr>
+    {% endfor %}
+
+    </tbody>
+</table>
+</div>
+</section>
+</div>
+
+<script>
+// LIVE TIME
+function updateTime() {
+    const now = new Date();
+    document.getElementById("liveTime").textContent = now.toLocaleString('en-US', {
+        weekday: 'short', hour: '2-digit', minute: '2-digit', second: '2-digit'
+    });
+}
+updateTime();
+setInterval(updateTime, 1000);
+
+// THEME TOGGLE
+document.getElementById("themeToggle").addEventListener("click", () => {
+    document.body.classList.toggle("light-mode");
+    localStorage.setItem("theme", document.body.classList.contains("light-mode") ? "light" : "dark");
+});
+if (localStorage.getItem("theme") === "light") {
+    document.body.classList.add("light-mode");
+}
+
+// SEARCH
+document.getElementById("searchInput").addEventListener("input", function () {
+    let value = this.value.toLowerCase();
+    document.querySelectorAll(".order-row").forEach(row => {
+        row.style.display =
+            row.dataset.client.includes(value) ||
+            row.dataset.product.includes(value) ||
+            row.dataset.phone.includes(value)
+            ? "" : "none";
+    });
+});
+
+// FILTER
+document.querySelectorAll(".filter").forEach(btn => {
+    btn.addEventListener("click", function () {
+        document.querySelectorAll(".filter").forEach(b => b.classList.remove("active"));
+        this.classList.add("active");
+
+        let filter = this.dataset.filter;
+        document.querySelectorAll(".order-row").forEach(row => {
+            row.style.display =
+                filter === "all" || row.dataset.product.includes(filter)
+                ? "" : "none";
+        });
+    });
+});
+
+// SELECT ALL + COUNT
+const selectAll = document.getElementById("selectAll");
+const rowChecks = document.querySelectorAll(".rowCheck");
+const selectedCount = document.getElementById("selectedCount");
+
+function updateCount() {
+    const count = document.querySelectorAll(".rowCheck:checked").length;
+    selectedCount.textContent = `${count} selected`;
+}
+
+selectAll.addEventListener("change", function () {
+    rowChecks.forEach(cb => cb.checked = this.checked);
+    updateCount();
+});
+
+rowChecks.forEach(cb => cb.addEventListener("change", updateCount));
+
+// BULK CONFIRM
+async function bulkConfirm() {
+    let selected = [...document.querySelectorAll(".rowCheck:checked")].map(cb => cb.value);
+    if (selected.length === 0) {
+        alert("Select orders first");
+        return;
+    }
+    if (!confirm(`Confirm ${selected.length} orders?`)) return;
+
+    for (let id of selected) {
+        await fetch(`/orders/confirm_order/${id}`, { method: "POST" });
+    }
+    location.reload();
+}
+
+// BULK DELETE
+async function bulkDelete() {
+    let selected = [...document.querySelectorAll(".rowCheck:checked")].map(cb => cb.value);
+    if (selected.length === 0) {
+        alert("Select orders first");
+        return;
+    }
+    if (!confirm(`Delete ${selected.length} orders? This cannot be undone.`)) return;
+
+    for (let id of selected) {
+        await fetch(`/orders/delete_order/${id}`, { method: "POST" });
+    }
+    location.reload();
+}
+</script>
+
+<style>
+:root {
+    --primary: #03492c;
+    --primary-dark: #022a1a;
+    --accent: #16c46d;
+    --bg: #f4f6f9;
+    --card: #fff;
+    --text: #1e293b;
+    --muted: #64748b;
+}
+
+body {
+    background: linear-gradient(135deg,#edfdf5,#d4f8e8,#bdf6d6);
+    font-family: 'Poppins', Arial, sans-serif;
+    margin: 0;
+    transition: background 0.3s ease;
+}
+
+body.light-mode {
+    background: linear-gradient(135deg,#f0fdf4,#dcfce7,#bbf7d0);
+}
+
+.orders-dashboard {
+    padding: 25px;
+    max-width: 1600px;
+    margin: auto;
+}
+
+/* HEADER */
+.dash-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+    background: linear-gradient(135deg,#03492c,#0b7a49,#16c46d);
+    color: white;
+    padding: 25px;
+    border-radius: 16px;
+    margin-bottom: 25px;
+}
+
+.header-left h1 {
+    margin: 0;
+    font-size: 1.8rem;
+    font-weight: 800;
+}
+
+.header-left p {
+    margin: 8px 0 0;
+    opacity: 0.9;
+}
+
+.meta {
+    margin-top: 8px;
+    display: flex;
+    gap: 8px;
+    background: rgba(255,255,255,0.15);
+    padding: 6px 12px;
+    border-radius: 8px;
+    width: fit-content;
+}
+
+.dash-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.dash-actions input {
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: none;
+    outline: none;
+    min-width: 200px;
+}
+
+.btn {
+    padding: 10px 16px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.btn.primary { background: #facc15; color: #1a1a1a; }
+.btn.dark { background: #1e293b; color: white; }
+.btn.secondary { background: white; color: var(--primary); }
+.btn.theme { background: rgba(255,255,255,0.2); color: white; }
+
+/* ANALYTICS */
+.analytics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.card {
+    background: var(--card);
+    padding: 20px;
+    text-align: center;
+    border-radius: 14px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    transition: 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+}
+
+.card h3 {
+    margin: 0 0 8px;
+    color: var(--muted);
+    font-size: 0.95rem;
+}
+
+.card p {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--text);
+}
+
+.card small {
+    color: var(--muted);
+    font-size: 0.85rem;
+}
+
+.card.blue { border-top: 4px solid #3b82f6; }
+.card.green { border-top: 4px solid #16a34a; }
+.card.gold { border-top: 4px solid #facc15; }
+.card.orange { border-top: 4px solid #f59e0b; }
+.card.purple { border-top: 4px solid #8b5cf6; }
+
+/* FILTER */
+.filter-bar {
+    margin-bottom: 15px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.filter {
+    padding: 10px 16px;
+    border: none;
+    cursor: pointer;
+    background: #e2e8f0;
+    border-radius: 10px;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+.filter.active, .filter:hover {
+    background: var(--primary);
+    color: white;
+}
+
+/* BULK BAR */
+.bulk-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    padding: 12px 16px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+.bulk-bar button {
+    padding: 10px 16px;
+    border: none;
+    cursor: pointer;
+    border-radius: 10px;
+    font-weight: 700;
+    color: white;
+    margin-left: 8px;
+}
+
+.success { background: #16a34a; }
+.danger { background: #dc2626; }
+
+/* TABLE */
+.orders-table {
+    background: white;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+}
+
+.table-wrap {
+    overflow-x: auto;
+}
+
+.orders-table table {
+    width: 100%;
+    min-width: 900px;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.orders-table th {
+    background: var(--primary);
+    color: white;
+    padding: 14px;
+    text-align: left;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    position: sticky;
+    top: 0;
+}
+
+.orders-table td {
+    padding: 14px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.order-row:hover {
+    background: #f8fffb;
+}
+
+.product-tag {
+    background: #e0f2fe;
+    color: #0369a1;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    color: white;
+}
+
+.pending { background: #f59e0b; }
+.confirmed { background: #16a34a; }
+
+.action-group {
+    display: flex;
+    gap: 6px;
+}
+
+.mini-btn {
+    border: none;
+    padding: 6px 10px;
+    cursor: pointer;
+    border-radius: 8px;
+    font-size: 16px;
+    color: white;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.mini-btn.blue { background: #3b82f6; }
+.mini-btn.orange { background: #f59e0b; }
+.mini-btn.green { background: #16a34a; }
+.mini-btn.red { background: #dc2626; }
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--muted);
+}
+
+/* PRINT */
+@media print {
+    .no-print { display: none !important; }
+
+    body {
+        background: white !important;
+        margin: 0;
+        padding: 0;
+        font-size: 12px;
+    }
+
+    .orders-dashboard {
+        padding: 0;
+        background: white;
+    }
+
+    .dash-header {
+        border: none;
+        box-shadow: none;
+        margin-bottom: 15px;
+        background: white;
+        color: black;
+    }
+
+    .analytics-grid {
+        grid-template-columns: repeat(3,1fr);
+        gap: 8px;
+        margin-bottom: 15px;
+    }
+
+    .card {
+        border: 1px solid #ccc;
+        background: white;
+        page-break-inside: avoid;
+        box-shadow: none;
+    }
+
+    .orders-table table {
+        width: 100%;
+        font-size: 11px;
+        border: 1px solid #000;
+    }
+
+    .orders-table th,
+    .orders-table td {
+        border: 1px solid #000;
+        padding: 6px;
+    }
+
+    .badge {
+        border: 1px solid #000;
+        background: white !important;
+        color: black !important;
+    }
+
+    tr {
+        page-break-inside: avoid;
+    }
+
+    @page {
+        size: A4 landscape;
+        margin: 12mm;
+    }
+}
+</style>
+
+{% endblock %}

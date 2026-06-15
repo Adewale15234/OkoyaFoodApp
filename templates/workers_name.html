@@ -1,0 +1,453 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="workers-page">
+
+    <!-- HEADER -->
+    <section class="workers-header">
+        <div class="header-left">
+            <img src="{{ url_for('static', filename='logo.png') }}" class="header-logo">
+            <div>
+                <h1>Registered Workers Directory</h1>
+                <p>Okoya Food Company Limited — HR Personnel Management System</p>
+            </div>
+        </div>
+
+        <div class="header-right">
+            <a href="{{ url_for('admin.admin_dashboard') }}" class="back-btn">← Dashboard</a>
+        </div>
+    </section>
+
+    <!-- SEARCH -->
+    <section class="search-section">
+        <input type="text" id="searchInput" placeholder="Search worker by name, code, phone or position...">
+    </section>
+
+    <!-- TABLE -->
+    <section class="table-wrapper">
+        <table id="workers-table">
+            <thead>
+                <tr>
+                    <th>Code</th>
+                    <th>Name</th>
+                    <th>Phone</th>
+                    <th>Position</th>
+                    <th>Employment Date</th>
+                    <th>Email</th>
+                    <th>Details</th>
+                    <th>Edit</th>
+                    <th>Delete</th>
+                    <th>Status</th>
+                    <th>Letter</th>
+                </tr>
+            </thead>
+
+            <tbody>
+            {% for worker in workers %}
+                <!-- MAIN ROW -->
+                <tr class="worker-row">
+                    <td data-label="Code">{{ worker.worker_code or '—' }}</td>
+                    <td data-label="Name">{{ worker.name }}</td>
+                    <td data-label="Phone">{{ worker.phone_number or '—' }}</td>
+                    <td data-label="Position">{{ worker.position or '—' }}</td>
+                    <td data-label="Employment Date">
+                        {{ worker.date_of_employment.strftime('%Y-%m-%d') if worker.date_of_employment else '—' }}
+                    </td>
+                    <td data-label="Email">{{ worker.email or '—' }}</td>
+
+                    <td>
+                        <button onclick="toggleDetails(this)" data-id="{{ worker.id }}" class="action-btn view-btn">
+    Details
+</button>
+                    </td>
+
+                    <td>
+                        <a href="{{ url_for('workers.edit_worker', worker_id=worker.id) }}" class="action-btn edit-btn">Edit</a>
+                    </td>
+
+                    <td>
+                        <form action="{{ url_for('workers.delete_worker', worker_id=worker.id) }}" 
+                            method="post" 
+                            onsubmit="return confirm('Delete this worker permanently?');">
+                        <button type="submit" class="action-btn delete-btn">Delete</button>
+                        </form>
+                    </td>
+
+                <td>
+                    {% if worker.is_active %}
+                        <span class="status active">Active</span>
+                    {% else %}
+                        <span class="status inactive">Inactive</span>
+                    {% endif %}
+
+                    <br><br>
+
+                    <form action="{{ url_for('workers.toggle_worker_status', worker_id=worker.id) }}" method="post">
+
+                        <input type="text"
+                            name="reason"
+                            placeholder="Enter reason (required)"
+                            required
+                            style="padding:6px; width:250px; margin-right:10px;">
+
+                        {% if worker.is_active %}
+                            <input type="hidden" name="action" value="toggle">
+                            <button type="submit" class="action-btn delete-btn">
+                                Deactivate
+                            </button>
+                        {% else %}
+                            <input type="hidden" name="action" value="toggle">
+                            <button type="submit" class="action-btn edit-btn">
+                                Activate
+                            </button>
+                        {% endif %}
+
+                    </form>
+                </td>
+
+                    <td>
+                        <a href="{{ url_for('workers.worker_letter', worker_id=worker.id) }}" class="action-btn letter-btn">View</a>
+                    </td>
+                </tr>
+
+                <!-- DETAILS -->
+                <tr id="details-{{ worker.id }}" class="details-row" style="display:none;">
+                    <td colspan="11">
+
+                        <div class="details-box">
+
+                            {% if worker.status_reason %}
+                            <div class="detail-card full">
+                                <h3>⚠ HR Record</h3>
+                                <p><strong>Status:</strong> {{ worker.status_type }}</p>
+                                <p><strong>Reason:</strong> {{ worker.status_reason }}</p>
+                                <p><strong>Date:</strong> {{ worker.status_date }}</p>
+
+                                <hr>
+
+                                <h3>Official Letter</h3>
+
+                                <pre>{{ worker.status_letter }}</pre>
+
+                                <button onclick="window.print()" class="action-btn edit-btn">
+                                    🖨 Print Letter
+                                </button>
+                            </div>
+                            
+                            {% endif %}
+
+                            <div class="detail-card">
+                                <h3>Staff Identity Card</h3>
+
+                                <a href="{{ url_for('workers.worker_id_card', worker_id=worker.id) }}" class="action-btn letter-btn">Generate ID Card</a>
+                            </div>
+                            
+                            <div class="detail-card">
+                                <h3>Passport</h3>
+                                {% if worker.passport %}
+                                    <img src="{{ worker.passport }}?v={{ worker.updated_at.timestamp() if worker.updated_at else worker.id }}" 
+                                        class="passport-img"
+                                        alt="{{ worker.name }}">
+                                {% else %}
+                                    <p>No passport uploaded</p>
+                                {% endif %}
+                            </div>
+
+                            <div class="detail-card">
+                                <h3>Personal Info</h3>
+                                <p><strong>DOB:</strong> {{ worker.date_of_birth.strftime('%Y-%m-%d') if worker.date_of_birth else '—' }}</p>
+                                <p><strong>Gender:</strong> {{ worker.gender or '—' }}</p>
+                                <p><strong>Qualification:</strong> {{ worker.qualifications or '—' }}</p>
+                                <p><strong>National ID:</strong> {{ worker.national_id or '—' }}</p>
+                                <p><strong>Nationality:</strong> {{ worker.nationality or '—' }}</p>
+                                <p><strong>Email:</strong> {{ worker.email or '—' }}</p>
+                            </div>
+
+                            <div class="detail-card">
+                                <h3>Residence</h3>
+                                <p><strong>Home:</strong> {{ worker.home_address or '—' }}</p>
+                                <p><strong>Ethnic Group:</strong> {{ worker.ethnic_group or '—' }}</p>
+                                <p><strong>Residence:</strong> {{ worker.place_of_residence or '—' }}</p>
+                                <p><strong>Disability:</strong> {{ worker.disability or '—' }}</p>
+                            </div>
+
+                            <div class="detail-card">
+                                <h3>Finance</h3>
+                                <p><strong>Salary:</strong> {{ worker.amount_of_salary or '—' }}</p>
+                                <p><strong>Guarantor:</strong> {{ worker.guarantor or '—' }}</p>
+                                <p><strong>Bank:</strong> {{ worker.bank_name or '—' }}</p>
+                                <p><strong>Account:</strong> {{ worker.bank_account or '—' }}</p>
+                            </div>
+
+                        </div>
+
+                    </td>
+                </tr>
+
+            {% endfor %}
+            </tbody>
+        </table>
+    </section>
+
+</div>
+
+<style>
+
+body{
+    background:linear-gradient(135deg,#042d18,#066839,#10c46d);
+    font-family:'Poppins',sans-serif;
+}
+
+/* PAGE */
+.workers-page{
+    width:96%;
+    max-width:1500px;
+    margin:auto;
+    padding:30px 15px;
+}
+
+/* HEADER */
+.workers-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    background:linear-gradient(135deg,#024628,#05894d,#0bd16c);
+    padding:25px 30px;
+    border-radius:20px;
+    box-shadow:0 15px 35px rgba(0,0,0,0.25);
+    margin-bottom:25px;
+}
+
+.header-left{
+    display:flex;
+    align-items:center;
+    gap:20px;
+    flex-wrap:wrap;
+}
+
+.header-logo{
+    width:120px;
+    height:120px;
+    object-fit:cover;
+    border-radius:18px;
+    border:4px solid rgba(255,255,255,0.25);
+    background:#fff;
+}
+
+.header-left h1{
+    margin:0;
+    color:#fff;
+    font-size:2rem;
+    font-weight:900;
+}
+
+.header-left p{
+    margin-top:5px;
+    color:#d9ffe9;
+}
+
+.back-btn{
+    background:#fff;
+    color:#026533;
+    padding:12px 24px;
+    border-radius:10px;
+    text-decoration:none;
+    font-weight:700;
+}
+
+/* SEARCH */
+.search-section{
+    margin-bottom:20px;
+}
+
+.search-section input{
+    width:100%;
+    padding:16px;
+    border:none;
+    border-radius:12px;
+    font-size:16px;
+    box-shadow:0 6px 18px rgba(0,0,0,0.18);
+}
+
+/* TABLE */
+.table-wrapper{
+    overflow:auto;
+    max-height:75vh;
+    border-radius:18px;
+    background:#fff;
+    box-shadow:0 12px 30px rgba(0,0,0,0.22);
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    min-width:1400px;
+}
+
+thead{
+    position:sticky;
+    top:0;
+    z-index:100;
+}
+
+th{
+    background:#03492c;
+    color:#fff;
+    padding:16px;
+    font-size:14px;
+    text-transform:uppercase;
+}
+
+td{
+    padding:14px;
+    border-bottom:1px solid #ddd;
+    font-size:14px;
+}
+
+.worker-row:hover{
+    background:#f1fff7;
+}
+
+/* BUTTONS */
+.action-btn{
+    padding:8px 12px;
+    border:none;
+    border-radius:8px;
+    color:white;
+    font-weight:700;
+    text-decoration:none;
+    cursor:pointer;
+    display:inline-block;
+    font-size:13px;
+}
+
+.view-btn{background:#16a34a;}
+.edit-btn{background:#2563eb;}
+.delete-btn{background:#dc2626;}
+.letter-btn{background:#9333ea;}
+
+.status{
+    font-weight:700;
+    padding:6px 10px;
+    border-radius:20px;
+    font-size:12px;
+}
+
+.active{
+    background:#d1fae5;
+    color:#065f46;
+}
+
+.inactive{
+    background:#fee2e2;
+    color:#991b1b;
+}
+
+/* DETAILS */
+.details-box{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    gap:20px;
+    padding:25px;
+    background:#f8fafc;
+}
+
+.detail-card{
+    background:white;
+    border-radius:14px;
+    padding:20px;
+    box-shadow:0 8px 20px rgba(0,0,0,0.08);
+}
+
+.detail-card.full{
+    grid-column:1/-1;
+}
+
+.detail-card h3{
+    margin-top:0;
+    color:#065f46;
+}
+
+.passport-img{
+    width:150px;
+    height:180px;
+    object-fit:cover;
+    border-radius:10px;
+    border:2px solid #ddd;
+}
+
+pre{
+    white-space:pre-wrap;
+    background:#f1f5f9;
+    padding:15px;
+    border-radius:10px;
+    max-height:400px;
+    overflow:auto;
+}
+
+/* MOBILE */
+@media(max-width:768px){
+
+    .workers-header{
+        flex-direction:column;
+        text-align:center;
+        gap:20px;
+    }
+
+    .header-left{
+        flex-direction:column;
+    }
+
+    .header-logo{
+        width:90px;
+        height:90px;
+    }
+
+    .header-left h1{
+        font-size:1.4rem;
+    }
+
+    table{
+        min-width:1200px;
+    }
+
+}
+
+</style>
+
+<script>
+
+function toggleDetails(btn) {
+
+    const id = btn.dataset.id;
+
+    const row = document.getElementById('details-' + id);
+    const hidden = row.style.display === 'none';
+
+    document.querySelectorAll('.details-row').forEach(r => {
+        r.style.display = 'none';
+    });
+
+    if (hidden) {
+        row.style.display = 'table-row';
+    }
+}
+
+/* SEARCH */
+document.getElementById('searchInput').addEventListener('keyup', function(){
+
+    let value=this.value.toLowerCase();
+
+    let rows=document.querySelectorAll('.worker-row');
+
+    rows.forEach(row=>{
+        let text=row.innerText.toLowerCase();
+        row.style.display=text.includes(value) ? '' : 'none';
+    });
+
+});
+
+</script>
+
+{% endblock %}

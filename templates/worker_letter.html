@@ -1,0 +1,667 @@
+{% extends 'base.html' %}
+
+{% block title %}Worker Letter | {{ worker.name }} | Okoya Food{% endblock %}
+
+{% block content %}
+
+<div class="letter-page" id="print-area">
+
+    <header class="letter-header no-print">
+        <div class="header-left">
+            <img src="{{ url_for('static', filename='logo.png') }}" class="letter-logo" alt="Logo">
+            <div>
+                <h1>HR Letter Center</h1>
+                <p>Official Disciplinary & Reinstatement Letters</p>
+            </div>
+        </div>
+
+        <div class="header-actions">
+            <button onclick="printSelection()" class="btn print-btn">🖨 Select & Print</button>
+            <button onclick="window.print()" class="btn print-btn">🖨 Print Full Page</button>
+            <a href="{{ url_for('workers.workers_name') }}" class="btn back-btn">← Back to Workers</a>
+        </div>
+    </header>
+
+    <!-- FIT TO PAGE CONTROLS -->
+    <div class="fit-controls no-print">
+        <div class="fit-controls-inner">
+            <span class="fit-label">📄 Fit to Page</span>
+            <input type="range" id="scaleSlider" min="80" max="120" value="100" step="1">
+            <span id="scaleValue">100%</span>
+            <button type="button" class="btn fit-btn" onclick="setScale(100)">100%</button>
+            <button type="button" class="btn fit-btn" onclick="setScale(110)">110%</button>
+            <button type="button" class="btn fit-btn" onclick="setScale(120)">120%</button>
+        </div>
+    </div>
+
+    <div class="letter-container">
+        
+        <!-- PRINT WRAPPER -->
+        <div class="print-wrapper" id="printWrapper">
+
+            <div class="meta-bar">
+                <span><strong>Worker ID:</strong> {{ worker.worker_code }}</span>
+                <span><strong>Dept:</strong> HR Department - OKOYA FOOD LTD</span>
+                <span><strong>Date:</strong> {{ current_date if current_date else now.strftime('%d %B %Y') if now else '' }}</span>
+            </div>
+
+            <div class="company-header">
+                <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo">
+                <h1>OKOYA FOOD COMPANY LIMITED</h1>
+                <p>Staff Management & HR Department</p>
+
+                {% if worker.status_type %}
+                    <div class="status-badge status-{{ worker.status_type|lower }}">
+                        {{ worker.status_type|upper }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="letter-title">
+                OFFICIAL HR DISCIPLINARY / REINSTATEMENT LETTER
+            </div>
+
+            <div class="info-box">
+                <div class="info-grid">
+                    <div>
+                        <p><strong>Name:</strong> {{ worker.name }}</p>
+                        <p><strong>Code:</strong> {{ worker.worker_code }}</p>
+                        <p><strong>Position:</strong> {{ worker.position or '—' }}</p>
+                        <p><strong>Phone:</strong> {{ worker.phone_number or '—' }}</p>
+                        <p><strong>Department:</strong> {{ worker.department or '—' }}</p>
+                    </div>
+
+                    <div class="passport-box">
+                        <div class="passport-box">
+                            {% if worker.passport %}
+                                <img src="{{ worker.passport }}" 
+                                class="worker-passport" 
+                                alt="{{ worker.name }}"
+                                onerror="this.src='{{ url_for('static', filename='logo.png') }}'">
+                            {% else %}
+                                <img src="{{ url_for('static', filename='logo.png') }}" 
+                                    class="worker-passport" 
+                                    alt="Default">
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>          
+
+            <hr class="divider">
+
+            {% if worker.status_letter %}
+                <div class="letter-content" id="letterContent">
+                    {{ worker.status_letter }}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <h3>No HR letter generated yet</h3>
+                    <p>Generate a letter from the worker profile to view it here.</p>
+                </div>
+            {% endif %}
+
+            <div class="signature">
+                <div class="sig-box">
+                    <div class="signature-line"></div>
+                    <span>HR Manager</span>
+                </div>
+
+                <div class="sig-box">
+                    <div class="signature-line"></div>
+                    <span>Managing Director</span>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="btn-area no-print">
+            <button class="btn print-btn" onclick="printSelection()">🖨 Select & Print Letter Only</button>
+            <button class="btn print-btn" onclick="window.print()">🖨 Print Full Page</button>
+            <a href="{{ url_for('workers.workers_name') }}" class="btn back-btn">← Back to Workers</a>
+            <form action="{{ url_for('workers.send_worker_letter', worker_id=worker.id) }}" method="POST" style="display:inline;">
+                <button type="submit" class="btn email-btn">📧 Send Email</button>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+<script>
+function setScale(val) {
+    const printWrapper = document.getElementById('printWrapper');
+    const scaleValue = document.getElementById('scaleValue');
+    const slider = document.getElementById('scaleSlider');
+    
+    const scale = val / 100;
+    printWrapper.style.setProperty('--print-scale', scale);
+    scaleValue.textContent = val + '%';
+    slider.value = val;
+    localStorage.setItem('letterScale', val);
+}
+
+function printSelection() {
+    const contentEl = document.getElementById('letterContent');
+    
+    if (!contentEl) {
+        alert('No letter content found to print.');
+        return;
+    }
+    
+    const content = contentEl.innerText;
+    
+    const printWindow = window.open('', '', 'height=800,width=800');
+    if (!printWindow) {
+        alert('Popup blocked. Allow popups for this site.');
+        return;
+    }
+    
+    printWindow.document.write(`
+        <html>
+        <head>
+            <title>Print Letter - {{ worker.name }}</title>
+            <style>
+                body {
+                    font-family: Arial, sans-serif;
+                    font-size: 12pt;
+                    line-height: 1.6;
+                    color: #000;
+                    padding: 15mm;
+                    white-space: pre-wrap;
+                }
+                @page {
+                    size: A4;
+                    margin: 15mm;
+                }
+            </style>
+        </head>
+        <body onload="window.print(); window.close()">
+            ${content.replace(/</g, '&lt;').replace(/>/g, '&gt;')}
+        </body>
+        </html>
+    `);
+    printWindow.document.close();
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    const slider = document.getElementById('scaleSlider');
+    const savedScale = localStorage.getItem('letterScale') || 100;
+    
+    setScale(savedScale);
+    slider.value = savedScale;
+    
+    slider.addEventListener('input', function() {
+        setScale(this.value);
+    });
+});
+</script>
+
+<style>
+:root {
+    --primary: #004080;
+    --primary-dark: #003060;
+    --success: #28a745;
+    --danger: #dc3545;
+    --warning: #ffc107;
+    --bg: #eef2f7;
+    --card: #fff;
+    --text: #1e293b;
+    --muted: #64748b;
+}
+
+body {
+    background: linear-gradient(135deg,#eef2f7,#dbe7f5,#c7daf0);
+    font-family: 'Poppins', Arial, sans-serif;
+    margin: 0;
+}
+
+.letter-page {
+    width: 100%;
+    max-width: 1200px;
+    margin: auto;
+    padding: 25px;
+}
+
+.fit-controls {
+    background: white;
+    padding: 15px 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    border: 1px solid #e2e8f0;
+}
+
+.fit-controls-inner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.fit-label {
+    font-weight: 700;
+    color: var(--primary);
+    font-size: 14px;
+}
+
+#scaleSlider {
+    flex: 1;
+    max-width: 200px;
+    height: 6px;
+    border-radius: 5px;
+    background: #e2e8f0;
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+    cursor: pointer;
+}
+
+/* Chrome/Safari thumb */
+#scaleSlider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--primary);
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+/* Firefox thumb */
+#scaleSlider::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--primary);
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+/* Firefox track */
+#scaleSlider::-moz-range-track {
+    background: #e2e8f0;
+    height: 6px;
+    border-radius: 5px;
+}
+
+#scaleSlider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--primary);
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+#scaleValue {
+    font-weight: 700;
+    color: var(--text);
+    min-width: 45px;
+    text-align: center;
+    background: #f1f5f9;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 13px;
+}
+
+.fit-btn {
+    padding: 6px 12px;
+    font-size: 12px;
+    background: #e2e8f0;
+    color: var(--text);
+}
+
+.fit-btn:hover {
+    background: var(--primary);
+    color: white;
+}
+
+.letter-header {
+    background: linear-gradient(135deg,#004080,#0056b3,#007bff);
+    color: white;
+    padding: 20px 25px;
+    border-radius: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 25px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.letter-logo {
+    width: 70px;
+    height: 70px;
+    object-fit: contain;
+    border-radius: 12px;
+    background: white;
+    padding: 5px;
+}
+
+.header-left h1 {
+    margin: 0;
+    font-size: 1.6rem;
+    font-weight: 800;
+}
+
+.header-left p {
+    margin: 5px 0 0;
+    opacity: 0.9;
+}
+
+.header-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.letter-container {
+    background: var(--card);
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 12px 35px rgba(0,0,0,0.12);
+}
+
+.print-wrapper {
+    width: 100%;
+    transform: scale(var(--print-scale));
+    transform-origin: top left;
+    width: calc(100% / var(--print-scale));
+}
+
+.meta-bar {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--muted);
+    background: #f8fafc;
+    padding: 12px 16px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.company-header {
+    text-align: center;
+    border-bottom: 2px solid var(--primary);
+    padding-bottom: 20px;
+    margin-bottom: 25px;
+}
+
+.company-header img {
+    width: 90px;
+    height: 90px;
+    object-fit: contain;
+}
+
+.company-header h1 {
+    margin: 12px 0 5px;
+    font-size: 22px;
+    color: var(--primary);
+    font-weight: 800;
+}
+
+.company-header p {
+    margin: 0;
+    font-size: 14px;
+    color: var(--muted);
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    margin-top: 12px;
+    color: white;
+}
+
+.status-warning { background: #f59e0b; }
+.status-danger { background: var(--danger); }
+.status-success { background: var(--success); }
+.status-deactivated { background: var(--danger); }
+.status-reactivated { background: var(--success); }
+.status-active { background: var(--success); }
+.status-inactive { background: var(--muted); }
+
+.letter-title {
+    text-align: center;
+    font-size: 18px;
+    font-weight: 700;
+    margin: 25px 0;
+    color: #111;
+    letter-spacing: 0.5px;
+}
+
+.info-box {
+    background: #f8fafc;
+    padding: 20px;
+    border-left: 4px solid var(--primary);
+    border-radius: 10px;
+    margin-bottom: 25px;
+}
+
+.info-grid {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.info-box p {
+    margin: 8px 0;
+    font-size: 14px;
+    line-height: 1.8;
+}
+
+.info-box strong {
+    color: var(--primary);
+}
+
+.worker-passport {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 12px;
+    border: 2px solid var(--primary);
+}
+
+.divider {
+    border: none;
+    height: 2px;
+    background: linear-gradient(90deg,transparent,var(--primary),transparent);
+    margin: 25px 0;
+}
+
+.letter-content {
+    background: #f8fafc;
+    border-left: 5px solid var(--primary);
+    padding: 25px;
+    font-size: 14px;
+    line-height: 1.9;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    color: var(--text);
+    border-radius: 10px;
+    display: block !important;
+    overflow: visible !important;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 50px 20px;
+    color: var(--muted);
+}
+
+.empty-state h3 {
+    color: var(--text);
+    margin-bottom: 10px;
+}
+
+.signature {
+    margin-top: 60px;
+    display: flex;
+    justify-content: space-between;
+    gap: 40px;
+    flex-wrap: wrap;
+}
+
+.sig-box {
+    text-align: center;
+    flex: 1;
+    min-width: 200px;
+}
+
+.signature-line {
+    margin-top: 50px;
+    border-top: 1px solid #000;
+    width: 220px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.sig-box span {
+    display: block;
+    margin-top: 10px;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.btn-area {
+    margin-top: 35px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.btn {
+    padding: 12px 20px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    font-weight: 700;
+    text-decoration: none;
+    display: inline-block;
+    transition: 0.2s;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.print-btn {
+    background: var(--success);
+    color: white;
+}
+
+.email-btn {
+    background: #007bff;
+    color: white;
+}
+
+.back-btn {
+    background: var(--primary);
+    color: white;
+}
+
+/* PRINT CSS - NO SCALING, NO CUTTING */
+@media print {
+    @page {
+        size: A4;
+        margin: 15mm;
+    }
+
+    html, body {
+        background: white !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        font-size: 11pt !important;
+        color: black !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .no-print {
+        display: none !important;
+    }
+
+    .letter-page {
+        max-width: 100% !important;
+        width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        box-shadow: none !important;
+    }
+
+    .letter-container {
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        padding: 0 !important;
+        background: white !important;
+    }
+
+    /* CRITICAL: Remove scaling in print */
+    .print-wrapper {
+        transform: none !important;
+        width: 100% !important;
+    }
+
+    .letter-content {
+        background: white !important;
+        color: black !important;
+        border-left: 3px solid black !important;
+        white-space: pre-wrap !important;
+        word-wrap: break-word !important;
+        font-size: 11pt !important;
+        line-height: 1.6 !important;
+        padding: 15px !important;
+        display: block !important;
+        overflow: visible !important;
+        page-break-inside: auto !important;
+        break-inside: auto !important;
+    }
+
+    .company-header h1,
+    .company-header p,
+    .letter-title,
+    .info-box p,
+    .info-box strong,
+    .meta-bar span,
+    .sig-box span {
+        color: black !important;
+    }
+
+    .meta-bar, .info-box {
+        background: white !important;
+        border: 1px solid #999 !important;
+    }
+
+    .company-header img,
+    .worker-passport,
+    .letter-logo {
+        width: 70px !important;
+        height: 70px !important;
+    }
+
+    .info-box, .signature, .company-header, .letter-title {
+        page-break-inside: avoid;
+    }
+}
+</style>
+
+{% endblock %}

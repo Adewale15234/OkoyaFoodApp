@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Okoya Worker Registration (HR System)</title>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+<style>
+/* =========================
+   GLOBAL RESET
+========================= */
+body {
+    background: #f3f6fb;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/* =========================
+   MAIN CONTAINER
+========================= */
+.register-container {
+    max-width: 1200px;
+    margin: 20px auto;
+    background: #fff;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    border: 1px solid #ddd;
+}
+
+/* =========================
+   BACK BUTTON
+========================= */
+.back-dashboard a {
+    text-decoration: none;
+    font-weight: bold;
+    color: #004080;
+}
+.back-dashboard a:hover {
+    text-decoration: underline;
+}
+
+/* =========================
+   HEADER
+========================= */
+.official-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    border-bottom: 2px solid #004080;
+    padding-bottom: 15px;
+    gap: 15px;
+}
+
+.company-logo img,
+.passport-preview img {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+}
+
+.official-header {
+    flex: 1;
+    text-align: center;
+    min-width: 250px;
+}
+
+.company-name {
+    color: #0a7a0a;
+    font-size: 1.8rem;
+    margin: 0;
+    font-weight: 800;
+}
+
+.company-motto {
+    color: goldenrod;
+    font-size: 0.95rem;
+    margin: 5px 0;
+}
+
+.company-address {
+    background: black;
+    color: white;
+    display: inline-block;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+}
+
+/* =========================
+   FORM LAYOUT
+========================= */
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px 25px;
+    margin-top: 20px;
+}
+
+.form-section-title {
+    grid-column: span 3;
+    font-weight: bold;
+    color: #004080;
+    margin-top: 25px;
+    border-left: 4px solid #004080;
+    padding-left: 8px;
+    font-size: 1.1rem;
+    break-after: avoid;
+}
+
+label {
+    font-weight: bold;
+    font-size: 13px;
+    display: block;
+    margin-bottom: 4px;
+    color: #111;
+}
+
+input, select, textarea {
+    width: 100%;
+    padding: 7px;
+    border: 1px solid #bbb;
+    border-radius: 6px;
+    outline: none;
+    font-size: 14px;
+    box-sizing: border-box;
+    background: #fff;
+}
+
+textarea {
+    resize: vertical;
+    min-height: 60px;
+}
+
+input:focus, select:focus, textarea:focus {
+    border-color: #004080;
+    box-shadow: 0 0 5px rgba(0,64,128,0.2);
+}
+
+/* =========================
+   VALIDATION STATES
+========================= */
+.invalid {
+    border: 2px solid red!important;
+}
+
+.valid {
+    border: 2px solid green!important;
+}
+
+/* =========================
+   LIVE INFO BOX
+========================= */
+.info-box {
+    background: #eef6ff;
+    padding: 10px;
+    border-left: 5px solid #004080;
+    margin-top: 10px;
+    font-size: 13px;
+    border-radius: 6px;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+.form-submit {
+    text-align: center;
+    margin-top: 25px;
+}
+
+.form-submit button,
+.form-submit input {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    margin: 5px;
+    font-size: 15px;
+}
+
+.form-submit button {
+    background: #004080;
+    color: white;
+}
+
+.form-submit button:hover {
+    background: #0066cc;
+}
+
+.btn-cancel {
+    background: #6b7280!important;
+    color: white;
+}
+
+.btn-cancel:hover {
+    background: #4b5563!important;
+}
+
+/* =========================
+   PASSPORT UPLOAD
+========================= */
+.passport-box {
+    margin-top: 10px;
+}
+
+/* =========================
+   PRINTABLE SUMMARY
+========================= */
+.print-summary {
+    display: none;
+}
+
+.print-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px 20px;
+    margin-top: 15px;
+}
+
+.print-field {
+    break-inside: avoid;
+    page-break-inside: avoid;
+}
+
+.print-label {
+    font-weight: bold;
+    font-size: 11pt;
+    color: #111;
+    margin-bottom: 3px;
+}
+
+.print-value {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid #bbb;
+    border-radius: 6px;
+    font-size: 11pt;
+    background: #fff;
+    min-height: 22px;
+    box-sizing: border-box;
+}
+
+.print-success {
+    background: #d4edda;
+    color: #155724;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #c3e6cb;
+    margin-bottom: 15px;
+    text-align: center;
+    font-weight: bold;
+}
+
+/* =========================
+   PRINT MODE - A4 FULL FIT
+========================= */
+@media print {
+    @page {
+        size: A4;
+        margin: 12mm 12mm; /* balanced margins so nothing cuts */
+    }
+
+    html, body {
+        width: 100%;
+        height: 100%;
+        background: white;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        font-size: 10pt;
+    }
+
+.back-dashboard,
+.no-print,
+.form-submit,
+#registerForm {
+        display: none!important;
+    }
+
+.print-summary {
+        display: block!important;
+        width: 100%;
+        height: auto;
+    }
+
+.register-container {
+        width: 100%;
+        max-width: none;
+        margin: 0;
+        padding: 0;
+        box-shadow: none;
+        border: none;
+        border-radius: 0;
+        background: white;
+    }
+
+.official-header-row {
+        border-bottom: 1px solid #000;
+        padding-bottom: 8px;
+        margin-bottom: 10px;
+        gap: 12px;
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+
+.company-logo img,
+.passport-preview img {
+        width: 80px;
+        height: 80px;
+    }
+
+.company-name {
+        font-size: 16pt;
+        margin: 0;
+        color: #000;
+        font-weight: 800;
+    }
+
+.company-motto {
+        font-size: 9pt;
+        margin: 3px 0;
+        color: #000;
+    }
+
+.company-address {
+        font-size: 8pt;
+        background: #000;
+        color: #fff;
+        padding: 4px 8px;
+        border-radius: 4px;
+    }
+
+h3 {
+        font-size: 11pt;
+        margin: 4px 0;
+        color: #000;
+    }
+
+.form-section-title {
+        grid-column: span 2;
+        font-size: 12pt;
+        color: #000;
+        border-left: 3px solid #000;
+        margin-top: 12px;
+        margin-bottom: 6px;
+        padding-left: 6px;
+        break-after: avoid;
+        page-break-after: avoid;
+    }
+
+.print-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px 20px;
+        margin-top: 10px;
+    }
+
+.print-field {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+
+.print-label {
+        font-weight: bold;
+        font-size: 10pt;
+        color: #111;
+        margin-bottom: 3px;
+    }
+
+.print-value {
+        width: 100%;
+        padding: 6px 8px;
+        border: 1px solid #999;
+        border-radius: 5px;
+        font-size: 10pt;
+        background: #fff;
+        min-height: 24px;
+        box-sizing: border-box;
+    }
+
+.print-success {
+        background: #e8f5e9;
+        color: #1b5e20;
+        padding: 8px;
+        border-radius: 5px;
+        border: 1px solid #a5d6a7;
+        margin-bottom: 10px;
+        text-align: center;
+        font-weight: bold;
+        font-size: 10pt;
+    }
+
+.signature-area {
+        margin-top: 40px;
+        text-align: center;
+    }
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+.form-grid,
+.print-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+.form-section-title {
+        grid-column: span 2;
+    }
+}
+
+@media (max-width: 600px) {
+.form-grid,
+.print-grid {
+        grid-template-columns: 1fr;
+    }
+.form-section-title {
+        grid-column: span 1;
+    }
+}
+</style>
+</head>
+
+<body {% if worker %}class="has-worker"{% endif %}>
+
+<div class="back-dashboard no-print">
+    <a href="{{ url_for('admin.admin_dashboard') }}">← Back to Dashboard</a>
+</div>
+
+<div class="register-container">
+
+<!-- HEADER -->
+<div class="official-header-row">
+    <div class="company-logo">
+        <img src="{{ url_for('static', filename='android-chrome-512x512.png') }}" alt="Logo">
+    </div>
+
+    <div class="official-header">
+        <h1 class="company-name">OKOYA FOOD COMPANY LIMITED</h1>
+        <h3 class="company-motto">POVERTY ERADICATION • EQUALITY • PRODUCTIVITY</h3>
+        <p class="company-address">Shaki, Oyo State, Nigeria</p>
+        <h3>WORKER REGISTRATION SYSTEM</h3>
+    </div>
+
+    <div class="passport-preview">
+        {% if worker and worker.passport %}
+        <img src="{{ url_for('uploaded_file', filename=worker.passport) }}" alt="Passport">
+        {% else %}
+        <img id="passportPreview" alt="Passport Preview">
+        {% endif %}
+    </div>
+</div>
+
+<!-- LIVE INFO -->
+<div class="info-box no-print">
+    Age: <span id="ageDisplay">--</span> |
+    Salary Status: <span id="salaryStatus">Pending</span> |
+    NIN Status: <span id="ninStatus">Not Verified</span>
+</div>
+
+<!-- FLASH MESSAGES -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }}" style="padding:10px; margin:10px 0; border-radius:6px; background:#fee; color:#c00; border:1px solid #c00;">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+<!-- PRINTABLE SUMMARY -->
+<div class="print-summary" id="printSummary">
+    {% if worker %}
+    <div class="print-success">
+        ✓ Worker Registered Successfully - Worker Code: {{ worker.worker_code }}
+    </div>
+
+    <div class="form-section-title">Registered Worker Information</div>
+
+    <div class="print-grid">
+        <div class="print-field">
+            <div class="print-label">Full Name</div>
+            <div class="print-value">{{ worker.name }}</div>
+        </div>
+        <div class="print-field">
+            <div class="print-label">Phone Number</div>
+            <div class="print-value">{{ worker.phone_number }}</div>
+        </div>
+        <div class="print-field">
+            <div class="print-label">Email</div>
+            <div class="print-value">{{ worker.email }}</div>
+        </div>
+        <div class="print-field">
+            <div class="print-label">Date of Birth</div>
+            <div class="print-value">{{ worker.date_of_birth }}</div>
+        </div>
+        <div class="print-field">
+            <div class="print-label">Gender</div>
+            <div class="print-value">{{ worker.gender }}</div>
+        </div>
+        <div class="print-field">
+            <div class="print-label">Nationality</div>
+            <div class="print-value">{{ worker.nationality }}</div>
+        </div>
+        <div class="print-field">
+            <div class="print-label">Ethnic Group</div>
+            <div class="print-value">{{ worker.ethnic_group or '-' }}</div>
+        </div>
+        <div class="print-field">
+            <div class="print-label">Home Address</div>
+            <div class="print-value">{{ worker.home_address }}</div>
+        </div>
+        <div class="print-field">
+            <div class="print-label">Place of Residence</div>
+            <div class="print-value">{{ worker.place_of_residence }}</div>
+        </div>
+        <div class="print-field">
+            <div class="print-label">Disability</div>
+            <div class="print-value">{{ worker.disability or 'None' }}</div>
+        </div>
+        <div class="print-field">
+            <div class="print-label">National ID / NIN</div>
+            <div class="print-value">{{ worker.national_id }}</div>
+        </div>
+        <div class="print-field">
+            <div class="print-label">Qualifications</div>
+            <div class="print-value">{{ worker.qualifications }}</div>
+        </div>
+        <div class="print-field">
+            <div class="print-label">Guarantor Name</div>
+            <div class="print-value">{{ worker.guarantor }}</div>
+        </div>
+        <div class="print-field">
+            <div class="print-label">Position</div>
+            <div class="print-value">{{ worker.position }}</div>
+        </div>
+        <div class="print-field">
+            <div class="print-label">Monthly Salary</div>
+            <div class="print-value">₦{{ "{:,.2f}".format(worker.amount_of_salary) }}</div>
+        </div>
+        <div class="print-field">
+            <div class="print-label">Date of Employment</div>
+            <div class="print-value">{{ worker.date_of_employment }}</div>
+        </div>
+        <div class="print-field">
+            <div class="print-label">Bank Name</div>
+            <div class="print-value">{{ worker.bank_name or '-' }}</div>
+        </div>
+        <div class="print-field">
+            <div class="print-label">Account Number</div>
+            <div class="print-value">{{ worker.bank_account or '-' }}</div>
+        </div>
+        <div class="print-field">
+            <div class="print-label">Account Name</div>
+            <div class="print-value">{{ worker.bank_account_name or '-' }}</div>
+        </div>
+    </div>
+
+    {% else %}
+    <div class="form-section-title">Worker Registration Details</div>
+    <div class="print-grid" id="printGrid">
+    </div>
+    {% endif %}
+
+    <div class="signature-area">
+        <p>_________________________ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; _________________________</p>
+        <p>HR Manager &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Managing Director</p>
+    </div>
+</div>
+
+<!-- FORM -->
+<form method="POST" action="{{ url_for('workers.register_worker') }}" enctype="multipart/form-data" id="registerForm">
+<!-- PASSPORT -->
+<div class="passport-box no-print">
+    <label>Upload Passport</label>
+    <input type="file" id="passport" name="passport" accept="image/*">
+    <small>Max 5MB. JPG/PNG/WEBP only</small>
+</div>
+
+<div class="form-grid">
+
+    <!-- PERSONAL INFORMATION -->
+    <div class="form-section-title">Personal Information</div>
+
+    <div>
+        <label>Full Name *</label>
+        <input name="name" required>
+    </div>
+
+    <div>
+        <label>Phone Number *</label>
+        <input name="phone_number" type="tel" required>
+    </div>
+
+    <div>
+        <label>Email *</label>
+        <input name="email" type="email" required>
+    </div>
+
+    <div>
+        <label>Date of Birth *</label>
+        <input type="date" id="dob" name="date_of_birth" required>
+    </div>
+
+    <div>
+        <label>Gender *</label>
+        <select name="gender" required>
+            <option value="">Select Gender</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+        </select>
+    </div>
+
+    <div>
+        <label>Nationality *</label>
+        <input name="nationality" required>
+    </div>
+
+    <div>
+        <label>Ethnic Group</label>
+        <input name="ethnic_group">
+    </div>
+
+    <div>
+        <label>Home Address *</label>
+        <textarea name="home_address" required></textarea>
+    </div>
+
+    <div>
+        <label>Place of Residence *</label>
+        <input name="place_of_residence" required>
+    </div>
+
+    <div>
+        <label>Disability</label>
+        <input name="disability" placeholder="Leave blank if none">
+    </div>
+
+    <!-- IDENTITY VERIFICATION -->
+    <div class="form-section-title">Identity & Qualifications</div>
+
+    <div>
+        <label>National ID / NIN *</label>
+        <input id="nin" name="national_id" required maxlength="11">
+    </div>
+
+    <div>
+        <label>Qualifications *</label>
+        <input name="qualifications" required placeholder="e.g. B.Sc, SSCE, Diploma">
+    </div>
+
+    <div>
+        <label>Guarantor Name *</label>
+        <input name="guarantor" required>
+    </div>
+
+    <!-- EMPLOYMENT -->
+    <div class="form-section-title">Employment Details</div>
+
+    <div>
+        <label>Position *</label>
+        <input name="position" required>
+    </div>
+
+    <div>
+        <label>Monthly Salary (₦) *</label>
+        <input type="number" name="amount_of_salary" step="0.01" min="0" required>
+    </div>
+
+    <div>
+        <label>Date of Employment *</label>
+        <input type="date" name="date_of_employment" required>
+    </div>
+
+    <!-- BANK DETAILS -->
+    <div class="form-section-title">Bank Details</div>
+
+    <div>
+        <label>Bank Name</label>
+        <input name="bank_name">
+    </div>
+
+    <div>
+        <label>Account Number</label>
+        <input id="acc" name="bank_account" maxlength="10">
+    </div>
+
+    <div>
+        <label>Account Name</label>
+        <input name="bank_account_name">
+    </div>
+
+</div>
+
+<!-- BUTTONS -->
+<div class="form-submit no-print">
+    <button type="button" id="printBtn">Print Form</button>
+    <button type="submit">Register Worker</button>
+    <button type="button" class="btn-cancel" onclick="window.history.back()">Cancel</button>
+</div>
+
+</form>
+
+</div>
+
+<!-- ================= SCRIPT ================= -->
+<script>
+// PASSPORT PREVIEW
+document.getElementById('passport')?.addEventListener('change', function(e){
+    const file = e.target.files[0];
+    if(file){
+        if(file.size > 5 * 1024 * 1024) {
+            alert('File too large. Max 5MB allowed.');
+            this.value = '';
+            return;
+        }
+        document.getElementById('passportPreview').src = URL.createObjectURL(file);
+    }
+});
+
+// AGE CALCULATION
+document.getElementById('dob')?.addEventListener('change', function(){
+    let dob = new Date(this.value);
+    if(!isNaN(dob)) {
+        let today = new Date();
+        let age = today.getFullYear() - dob.getFullYear();
+        let monthDiff = today.getMonth() - dob.getMonth();
+        if(monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
+            age--;
+        }
+        document.getElementById('ageDisplay').innerText = age + ' years';
+    }
+});
+
+// NIN VALIDATION
+document.getElementById('nin')?.addEventListener('input', function(){
+    let val = this.value;
+    if(val.length === 11 && /^\d+$/.test(val)){
+        this.classList.add("valid");
+        this.classList.remove("invalid");
+        document.getElementById("ninStatus").innerText = "Valid Format";
+    } else if(val.length > 0) {
+        this.classList.add("invalid");
+        this.classList.remove("valid");
+        document.getElementById("ninStatus").innerText = "Invalid NIN";
+    } else {
+        this.classList.remove("valid", "invalid");
+        document.getElementById("ninStatus").innerText = "Not Verified";
+    }
+});
+
+// ACCOUNT VALIDATION
+document.getElementById('acc')?.addEventListener('input', function(){
+    if(this.value.length >= 10 && /^\d+$/.test(this.value)){
+        this.style.border = "2px solid green";
+    } else if(this.value.length > 0) {
+        this.style.border = "2px solid red";
+    } else {
+        this.style.border = "1px solid #bbb";
+    }
+});
+
+// PRINT FUNCTION
+document.getElementById('printBtn').addEventListener('click', function(e) {
+    const form = document.getElementById('registerForm');
+    const requiredFields = form.querySelectorAll('input[required], select[required], textarea[required]');
+    let empty = false;
+
+    requiredFields.forEach(field => {
+        if(!field.value.trim()) {
+            field.style.border = '2px solid red';
+            empty = true;
+        }
+    });
+
+    if(empty) {
+        alert('Please fill all required fields before printing.');
+        return;
+    }
+
+    {% if not worker %}
+    const printGrid = document.getElementById('printGrid');
+    printGrid.innerHTML = '';
+
+    const fields = [
+        ['Full Name', form.querySelector('[name="name"]').value],
+        ['Phone Number', form.querySelector('[name="phone_number"]').value],
+        ['Email', form.querySelector('[name="email"]').value],
+        ['Date of Birth', form.querySelector('[name="date_of_birth"]').value],
+        ['Gender', form.querySelector('[name="gender"]').value],
+        ['Nationality', form.querySelector('[name="nationality"]').value],
+        ['Ethnic Group', form.querySelector('[name="ethnic_group"]').value],
+        ['Home Address', form.querySelector('[name="home_address"]').value],
+        ['Place of Residence', form.querySelector('[name="place_of_residence"]').value],
+        ['Disability', form.querySelector('[name="disability"]').value || 'None'],
+        ['National ID / NIN', form.querySelector('[name="national_id"]').value],
+        ['Qualifications', form.querySelector('[name="qualifications"]').value],
+        ['Guarantor Name', form.querySelector('[name="guarantor"]').value],
+        ['Position', form.querySelector('[name="position"]').value],
+        ['Monthly Salary', '₦' + form.querySelector('[name="amount_of_salary"]').value],
+        ['Date of Employment', form.querySelector('[name="date_of_employment"]').value],
+        ['Bank Name', form.querySelector('[name="bank_name"]').value],
+        ['Account Number', form.querySelector('[name="bank_account"]').value],
+        ['Account Name', form.querySelector('[name="bank_account_name"]').value]
+    ];
+
+    fields.forEach(([label, value]) => {
+        if(value && value.trim()!== '') {
+            const item = document.createElement('div');
+            item.className = 'print-field';
+            item.innerHTML = `<div class="print-label">${label}</div><div class="print-value">${value}</div>`;
+            printGrid.appendChild(item);
+        }
+    });
+    {% endif %}
+
+    window.print();
+});
+</script>
+
+</body>
+</html>

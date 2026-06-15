@@ -1,0 +1,350 @@
+{% extends 'base.html' %}
+{% block title %}Materials & Inventory | Okoya Food{% endblock %}
+
+{% block content %} 
+<div class="materials-page">
+    <!-- BACK TO DASHBOARD -->
+    <div style="margin-bottom: 15px;">
+        {% if is_admin %} 
+            <a href="{{ url_for('admin.admin_dashboard') }}" class="btn-export">← Back to Admin Dashboard</a>
+        {% else %} 
+            <a href="{{ url_for('secretary.secretary_dashboard') }}" class="btn-export">← Back to Secretary Dashboard</a>
+        {% endif %} 
+    </div>
+
+    <!-- HEADER WITH LOGO -->
+    <header class="page-header"> 
+        <div class="header-left"> 
+            <div class="logo-wrap"> 
+                <img src="{{ url_for('static', filename='logo.png') }}" class="main-company-logo" alt="Okoya Logo"> 
+            </div> 
+            <div class="company-text-block"> 
+                <h1>Materials & Inventory Control</h1> 
+                <p>OKOYA FOOD COMPANY LIMITED • Real-time Stock Management</p> 
+            </div> 
+        </div> 
+        <div class="header-actions"> 
+            <a href="{{ url_for('materials.export_csv') }}" class="btn-export">📊 Export CSV</a>
+            {% if is_admin %} 
+                <button class="btn-primary" onclick="openModal('addMaterialModal')">+ New Material</button>
+            {% endif %} 
+        </div>
+    </header>
+
+    <!-- FLASH MESSAGES -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %} 
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- LOW STOCK ALERTS -->
+    {% if low_stock %} 
+        <div class="alert-banner"> 
+            <strong>⚠ Low Stock Alert:</strong>
+            {% for item in low_stock %} 
+                <span class="alert-item">{{ item.name }}: {{ item.remaining|int if item.remaining == item.remaining|int else '%.2f'|format(item.remaining) }} {{ item.unit }} left</span>
+            {% endfor %} 
+        </div>
+    {% endif %}
+
+    <!-- STATS -->
+    <section class="stats-row"> 
+        <div class="stat-card"> 
+            <small>Total Materials</small> 
+            <h2>{{ materials|length }}</h2> 
+        </div> 
+        <div class="stat-card"> 
+            <small>Low Stock Items</small> 
+            <h2 class="text-danger">{{ low_stock|length }}</h2> 
+        </div> 
+        <div class="stat-card"> 
+            <small>Categories</small> 
+            <h2>{{ categories|length }}</h2> 
+        </div> 
+        <div class="stat-card"> 
+            <small>Access Level</small> 
+            <h2>{% if is_admin %}Full Admin{% else %}Secretary{% endif %}</h2> 
+        </div> 
+    </section>
+
+    <!-- SEARCH + FILTER -->
+    <section class="controls-bar"> 
+        <form method="GET" class="search-form">
+            <input type="text" name="search" placeholder="Search materials, e.g. Cement, Rod..." value="{{ search }}"> 
+            <select name="category"> 
+                <option value="">All Categories</option>
+                {% for cat in categories %} 
+                    <option value="{{ cat }}" {% if cat == selected_category %}selected{% endif %}>{{ cat }}</option>
+                {% endfor %} 
+            </select> 
+            <button type="submit">Filter</button> 
+            <a href="{{ url_for('materials.dashboard') }}" class="btn-reset">Reset</a> 
+        </form>
+    </section>
+
+    <!-- GROUPED TABLES BY CATEGORY -->
+    {% for category, items in grouped.items() %} 
+        <section class="category-section"> 
+            <h3 class="category-title">{{ category }}</h3>
+            <div class="table-wrap"> 
+                <table class="data-table"> 
+                    <thead> 
+                        <tr>
+                            <th>Material</th> 
+                            <th>Total Bought</th> 
+                            <th>Total Used/Sold</th>
+                            <th>Remaining</th> 
+                            <th>Unit</th> 
+                            <th>Status</th> 
+                            <th>Actions</th> 
+                        </tr> 
+                    </thead>
+                    <tbody>
+                        {% for m in items %} 
+                            <tr class="{% if m.is_low_stock %}row-warning{% endif %}"> 
+                                <td><strong>{{ m.name }}</strong></td> 
+                                <td>{{ m.total_in|int if m.total_in == m.total_in|int else '%.2f'|format(m.total_in) }}</td> 
+                                <td>{{ m.total_out|int if m.total_out == m.total_out|int else '%.2f'|format(m.total_out) }}</td> 
+                                <td><strong class="remaining-num">{{ m.remaining|int if m.remaining == m.remaining|int else '%.2f'|format(m.remaining) }}</strong></td> 
+                                <td>{{ m.unit }}</td> 
+                                <td>
+                                    {% if m.is_low_stock %}
+                                        <span class="status-low">Low Stock</span>
+                                    {% else %} 
+                                        <span class="status-ok">In Stock</span>
+                                    {% endif %} 
+                                </td> 
+                                <td class="action-btns">
+                                    {% if is_admin %}
+                                        <button onclick="openTxnModal({{ m.id }}, '{{ m.name }}', '{{ m.unit }}', 'stock_in')" class="btn-small green">Stock In</button>
+                                    {% endif %}
+                                    <button onclick="openTxnModal({{ m.id }}, '{{ m.name }}', '{{ m.unit }}', 'usage')" class="btn-small orange">Log Usage</button>
+                                    <button onclick="openTxnModal({{ m.id }}, '{{ m.name }}', '{{ m.unit }}', 'sale')" class="btn-small blue">Sale</button> 
+                                    <a href="{{ url_for('materials.material_history', material_id=m.id) }}" class="btn-small grey">History</a> 
+                                    <a href="{{ url_for('materials.print_analysis', material_id=m.id) }}" target="_blank" class="btn-small purple">Print</a>
+                                    {% if is_admin %} 
+                                        <form method="POST" action="{{ url_for('materials.delete_material', material_id=m.id) }}" style="display:inline;" onsubmit="return confirm('Delete {{ m.name }}? This will remove the material and ALL its transactions. This cannot be undone.');"> 
+                                            <button type="submit" class="btn-small red">Delete</button>
+                                        </form>
+                                    {% endif %} 
+                                </td> 
+                            </tr>
+                        {% endfor %} 
+                    </tbody> 
+                </table> 
+            </div>
+        </section>
+    {% else %} 
+        <div class="empty-state"> 
+            <p>No materials yet.</p>
+            {% if is_admin %}
+                <button class="btn-primary" onclick="openModal('addMaterialModal')">Add First Material</button>
+            {% endif %} 
+        </div>
+    {% endfor %} 
+</div>
+
+<!-- MODAL: ADD MATERIAL -->
+{% if is_admin %} 
+    <div id="addMaterialModal" class="modal"> 
+        <div class="modal-content"> 
+            <span class="close" onclick="closeModal('addMaterialModal')">&times;</span> 
+            <h3>Add New Material</h3> 
+            <form method="POST" action="{{ url_for('materials.add_material') }}"> 
+                <div class="form-grid"> 
+                    <div class="form-group"> 
+                        <label>Material Name</label>
+                        <input type="text" name="name" placeholder="Cement 50kg, Iron Rod 12mm" required> 
+                    </div> 
+                    <div class="form-group"> 
+                        <label>Unit</label> 
+                        <input type="text" name="unit" placeholder="bags, tons, pieces, kg" required> 
+                    </div>
+                    <div class="form-group"> 
+                        <label>Category</label> 
+                        <input type="text" name="category" placeholder="Construction, Food, Equipment" value="Construction"> 
+                    </div> 
+                    <div class="form-group"> 
+                        <label>Low Stock Alert At</label> 
+                        <input type="number" name="low_stock_threshold" value="10" min="1"> 
+                    </div> 
+                </div> 
+                <button type="submit" class="btn-primary">Add Material</button> 
+            </form> 
+        </div> 
+    </div>
+{% endif %}
+
+<!-- MODAL: TRANSACTION -->
+<div id="txnModal" class="modal"> 
+    <div class="modal-content"> 
+        <span class="close" onclick="closeModal('txnModal')">&times;</span> 
+        <h3 id="txnTitle">Transaction</h3>
+        {% if not is_admin %}
+            <p class="pending-notice">⚠ Entry will be pending until admin verifies</p>
+        {% endif %} 
+        <form method="POST" action="{{ url_for('materials.add_transaction') }}"> 
+            <input type="hidden" name="material_id" id="txn_material_id"> 
+            <input type="hidden" name="type" id="txn_type"> 
+            <div class="form-grid"> 
+                <div class="form-group"> 
+                    <label>Material</label> 
+                    <input type="text" id="txn_material_name" disabled> 
+                </div> 
+                <div class="form-group">
+                    <label>Quantity <span id="txn_unit" class="unit-label"></span></label> 
+                    <input type="number" name="quantity" step="0.01" min="0.01" required> 
+                </div> 
+                <div class="form-group" id="priceGroup"> 
+                    <label>Unit Price ₦</label> 
+                    <input type="number" name="unit_price" step="0.01" min="0"> 
+                </div> 
+                <div class="form-group"> 
+                    <label id="purposeLabel">Purpose</label> 
+                    <input type="text" name="purpose" id="txn_purpose" placeholder="Foundation / Client name / Project">
+                </div> 
+                <div class="form-group"> 
+                    <label>Client/Supplier</label> 
+                    <input type="text" name="client_supplier" id="txn_client_supplier"> 
+                </div> 
+                <div class="form-group"> 
+                    <label>Recorded By</label> 
+                    <input type="text" name="recorded_by_name" id="txn_recorded_by" required> 
+                </div> 
+                <div class="form-group full">
+                    <label>Notes</label> 
+                    <textarea name="notes" rows="2" placeholder="Optional details"></textarea> 
+                </div> 
+            </div> 
+            <button type="submit" class="btn-primary">Save Transaction</button> 
+        </form> 
+    </div> 
+</div>
+
+<style>
+.materials-page {padding:20px;background:#f8fafc;min-height:100vh;font-family:'Poppins',sans-serif}
+.page-header {display:flex;justify-content:space-between;align-items:center;margin-bottom:25px;flex-wrap:wrap;gap:20px;background:#fff;padding:20px;border-radius:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06)}
+.header-left{display:flex;align-items:center;gap:20px}
+.logo-wrap {width:70px;height:70px;background:#fff;border-radius:12px;display:flex;align-items:center;justify-content:center;padding:8px;box-shadow:0 4px 12px rgba(0,0,0,0.1)}
+.main-company-logo{width:100%;height:100%;object-fit:contain}
+.company-text-block h1 {font-size:1.8rem;color:#0f172a;margin:0;font-weight:800}
+.company-text-block p{color:#64748b;margin:5px 0 0;font-size:0.9rem}
+.header-actions{display:flex;gap:10px}
+.btn-primary {background:#16a34a;color:#fff;padding:10px 20px;border:none;border-radius:8px;font-weight:600;cursor:pointer;text-decoration:none;transition:0.2s}
+.btn-primary:hover{background:#15803d;transform:translateY(-1px)}
+.btn-export{background:#fff;color:#0f172a;padding:10px 20px;border:1px solid #cbd5e1;border-radius:8px;font-weight:600;text-decoration:none}
+.btn-export:hover{background:#f1f5f9}
+.btn-small.red{background:#fee2e2;color:#991b1b}
+.btn-small.red:hover{background:#fecaca}
+.alert {padding:12px 16px;border-radius:8px;margin-bottom:15px;font-weight:500}
+.alert-success{background:#d1fae5;color:#065f46;border:1px solid #10b981}
+.alert-error{background:#fee2e2;color:#991b1b;border:1px solid #ef4444}
+.alert-info{background:#dbeafe;color:#1e40af;border:1px solid #3b82f6}
+.alert-banner {background:#fef3c7;border-left:4px solid #f59e0b;padding:15px;border-radius:8px;margin-bottom:20px;color:#92400e}
+.alert-item {display:inline-block;background:#fff;padding:4px 10px;border-radius:6px;margin:5px 5px 0 0;font-size:0.85rem;font-weight:600}
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:15px;margin-bottom:25px}
+.stat-card{background:#fff;padding:20px;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,0.1);border-top:3px solid #16a34a}
+.stat-card small {color:#64748b;font-weight:600;font-size:0.8rem;text-transform:uppercase}
+.stat-card h2{margin:8px 0 0;color:#0f172a;font-size:2rem}
+.text-danger{color:#dc2626!important}
+.controls-bar {background:#fff;padding:15px;border-radius:12px;margin-bottom:20px;box-shadow:0 1px 3px rgba(0,0,0,0.06)}
+.search-form{display:flex;gap:10px;flex-wrap:wrap}
+.search-form input,.search-form select{padding:10px 15px;border:1px solid #cbd5e1;border-radius:8px;font-size:0.9rem;flex:1;min-width:200px}
+.search-form button {padding:10px 20px;background:#0f172a;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600}
+.btn-reset {padding:10px 20px;background:#f1f5f9;color:#475569;border-radius:8px;text-decoration:none;font-weight:600}
+.category-section{margin-bottom:30px}
+.category-title {background:#0f172a;color:#fff;padding:12px 20px;border-radius:10px 10px 0 0;margin:0;font-size:1.1rem}
+.table-wrap{background:#1e293b;border-radius:0 0 12px 12px;overflow-x:auto;box-shadow:0 1px 3px rgba(0,0,0,0.1)}
+.data-table{width:100%;border-collapse:collapse;min-width:900px}
+.data-table thead{background:#0f172a}
+.data-table th{padding:15px;text-align:left;font-weight:700;color:#ffffff;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.5px}
+.data-table td{padding:15px;border-top:1px solid #334155;color:#ffffff;font-size:0.95rem}
+.data-table tbody tr{background:#1e293b}
+.data-table tbody tr:hover{background:#334155}
+.row-warning{background:#78350f}
+.remaining-num{color:#4ade80;font-size:1.05rem}
+.status-ok {color:#16a34a;font-weight:600;background:#dcfce7;padding:4px 12px;border-radius:12px;font-size:0.8rem}
+.status-low {color:#dc2626;font-weight:600;background:#fee2e2;padding:4px 12px;border-radius:12px;font-size:0.8rem}
+.action-btns{display:flex;gap:6px;flex-wrap:wrap}
+.btn-small {padding:6px 12px;border:none;border-radius:6px;font-size:0.8rem;cursor:pointer;text-decoration:none;font-weight:600;transition:0.2s}
+.btn-small.green{background:#dcfce7;color:#166534}
+.btn-small.green:hover{background:#bbf7d0}
+.btn-small.orange{background:#ffedd5;color:#9a3412}
+.btn-small.orange:hover{background:#fed7aa}
+.btn-small.blue{background:#dbeafe;color:#1e40af}
+.btn-small.blue:hover{background:#bfdbfe}
+.btn-small.grey{background:#f1f5f9;color:#475569}
+.btn-small.grey:hover{background:#e2e8f0}
+.btn-small.purple{background:#f3e8ff;color:#6b21a8}
+.btn-small.purple:hover{background:#e9d5ff}
+.empty-state {text-align:center;padding:60px 20px;background:#fff;border-radius:12px}
+.pending-notice {background:#fef3c7;color:#92400e;padding:10px;border-radius:8px;margin-bottom:15px;font-size:0.9rem}
+.unit-label{color:#16a34a;font-weight:600}
+.modal {display:none;position:fixed;z-index:1000;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);overflow-y:auto}
+.modal-content {background:#fff;margin:3% auto;padding:30px;border-radius:16px;width:90%;max-width:650px;position:relative;box-shadow:0 20px 60px rgba(0,0,0,0.3)}
+.close {position:absolute;right:20px;top:15px;font-size:28px;cursor:pointer;color:#94a3b8;font-weight:300}
+.close:hover{color:#0f172a}
+.modal-content h3{margin:0 0 20px;color:#0f172a;font-size:1.5rem}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin:20px 0}
+.form-group{display:flex;flex-direction:column}
+.form-group.full{grid-column:1/-1}
+.form-group label {font-weight:600;color:#475569;margin-bottom:6px;font-size:0.9rem}
+.form-group input,.form-group textarea {padding:11px;border:1px solid #cbd5e1;border-radius:8px;font-size:0.95rem;font-family:inherit}
+.form-group input:focus,.form-group textarea:focus {outline:none;border-color:#16a34a;box-shadow:0 0 0 3px rgba(22,163,74,0.1)}
+@media(max-width:768px){
+.form-grid{grid-template-columns:1fr}
+.page-header{flex-direction:column;align-items:flex-start}
+.header-left{flex-direction:column;align-items:flex-start}
+.data-table{font-size:0.85rem}
+.action-btns{flex-direction:column}
+.btn-small{width:100%;text-align:center} } 
+</style>
+
+<script>
+function openModal(id){
+    document.getElementById(id).style.display='block'
+}
+
+function closeModal(id){
+    document.getElementById(id).style.display='none'
+}
+
+function openTxnModal(materialId, name, unit, type){
+    document.getElementById('txn_material_id').value = materialId;
+    document.getElementById('txn_material_name').value = name;
+    document.getElementById('txn_unit').textContent = unit;
+    document.getElementById('txn_type').value = type;
+    document.getElementById('txn_recorded_by').value = '{{ session.get("username", "") }}';
+
+    let title = 'Stock In', label = 'Supplier', showPrice = true, placeholder = 'Dangote Cement'; 
+    if(type === 'usage'){
+        title = 'Log Usage'; 
+        label = 'Used For'; 
+        showPrice = false; 
+        placeholder='Foundation work, Block molding';
+    } 
+    if(type === 'sale'){
+        title = 'Record Sale'; 
+        label = 'Client Name'; 
+        showPrice = true; 
+        placeholder='Customer name';
+    }
+
+    document.getElementById('txnTitle').textContent = title;
+    document.getElementById('purposeLabel').textContent = label;
+    document.getElementById('priceGroup').style.display = showPrice ? 'block' : 'none'; 
+    document.getElementById('txn_purpose').placeholder = placeholder;
+
+    openModal('txnModal'); 
+}
+
+window.onclick = function(e){ 
+    if (e.target.classList.contains('modal')) {
+        e.target.style.display='none'
+    } 
+}
+</script>
+{% endblock %}

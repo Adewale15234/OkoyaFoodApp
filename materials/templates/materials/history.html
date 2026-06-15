@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+{% block title %}{{ material.name }} History | Okoya Food{% endblock %}
+{% block content %}
+<div class="history-page">
+    <header class="page-header">
+        <div class="header-left">
+            <div class="logo-wrap">
+                <img src="{{ url_for('static', filename='logo.png') }}" class="main-company-logo" alt="Okoya Logo">
+            </div>
+            <div class="company-text-block">
+                <h1>{{ material.name }} Transaction History</h1>
+                <p>Category: {{ material.category }} | Unit: {{ material.unit }} | Remaining: <strong>{{ material.remaining|int if material.remaining == material.remaining|int else '%.2f'|format(material.remaining) }}</strong></p>
+            </div>
+        <div class="header-actions">
+            <a href="{{ url_for('materials.print_analysis', material_id=material.id) }}" target="_blank" class="btn-export">🖨 Print Report</a>
+            <a href="{{ url_for('materials.dashboard') }}" class="btn-primary">Back to Dashboard</a>
+        </div>
+    </header>
+
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Quantity</th>
+                    <th>Unit Price</th>
+                    <th>Total Value</th>
+                    <th>Purpose/Client</th>
+                    <th>Recorded By</th>
+                    <th>Status</th>
+                    {% if is_admin %}<th>Actions</th>{% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for txn in transactions %}
+                <tr class="{% if not txn.is_verified %}row-pending{% endif %}">
+                    <td>{{ txn.date_created.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td><span class="txn-type {{ txn.type }}">{{ txn.type.replace('_', ' ').title() }}</span></td>
+                    <td>{{ txn.quantity|int if txn.quantity == txn.quantity|int else '%.2f'|format(txn.quantity) }} {{ material.unit }}</td>
+                    <td>{% if txn.unit_price %}₦{{ "{:,.2f}".format(txn.unit_price) }}{% else %}-{% endif %}</td>
+                    <td>{% if txn.total_value %}₦{{ "{:,.2f}".format(txn.total_value) }}{% else %}-{% endif %}</td>
+                    <td>{{ txn.purpose or '-' }}<br><small>{{ txn.client_supplier or '' }}</small></td>
+                    <td>{{ txn.recorded_by_name }}</td>
+                    <td>
+                        {% if txn.is_verified %}
+                        <span class="status-verified">✓ Verified</span>
+                        {% else %}
+                        <span class="status-pending">Pending</span>
+                        {% endif %}
+                        {% if txn.is_edited %}<br><small>Edited</small>{% endif %}
+                    </td>
+                    {% if is_admin %}
+                    <td class="action-btns">
+                        {% if not txn.is_verified %}
+                        <form method="POST" action="{{ url_for('materials.verify_transaction', txn_id=txn.id) }}" style="display:inline">
+                            <button type="submit" class="btn-small green">Verify</button>
+                        </form>
+                        {% endif %}
+                        <button onclick="openEditModal({{ txn.id }}, {{ txn.quantity }}, '{{ txn.unit_price or '' }}', '{{ txn.purpose or '' }}', '{{ txn.client_supplier or '' }}')" class="btn-small blue">Edit</button>
+                        <form method="POST" action="{{ url_for('materials.delete_transaction', txn_id=txn.id) }}" style="display:inline" onsubmit="return confirm('Delete this entry?')">
+                            <button type="submit" class="btn-small red">Delete</button>
+                        </form>
+                    </td>
+                    {% endif %}
+                </tr>
+                {% else %}
+                <tr><td colspan="{% if is_admin %}9{% else %}8{% endif %}" class="empty">No transactions yet</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal('editModal')">&times;</span>
+        <h3>Edit Transaction</h3>
+        <form method="POST" id="editForm">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Quantity</label>
+                    <input type="number" name="quantity" id="edit_qty" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label>Unit Price ₦</label>
+                    <input type="number" name="unit_price" id="edit_price" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label>Purpose</label>
+                    <input type="text" name="purpose" id="edit_purpose">
+                </div>
+                <div class="form-group">
+                    <label>Client/Supplier</label>
+                    <input type="text" name="client_supplier" id="edit_client">
+                </div>
+            </div>
+            <button type="submit" class="btn-primary">Save Changes</button>
+        </form>
+    </div>
+</div>
+
+<style>
+.history-page{padding:20px;background:#f8fafc;min-height:100vh}
+.page-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:25px;flex-wrap:wrap;gap:20px;background:#fff;padding:20px;border-radius:16px}
+.header-left{display:flex;align-items:center;gap:20px}
+.logo-wrap{width:70px;height:70px;background:#fff;border-radius:12px;display:flex;align-items:center;justify-content:center;padding:8px;box-shadow:0 4px 12px rgba(0,0,0,0.1)}
+.main-company-logo{width:100%;height:100%;object-fit:contain}
+.company-text-block h1{font-size:1.6rem;color:#0f172a;margin:0;font-weight:800}
+.company-text-block p{color:#64748b;margin:5px 0 0;font-size:0.9rem}
+.header-actions{display:flex;gap:10px}
+.btn-primary,.btn-export{padding:10px 20px;border-radius:8px;font-weight:600;text-decoration:none}
+.btn-primary{background:#16a34a;color:#fff;border:none}
+.btn-export{background:#fff;color:#0f172a;border:1px solid #cbd5e1}
+.table-wrap{background:#fff;border-radius:12px;overflow-x:auto;box-shadow:0 1px 3px rgba(0,0,0,0.1)}
+.data-table{width:100%;border-collapse:collapse;min-width:1000px}
+.data-table thead{background:#f8fafc}
+.data-table th{
+    padding:15px;
+    text-align:left;
+    font-weight:700;
+    color:#ffffff;
+    background:#0f172a;
+    font-size:0.8rem;
+    text-transform:uppercase;
+    letter-spacing:0.5px
+}
+.data-table td{padding:15px;border-top:1px solid #e2e8f0;font-size:0.9rem}
+.row-pending{background:#fffbeb}
+.txn-type{display:inline-block;padding:4px 10px;border-radius:6px;font-size:0.8rem;font-weight:600;text-transform:uppercase}
+.txn-type.stock_in{background:#dcfce7;color:#166534}
+.txn-type.usage{background:#ffedd5;color:#9a3412}
+.txn-type.sale{background:#dbeafe;color:#1e40af}
+.status-verified{color:#16a34a;font-weight:600}
+.status-pending{color:#f59e0b;font-weight:600}
+.action-btns{display:flex;gap:6px;flex-wrap:wrap}
+.btn-small{padding:6px 12px;border:none;border-radius:6px;font-size:0.8rem;cursor:pointer;text-decoration:none;font-weight:600}
+.btn-small.green{background:#dcfce7;color:#166534}
+.btn-small.blue{background:#dbeafe;color:#1e40af}
+.btn-small.red{background:#fee2e2;color:#991b1b}
+.modal{display:none;position:fixed;z-index:1000;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,0.5)}
+.modal-content{background:#fff;margin:5% auto;padding:30px;border-radius:16px;width:90%;max-width:600px;position:relative}
+.close{position:absolute;right:20px;top:15px;font-size:28px;cursor:pointer;color:#94a3b8}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin:20px 0}
+.form-group{display:flex;flex-direction:column}
+.form-group label{font-weight:600;color:#475569;margin-bottom:6px;font-size:0.9rem}
+.form-group input{padding:11px;border:1px solid #cbd5e1;border-radius:8px}
+</style>
+
+<script>
+function closeModal(id){document.getElementById(id).style.display='none'}
+function openEditModal(id, qty, price, purpose, client){
+    document.getElementById('edit_qty').value = qty;
+    document.getElementById('edit_price').value = price;
+    document.getElementById('edit_purpose').value = purpose;
+    document.getElementById('edit_client').value = client;
+    document.getElementById('editForm').action = '/materials/edit/' + id;
+    document.getElementById('editModal').style.display='block';
+}
+window.onclick = function(e){
+    if(e.target.classList.contains('modal')){e.target.style.display='none'}
+}
+</script>
+{% endblock %}

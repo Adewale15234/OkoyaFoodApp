@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AI Offence Review Panel | Okoya HR System</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+<style>
+
+/* =========================
+   GLOBAL PAGE LAYOUT
+========================= */
+body{
+    background: linear-gradient(135deg,#041c10,#065f46,#10b981);
+    font-family: Arial, sans-serif;
+}
+
+/* =========================
+   MAIN CONTAINER
+========================= */
+.review-container {
+    max-width: 1050px;
+    margin: 25px auto;
+    padding: 25px;
+    background: #fff;
+    border-radius: 15px;
+    box-shadow: 0 15px 45px rgba(0,0,0,0.25);
+    border-top: 6px solid #0b5d3b;
+}
+
+/* =========================
+   HEADER
+========================= */
+.official-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    border-bottom: 2px solid #0b5d3b;
+    padding-bottom: 15px;
+}
+
+.company-logo img {
+    height: 95px;
+    width: 95px;
+    object-fit: contain;
+    border-radius: 10px;
+}
+
+.official-header {
+    text-align: center;
+    flex: 1;
+}
+
+.company-name {
+    color: #0b5d3b;
+    font-size: 1.8rem;
+    font-weight: 900;
+}
+
+.company-motto {
+    color: goldenrod;
+    font-weight: bold;
+    font-size: 0.85rem;
+}
+
+.company-address {
+    background: black;
+    color: white;
+    padding: 6px 12px;
+    display: inline-block;
+    border-radius: 6px;
+    font-size: 0.75rem;
+}
+
+/* =========================
+   TITLE
+========================= */
+.page-title {
+    text-align: center;
+    color: #0b5d3b;
+    font-size: 1.6rem;
+    font-weight: 900;
+    margin: 18px 0;
+}
+
+/* =========================
+   WORKER INFO BOX
+========================= */
+.review-box {
+    border: 2px solid #0b5d3b;
+    border-radius: 12px;
+    padding: 18px;
+    background: #f9f9f9;
+    margin-bottom: 20px;
+}
+
+.review-box p {
+    margin: 6px 0;
+    font-weight: 500;
+}
+
+/* =========================
+   SEVERITY BADGE
+========================= */
+.badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.low { background:#dcfce7; color:#166534; }
+.medium { background:#fef3c7; color:#92400e; }
+.high { background:#fee2e2; color:#991b1b; }
+.critical { background:#7f1d1d; color:#fff; }
+
+/* =========================
+   AI REPORT PANEL
+========================= */
+.ai-report {
+    background: #0f172a;
+    color: white;
+    padding: 18px;
+    border-radius: 12px;
+    white-space: pre-wrap;
+    font-size: 0.9rem;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.3);
+}
+
+/* =========================
+   ANALYTICS GRID
+========================= */
+.analysis-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+    margin-top: 18px;
+}
+
+.analysis-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    padding: 14px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+/* =========================
+   WORKFLOW
+========================= */
+.workflow-box{
+    background:#f1f5f9;
+    padding:14px;
+    border-radius:10px;
+    margin-top:18px;
+    border-left:4px solid #0b5d3b;
+    font-weight:600;
+}
+
+/* =========================
+   ACTION BUTTONS
+========================= */
+.button-group {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 25px;
+}
+
+.btn {
+    padding: 10px 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.2s;
+}
+
+.btn:hover{
+    transform: scale(1.05);
+}
+
+.btn-danger { background:#dc2626; color:white; }
+.btn-warning { background:#f59e0b; color:black; }
+.btn-success { background:#16a34a; color:white; }
+.btn-secondary { background:#0b5d3b; color:white; }
+.btn-dark { background:#111827; color:white; }
+
+/* =========================
+   PRINT MODE
+========================= */
+@media print {
+    body{
+        background:white !important;
+    }
+
+    .review-container{
+        width:210mm;
+        min-height:297mm;
+        box-shadow:none;
+        border:none;
+    }
+
+    .no-print{
+        display:none !important;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="review-container">
+
+    <!-- HEADER -->
+    <div class="official-header-row">
+
+        <div class="company-logo">
+            <img src="{{ url_for('static', filename='android-chrome-512x512.png') }}">
+        </div>
+
+        <div class="official-header">
+            <h1 class="company-name">OKOYA FOOD COMPANY LIMITED</h1>
+            <h3 class="company-motto">
+                POVERTY ERADICATION • REDUCE INEQUALITY • LEAVE NO ONE BEHIND
+            </h3>
+            <p class="company-address">
+                KM 7 Idi APA Community, Shaki, Oyo State, Nigeria
+            </p>
+        </div>
+
+    </div>
+
+    <!-- TITLE -->
+    <div class="page-title">
+        AI OFFENCE REVIEW & HR DECISION PANEL
+    </div>
+
+    <!-- WORKER INFO -->
+    <div class="review-box">
+
+        <p><b>Worker Name:</b> {{ worker.name }}</p>
+        <p><b>Worker Code:</b> {{ worker.worker_code }}</p>
+        <p><b>Position:</b> {{ worker.position }}</p>
+
+        <p>
+            <b>Case Severity:</b>
+            <span class="badge {{ severity|default('medium') }}">
+                {{ severity|default('Medium') }}
+            </span>
+        </p>
+
+        <hr>
+
+        <p><b>Reported Reason:</b></p>
+        <p>{{ reason }}</p>
+
+    </div>
+
+    <!-- AI REPORT -->
+    <div class="ai-report">
+        {{ ai_report }}
+    </div>
+
+    <!-- ANALYTICS -->
+    <div class="analysis-grid">
+
+        <div class="analysis-card">
+            <b>Risk Level</b>
+            <p>{{ risk_level | default("Analyzing...") }}</p>
+        </div>
+
+        <div class="analysis-card">
+            <b>Recommendation</b>
+            <p>{{ recommendation | default("Pending AI decision") }}</p>
+        </div>
+
+        <div class="analysis-card">
+            <b>HR Priority</b>
+            <p>{{ priority | default("Normal") }}</p>
+        </div>
+
+    </div>
+
+    <!-- WORKFLOW -->
+    <div class="workflow-box">
+        HR Workflow:
+        <br>
+        Pending → Investigation → Decision → Execution
+    </div>
+
+    <!-- ACTIONS -->
+    <form method="POST" action="{{ url_for('toggle_worker_status', worker_id=worker.id) }}">
+
+        <input type="hidden" name="reason" value="{{ reason }}">
+
+        <div class="button-group no-print">
+
+            <button type="submit" name="action" value="warning" class="btn btn-warning">
+                Issue Warning
+            </button>
+
+            <button type="submit" name="action" value="suspend" class="btn btn-danger">
+                Suspend Worker
+            </button>
+
+            <button type="submit" name="action" value="reinstate" class="btn btn-success">
+                Reinstate
+            </button>
+
+            <button type="button" onclick="window.print()" class="btn btn-dark">
+                Print Report
+            </button>
+
+            <a href="{{ url_for('workers_name') }}">
+                <button type="button" class="btn btn-secondary">
+                    Back
+                </button>
+            </a>
+
+        </div>
+
+    </form>
+
+</div>
+
+</body>
+</html>
