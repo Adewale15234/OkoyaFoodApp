@@ -9,8 +9,13 @@
             </div>
             <div class="company-text-block">
                 <h1>{{ material.name }} Transaction History</h1>
-                <p>Category: {{ material.category }} | Unit: {{ material.unit }} | Remaining: <strong>{{ material.remaining|int if material.remaining == material.remaining|int else '%.2f'|format(material.remaining) }}</strong></p>
+                <p>
+                    Category: {{ material.category }} | 
+                    Unit: {{ material.unit }} | 
+                    Remaining: <strong>{{ material.remaining|int if material.remaining == material.remaining|int else '%.2f'|format(material.remaining) }}</strong> {{ material.unit }}
+                </p>
             </div>
+        </div>
         <div class="header-actions">
             <a href="{{ url_for('materials.print_analysis', material_id=material.id) }}" target="_blank" class="btn-export">🖨 Print Report</a>
             <a href="{{ url_for('materials.dashboard') }}" class="btn-primary">Back to Dashboard</a>
@@ -23,24 +28,30 @@
                 <tr>
                     <th>Date</th>
                     <th>Type</th>
-                    <th>Quantity</th>
-                    <th>Unit Price</th>
-                    <th>Total Value</th>
+                    <th class="text-end">Quantity</th>
+                    <th>Unit</th>
+                    <th class="text-end">Unit Price</th>
+                    <th class="text-end">Total Value</th>
                     <th>Purpose/Client</th>
                     <th>Recorded By</th>
                     <th>Status</th>
+                    <th>Notes</th>
                     {% if is_admin %}<th>Actions</th>{% endif %}
                 </tr>
             </thead>
             <tbody>
                 {% for txn in transactions %}
                 <tr class="{% if not txn.is_verified %}row-pending{% endif %}">
-                    <td>{{ txn.date_created.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td>{{ txn.transaction_date.strftime('%Y-%m-%d') }}<br><small>{{ txn.date_created.strftime('%H:%M') }}</small></td>
                     <td><span class="txn-type {{ txn.type }}">{{ txn.type.replace('_', ' ').title() }}</span></td>
-                    <td>{{ txn.quantity|int if txn.quantity == txn.quantity|int else '%.2f'|format(txn.quantity) }} {{ material.unit }}</td>
-                    <td>{% if txn.unit_price %}₦{{ "{:,.2f}".format(txn.unit_price) }}{% else %}-{% endif %}</td>
-                    <td>{% if txn.total_value %}₦{{ "{:,.2f}".format(txn.total_value) }}{% else %}-{% endif %}</td>
-                    <td>{{ txn.purpose or '-' }}<br><small>{{ txn.client_supplier or '' }}</small></td>
+                    <td class="text-end tabular-nums"><strong>{{ txn.quantity|int if txn.quantity == txn.quantity|int else '%.2f'|format(txn.quantity) }}</strong></td>
+                    <td>{{ material.unit }}</td>
+                    <td class="text-end tabular-nums">{% if txn.unit_price %}₦{{ "{:,.2f}".format(txn.unit_price) }}{% else %}-{% endif %}</td>
+                    <td class="text-end tabular-nums">{% if txn.total_value %}₦{{ "{:,.2f}".format(txn.total_value) }}{% else %}-{% endif %}</td>
+                    <td>
+                        {{ txn.purpose or '-' }}
+                        {% if txn.client_supplier %}<br><small>{{ txn.client_supplier }}</small>{% endif %}
+                    </td>
                     <td>{{ txn.recorded_by_name }}</td>
                     <td>
                         {% if txn.is_verified %}
@@ -48,7 +59,12 @@
                         {% else %}
                         <span class="status-pending">Pending</span>
                         {% endif %}
-                        {% if txn.is_edited %}<br><small>Edited</small>{% endif %}
+                        {% if txn.is_edited %}<br><small class="text-muted">Edited</small>{% endif %}
+                    </td>
+                    <td>
+                        {% if txn.notes %}
+                        <button onclick="viewNotes('{{ txn.notes|e }}', '{{ txn.transaction_date.strftime('%Y-%m-%d') }}')" class="btn-small grey">View</button>
+                        {% else %}-{% endif %}
                     </td>
                     {% if is_admin %}
                     <td class="action-btns">
@@ -57,15 +73,15 @@
                             <button type="submit" class="btn-small green">Verify</button>
                         </form>
                         {% endif %}
-                        <button onclick="openEditModal({{ txn.id }}, {{ txn.quantity }}, '{{ txn.unit_price or '' }}', '{{ txn.purpose or '' }}', '{{ txn.client_supplier or '' }}')" class="btn-small blue">Edit</button>
-                        <form method="POST" action="{{ url_for('materials.delete_transaction', txn_id=txn.id) }}" style="display:inline" onsubmit="return confirm('Delete this entry?')">
+                        <button onclick="openEditModal({{ txn.id }}, {{ txn.quantity }}, '{{ txn.unit_price or '' }}', '{{ txn.purpose|e or '' }}', '{{ txn.client_supplier|e or '' }}', '{{ txn.notes|e or '' }}', '{{ txn.recorded_by_name|e }}')" class="btn-small blue">Edit</button>
+                        <form method="POST" action="{{ url_for('materials.delete_transaction', txn_id=txn.id) }}" style="display:inline" onsubmit="return confirm('Delete this entry? This cannot be undone.')">
                             <button type="submit" class="btn-small red">Delete</button>
                         </form>
                     </td>
                     {% endif %}
                 </tr>
                 {% else %}
-                <tr><td colspan="{% if is_admin %}9{% else %}8{% endif %}" class="empty">No transactions yet</td></tr>
+                <tr><td colspan="{% if is_admin %}11{% else %}10{% endif %}" class="empty">No transactions yet</td></tr>
                 {% endfor %}
             </tbody>
         </table>
@@ -80,12 +96,12 @@
         <form method="POST" id="editForm">
             <div class="form-grid">
                 <div class="form-group">
-                    <label>Quantity</label>
-                    <input type="number" name="quantity" id="edit_qty" step="0.01" required>
+                    <label>Quantity <span class="unit-label">{{ material.unit }}</span></label>
+                    <input type="number" name="quantity" id="edit_qty" step="0.01" min="0.01" required>
                 </div>
                 <div class="form-group">
                     <label>Unit Price ₦</label>
-                    <input type="number" name="unit_price" id="edit_price" step="0.01">
+                    <input type="number" name="unit_price" id="edit_price" step="0.01" min="0">
                 </div>
                 <div class="form-group">
                     <label>Purpose</label>
@@ -95,9 +111,27 @@
                     <label>Client/Supplier</label>
                     <input type="text" name="client_supplier" id="edit_client">
                 </div>
+                <div class="form-group">
+                    <label>Recorded By</label>
+                    <input type="text" name="recorded_by_name" id="edit_recorded_by" required>
+                </div>
+                <div class="form-group full">
+                    <label>Notes</label>
+                    <textarea name="notes" id="edit_notes" rows="3" placeholder="Optional details"></textarea>
+                </div>
             </div>
             <button type="submit" class="btn-primary">Save Changes</button>
         </form>
+    </div>
+</div>
+
+<!-- VIEW NOTES MODAL -->
+<div id="notesModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal('notesModal')">&times;</span>
+        <h3>Transaction Notes</h3>
+        <p id="notesDate" class="text-muted"></p>
+        <div id="notesContent" class="notes-box"></div>
     </div>
 </div>
 
@@ -111,10 +145,11 @@
 .company-text-block p{color:#64748b;margin:5px 0 0;font-size:0.9rem}
 .header-actions{display:flex;gap:10px}
 .btn-primary,.btn-export{padding:10px 20px;border-radius:8px;font-weight:600;text-decoration:none}
-.btn-primary{background:#16a34a;color:#fff;border:none}
+.btn-primary{background:#16a34a;color:#fff;border:none;cursor:pointer}
+.btn-primary:hover{background:#15803d}
 .btn-export{background:#fff;color:#0f172a;border:1px solid #cbd5e1}
 .table-wrap{background:#fff;border-radius:12px;overflow-x:auto;box-shadow:0 1px 3px rgba(0,0,0,0.1)}
-.data-table{width:100%;border-collapse:collapse;min-width:1000px}
+.data-table{width:100%;border-collapse:collapse;min-width:1200px}
 .data-table thead{background:#f8fafc}
 .data-table th{
     padding:15px;
@@ -124,40 +159,72 @@
     background:#0f172a;
     font-size:0.8rem;
     text-transform:uppercase;
-    letter-spacing:0.5px
+    letter-spacing:0.5px;
+    white-space:nowrap;
 }
-.data-table td{padding:15px;border-top:1px solid #e2e8f0;font-size:0.9rem}
+.data-table td{padding:15px;border-top:1px solid #e2e8f0;font-size:0.9rem;vertical-align:top}
+.data-table .text-end{text-align:right}
+.data-table .tabular-nums{font-variant-numeric:tabular-nums}
+.data-table .empty{text-align:center;padding:40px;color:#94a3b8}
 .row-pending{background:#fffbeb}
-.txn-type{display:inline-block;padding:4px 10px;border-radius:6px;font-size:0.8rem;font-weight:600;text-transform:uppercase}
+.txn-type{display:inline-block;padding:4px 10px;border-radius:6px;font-size:0.8rem;font-weight:600;text-transform:uppercase;white-space:nowrap}
 .txn-type.stock_in{background:#dcfce7;color:#166534}
 .txn-type.usage{background:#ffedd5;color:#9a3412}
 .txn-type.sale{background:#dbeafe;color:#1e40af}
 .status-verified{color:#16a34a;font-weight:600}
 .status-pending{color:#f59e0b;font-weight:600}
+.text-muted{color:#94a3b8;font-size:0.8rem}
 .action-btns{display:flex;gap:6px;flex-wrap:wrap}
-.btn-small{padding:6px 12px;border:none;border-radius:6px;font-size:0.8rem;cursor:pointer;text-decoration:none;font-weight:600}
+.btn-small{padding:6px 12px;border:none;border-radius:6px;font-size:0.8rem;cursor:pointer;text-decoration:none;font-weight:600;white-space:nowrap}
 .btn-small.green{background:#dcfce7;color:#166534}
+.btn-small.green:hover{background:#bbf7d0}
 .btn-small.blue{background:#dbeafe;color:#1e40af}
+.btn-small.blue:hover{background:#bfdbfe}
 .btn-small.red{background:#fee2e2;color:#991b1b}
-.modal{display:none;position:fixed;z-index:1000;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,0.5)}
-.modal-content{background:#fff;margin:5% auto;padding:30px;border-radius:16px;width:90%;max-width:600px;position:relative}
-.close{position:absolute;right:20px;top:15px;font-size:28px;cursor:pointer;color:#94a3b8}
+.btn-small.red:hover{background:#fecaca}
+.btn-small.grey{background:#f1f5f9;color:#475569}
+.btn-small.grey:hover{background:#e2e8f0}
+.modal{display:none;position:fixed;z-index:1000;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);overflow-y:auto}
+.modal-content{background:#fff;margin:5% auto;padding:30px;border-radius:16px;width:90%;max-width:600px;position:relative;box-shadow:0 20px 60px rgba(0,0,0,0.3)}
+.close{position:absolute;right:20px;top:15px;font-size:28px;cursor:pointer;color:#94a3b8;font-weight:300}
+.close:hover{color:#0f172a}
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin:20px 0}
 .form-group{display:flex;flex-direction:column}
+.form-group.full{grid-column:1/-1}
 .form-group label{font-weight:600;color:#475569;margin-bottom:6px;font-size:0.9rem}
-.form-group input{padding:11px;border:1px solid #cbd5e1;border-radius:8px}
+.form-group input,.form-group textarea{padding:11px;border:1px solid #cbd5e1;border-radius:8px;font-size:0.95rem;font-family:inherit}
+.form-group input:focus,.form-group textarea:focus{outline:none;border-color:#16a34a;box-shadow:0 0 0 3px rgba(22,163,74,0.1)}
+.unit-label{color:#16a34a;font-weight:600}
+.notes-box{background:#f8fafc;padding:15px;border-radius:8px;border:1px solid #e2e8f0;white-space:pre-wrap;word-wrap:break-word;margin-top:10px}
+@media(max-width:768px){
+.form-grid{grid-template-columns:1fr}
+.page-header{flex-direction:column;align-items:flex-start}
+.header-left{flex-direction:column;align-items:flex-start}
+.action-btns{flex-direction:column}
+.btn-small{width:100%;text-align:center}
+}
 </style>
 
 <script>
 function closeModal(id){document.getElementById(id).style.display='none'}
-function openEditModal(id, qty, price, purpose, client){
+
+function openEditModal(id, qty, price, purpose, client, notes, recordedBy){
     document.getElementById('edit_qty').value = qty;
     document.getElementById('edit_price').value = price;
     document.getElementById('edit_purpose').value = purpose;
     document.getElementById('edit_client').value = client;
+    document.getElementById('edit_notes').value = notes;
+    document.getElementById('edit_recorded_by').value = recordedBy;
     document.getElementById('editForm').action = '/materials/edit/' + id;
     document.getElementById('editModal').style.display='block';
 }
+
+function viewNotes(notes, date){
+    document.getElementById('notesContent').textContent = notes;
+    document.getElementById('notesDate').textContent = 'Date: ' + date;
+    document.getElementById('notesModal').style.display='block';
+}
+
 window.onclick = function(e){
     if(e.target.classList.contains('modal')){e.target.style.display='none'}
 }
